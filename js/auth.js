@@ -1,40 +1,3 @@
-/*async function login() {
-
-
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    try {
-        const response = await fetch('https://localhost:7219/api/Auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email,
-                password
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
-        }
-
-        const data = await response.json();
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('role', data.user.role); // تخزين الدور
-        localStorage.setItem('email', JSON.stringify(data.user.email)); // تخزين الصلاحيات
-
-
-        // توجيه للداشبورد
-        window.location.href = 'dashboard.html';
-    } catch (error) {
-        document.getElementById('error-message').textContent = error.message;
-    }
-}
-*/
-
-
 function parseJwt(token) {
     try {
         if (!token) throw new Error('No token provided');
@@ -116,10 +79,11 @@ async function login() {
 
         // حفظ بيانات المستخدم
         localStorage.setItem('userData', JSON.stringify({
+            fullName: data.user.fullName,
+            userId: data.user.id,
             email: decodedToken.email,
             role: decodedToken.role,
-            fullName: decodedToken.fullName,
-            userId: decodedToken.userId
+
         }));
 
 
@@ -128,7 +92,7 @@ async function login() {
         redirectBasedOnRole(decodedToken.role);
 
     } catch (error) {
-        hideLoader();
+        // hideLoader();
         errorElement.textContent = error.message;
         console.error('Login error:', error);
     }

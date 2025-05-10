@@ -118,7 +118,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="./Doctor/Doctors.html" class="nav-link">
+                            <a href="./Prescription/CreatePrescription.html" oc class="nav-link">
                                 <i class="nav-icon fas fa-file-medical"></i>
                                 <p>إنشاء وصفة</p>
                             </a>
@@ -326,6 +326,8 @@
     <script>
         checkAccess(['Doctor'], '../../shared/unauthorized.html');
         getUserName();
+        getDactorByUserId();
+
 
         $(document).ready(function() {
             // إغلاق القائمة الجانبية تلقائياً على الهواتف

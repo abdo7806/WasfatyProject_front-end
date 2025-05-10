@@ -51,3 +51,40 @@ function getUserName() {
     role[1].textContent = userData.role;
 
 }
+
+
+async function getDactorByUserId() {
+
+    const userData = JSON.parse(localStorage.getItem("userData"));
+
+    let userId = userData.userId;
+
+    const response = await fetch(`https://localhost:7219/api/Doctor/GetDoctorByUserId/${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+
+    });
+
+    // إخفاء مؤشر تحميل
+
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'البريد الإلكتروني أو كلمة المرور غير صحيحة');
+
+    }
+
+    const data = await response.json();
+
+    console.log(data);
+    localStorage.setItem('doctorData', JSON.stringify({
+        id: data.id,
+        medicalCenter: data.medicalCenter,
+        specialization: data.specialization,
+        licenseNumber: data.licenseNumber,
+
+    }));
+}
