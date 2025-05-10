@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>تعديل مستخدم</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="alert alert-danger" id="error-message" style="display: none;" role="alert"></div>
+
+        <h2>تعديل مستخدم</h2>
+        <form id="editUserForm">
+            <div class="form-group">
+                <label for="fullName">الاسم بالكامل:</label>
+                <input type="text" id="fullName" class="form-control" placeholder="الاسم الكامل" required />
+                <div id="fullNameError" class="text-danger"></div>
+            </div>
+            <div class="form-group">
+                <label for="email">البريد الإلكتروني:</label>
+                <input type="email" id="email" class="form-control" placeholder="البريد الإلكتروني" required />
+                <div id="emailError" class="text-danger"></div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label class="form-label">اختر الدور</label>
+                <select class="form-control" id="role" required>
+                    <option selected disabled>اختر الدور</option>
+                    <option value="3">مريض</option>
+                    <option value="2">طبيب</option>
+                    <option value="4">صيدلي</option>
+                    <option value="1">مدير</option>
+                </select>
+                <div id="roleError" class="text-danger"></div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="updateUser()">تحديث المستخدم</button>
+            <a href="User.html" class="btn btn-secondary">رجوع</a>
+        </form>
+    </div>
+    <script src="../../../js/users.js"></script>
+    <script src="../../../js/checkAccess.js"></script>
+
+    <!-- Custom Scripts -->
+    <script>
+        checkAccess(['Admin'], '../../../shared/unauthorized.html');
+        // دالة لتحميل بيانات المستخدم
+        async function loadUserData(userId) {
+            try {
+                const response = await fetch(`https://localhost:7219/api/User/${userId}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                const user = await response.json();
+                document.getElementById('fullName').value = user.fullName;
+                document.getElementById('email').value = user.email;
+                document.getElementById('role').value = user.role;
+            } catch (error) {
+                console.error('خطأ في تحميل بيانات المستخدم:', error);
+            }
+        }
+
+        function validateForm() {
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const role = document.getElementById('role').value;
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            // إعادة تعيين رسائل الخطأ
+            document.getElementById('fullNameError').textContent = '';
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('roleError').textContent = '';
+
+            let isValid = true;
+
+            if (!fullName) {
+                document.getElementById('fullNameError').textContent = 'الاسم الكامل مطلوب!';
+                isValid = false;
+            }
+            if (!email) {
+                document.getElementById('emailError').textContent = 'البريد الإلكتروني مطلوب!';
+                isValid = false;
+            } else if (!emailPattern.test(email)) {
+                document.getElementById('emailError').textContent = 'يرجى إدخال بريد إلكتروني صحيح.';
+                isValid = false;
+            }
+            if (!role) {
+                document.getElementById('roleError').textContent = 'يجب اختيار دور!';
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+
+        $(document).ready(function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('id'); // الحصول على القيمة المرتبطة بمفتاح 'id'
+
+            if (userId) {
+                loadUserData(userId); // استدعاء دالة تحميل بيانات المستخدم
+            } else {
+                alert('معرف المستخدم غير موجود في عنوان URL.');
+            }
+        });
+    </script>
+</body>
+
+</html>

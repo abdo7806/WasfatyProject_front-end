@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض الوصفات الطبية</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+        }
+        
+        .table-container {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container table-container">
+        <h2>قائمة الوصفات الطبية</h2>
+
+        <!-- حقل البحث -->
+        <div class="mb-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="بحث عن الوصفة..." oninput="searchPrescriptions()">
+        </div>
+
+        <a href="CreatePrescription.html" class="btn btn-primary mb-3">إنشاء وصفة جديدة</a>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>رقم الوصفة</th>
+                    <th>اسم المريض</th>
+                    <th>اسم الطبيب</th>
+                    <th>عدد الادوية في الوصفة</th>
+                    <th>تاريخ الإنشاء</th>
+                    <th>هل تم الصرف؟</th>
+                    <th>أزرار</th>
+                </tr>
+            </thead>
+            <tbody id="prescription-table-body">
+                <!-- سيتم ملء هذا الجزء من الجدول عبر JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // تخزين الوصفات في المتغير لتصفية البحث لاحقاً
+        let prescriptions = [];
+
+        async function loadPrescriptions() {
+            try {
+                // استبدل الرابط هنا برابط الـ API الخاص بك
+                const response = await fetch('https://localhost:7219/api/Prescription/All');
+                prescriptions = await response.json(); // تخزين البيانات في المتغير
+
+                displayPrescriptions(prescriptions); // عرض الوصفات
+            } catch (error) {
+                console.error('حدث خطأ أثناء جلب البيانات:', error);
+            }
+        }
+
+        // عرض الوصفات في الجدول
+        function displayPrescriptions(data) {
+            const tableBody = document.getElementById('prescription-table-body');
+            tableBody.innerHTML = ''; // مسح الجدول قبل إضافة البيانات الجديدة
+
+            data.forEach(prescription => {
+                const row = document.createElement('tr');
+
+                // إضافة بيانات الوصفة
+                row.innerHTML = `
+                    <td>${prescription.id}</td>
+                    <td>${prescription.patient.user.fullName}</td>
+                    <td>${prescription.doctor.user.fullName}</td>
+                    <td>${prescription.prescriptionItems.length}</td>
+                    <td>${new Date(prescription.issuedDate).toLocaleDateString()}</td>
+                    <td>${prescription.isDispensed ? 'نعم' : 'لا'}</td>
+                    <td>
+
+                        <a href="./DetailsPrescription.html?id=${prescription.id}" class="btn btn-info btn-sm">عرض التفاصيل</a>
+                        <a href="./EditPrescription.html?id=${prescription.id}" class="btn btn-warning btn-sm" >تعديل</a>
+                        <button class="btn btn-danger btn-sm" onclick="deletePrescription(${prescription.id})">حذف</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // تابع لعرض تفاصيل الوصفة
+        /*  function viewPrescription(prescriptionId) {
+            //  alert('عرض تفاصيل الوصفة رقم: ' + prescriptionId);
+            // يمكن توجيه المستخدم إلى صفحة تفاصيل الوصفة
+            // window.location.href = `/prescriptions/${prescriptionId}`;
+        }*/
+
+        // تصفية الوصفات بناءً على البحث
+        function searchPrescriptions() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const filteredPrescriptions = prescriptions.filter(prescription => {
+                return (
+                    prescription.id.toString().includes(searchInput) ||
+                    prescription.patient.user.fullName.toLowerCase().includes(searchInput) ||
+                    prescription.doctor.user.fullName.toLowerCase().includes(searchInput) ||
+                    prescription.prescriptionItems.length.toString().includes(searchInput)
+                );
+            });
+
+            displayPrescriptions(filteredPrescriptions); // عرض النتائج بعد التصفية
+        }
+
+        // تحميل الوصفات عند تحميل الصفحة
+        window.onload = loadPrescriptions;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

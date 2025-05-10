@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <title>تعديل صرف دواء</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        body {
+            direction: rtl;
+            background-color: #f8f9fa;
+        }
+
+        .select2-container--default .select2-selection--single {
+            height: 38px;
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .medication-item {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body class="container mt-5">
+
+    <h2 class="mb-4">تعديل صرف دواء</h2>
+
+    <div id="message" class="mt-3"></div>
+
+    <form id="dispenseForm">
+        <input type="hidden" id="dispenseId">
+        <!-- لإخفاء معرف الصرف -->
+
+        <div class="mb-3">
+            <label for="prescriptionId" class="form-label">رقم الوصفة</label>
+            <input type="number" class="form-control" id="prescriptionId" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="pharmacySelect" class="form-label">الصيدلية</label>
+            <select id="pharmacySelect" class="form-select" required></select>
+        </div>
+
+        <div class="mb-3">
+            <label for="pharmacistSelect" class="form-label">الصيدلي</label>
+            <select id="pharmacistSelect" class="form-select" required></select>
+        </div>
+
+        <div class="mb-3">
+            <label for="dispensedDate" class="form-label">تاريخ الصرف</label>
+            <input type="date" class="form-control" id="dispensedDate" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">تحديث</button>
+        <a href="./DispenseRecords.html" class="btn btn-secondary">رجوع</a>
+    </form>
+
+
+
+    <div class="container mt-5" id="prescriptionInfo">
+        <h2 class="mb-4 text-center text-primary">💊 تفاصيل الوصفة الطبية</h2>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title text-success">معلومات الوصفة</h5>
+                <p><strong>رقم الوصفة:</strong> <span id="prescription-id" class="badge bg-secondary"></span></p>
+                <p><strong>المريض:</strong> <span id="patient-name"></span></p>
+                <p><strong>الطبيب:</strong> <span id="doctor-name"></span></p>
+                <p><strong>هل الوصفة مصروفة:</strong> <span id="isDispensed"></span></p>
+                <p><strong>تاريخ الإنشاء:</strong> <span id="created-at"></span></p>
+            </div>
+        </div>
+
+        <h4 class="mb-3 text-info">📝 قائمة الأدوية</h4>
+        <div id="medication-list" class="mb-3"></div>
+
+
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="../../../js/checkAccess.js"></script>
+
+    <!-- Custom Scripts -->
+    <script>
+        checkAccess(['Admin'], '../../../shared/unauthorized.html');
+
+        $(document).ready(function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dispenseId = urlParams.get('id'); // جلب ID من الرابط
+
+            if (!dispenseId) {
+                $('#message').html('<div class="alert alert-danger">لم يتم تحديد سجل الصرف للتعديل</div>');
+                return;
+            }
+
+            $('#dispenseId').val(dispenseId);
+
+            // تحميل الصيدليات
+
+            $.ajax({
+                url: 'https://localhost:7219/api/Pharmacy/All',
+                type: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token') // أضف التوكن إلى الهيدر
+                },
+                success: function(pharmacies) {
+                    const pharmacyData = pharmacies.map(p => ({
+                        id: p.id,
+                        text: p.name
+                    }));
+                    $('#pharmacySelect').select2({
+                        data: pharmacyData,
+                        placeholder: 'اختر الصيدلية',
+                        allowClear: true
+                    });
+                },
+                error: function() {
+                    $('#message').html('<div class="alert alert-danger">فشل في تحميل الصيدليات</div>');
+                }
+            });
+
+            // تحميل الصيادلة
+
+            $.ajax({
+                url: 'https://localhost:7219/api/Pharmacist/All',
+                type: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token') // أضف التوكن إلى الهيدر
+                },
+                success: function(pharmacists) {
+                    const pharmacistData = pharmacists.map(p => ({
+                        id: p.id,
+                        text: p.user ? p.user.fullName : ''
+                    }));
+                    $('#pharmacistSelect').select2({
+                        data: pharmacistData,
+                        placeholder: 'اختر الصيدلي',
+                        allowClear: true
+                    });
+                },
+                error: function() {
+                    $('#message').html('<div class="alert alert-danger">فشل في تحميل الصيادلة</div>');
+                }
+            });
+
+
+            // تحميل سجل الصرف
+            $.ajax({
+                url: `https://localhost:7219/api/DispenseRecord/${dispenseId}`,
+                type: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token') // أضف التوكن إلى الهيدر
+                },
+                success: function(dispense) {
+                    $('#prescriptionId').val(dispense.prescriptionId);
+                    $('#pharmacySelect').val(dispense.pharmacyId).trigger('change');
+                    $('#pharmacistSelect').val(dispense.pharmacistId).trigger('change');
+                    $('#dispensedDate').val(dispense.dispensedDate.split('T')[0]); // لتنسيق التاريخ
+
+                    // تحميل الوصفة
+                    $.ajax({
+                        url: `https://localhost:7219/api/Prescription/${dispense.prescriptionId}`,
+                        type: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer ' + localStorage.getItem('token') // أضف التوكن إلى الهيدر
+                        },
+                        success: function(prescription) {
+                            if (!prescription) {
+                                $('#prescriptionInfo').html('<div class="alert alert-danger">الوصفة غير موجودة</div>');
+                                return;
+                            }
+
+                            $('#prescription-id').text(`${prescription.id}`);
+                            $('#patient-name').text(`${prescription.patient.user.fullName}`);
+                            $('#doctor-name').text(`${prescription.doctor.user.fullName}`);
+                            $('#isDispensed').text(`${prescription.isDispensed ? 'نعم' : 'لا'}`);
+                            $('#created-at').text(`${new Date(prescription.issuedDate).toLocaleDateString('ar-EG')}`);
+
+                            let html = "";
+                            prescription.prescriptionItems.forEach(item => {
+                                html += `
+                        <div id="medication-item" class="mb-3">
+                            <h6><span class="badge bg-primary">${item.medicationId}</span></h6>
+                            <p>💊 <strong>جرعة:</strong> ${item.dosage}</p>
+                            <p>⏰ <strong>مرات يومية:</strong> ${item.frequency}</p>
+                            <p>📅 <strong>مدة:</strong> ${item.duration} يوم</p>
+                        </div>`;
+                            });
+
+                            $('#medication-list').html(html);
+                        },
+                        error: function() {
+                            $('#prescriptionInfo').html('<div class="alert alert-danger">فشل في جلب بيانات الوصفة</div>');
+                        }
+                    });
+                },
+                error: function() {
+                    $('#message').html('<div class="alert alert-danger">فشل في تحميل بيانات سجل الصرف</div>');
+                }
+            });
+
+
+            // إرسال النموذج للتحديث
+            $('#dispenseForm').on('submit', function(e) {
+                e.preventDefault();
+
+                const data = {
+                    id: parseInt($('#dispenseId').val()),
+                    prescriptionId: parseInt($('#prescriptionId').val()),
+                    pharmacyId: parseInt($('#pharmacySelect').val()),
+                    pharmacistId: parseInt($('#pharmacistSelect').val()),
+                    dispensedDate: $('#dispensedDate').val()
+                };
+
+                $.ajax({
+                    url: `https://localhost:7219/api/DispenseRecord/${dispenseId}`,
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token') // أضف التوكن إلى الهيدر
+                    },
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function() {
+                        $('#message').html('<div class="alert alert-success">تم التحديث بنجاح!</div>');
+                    },
+                    error: function(xhr) {
+                        $('#message').html('<div class="alert alert-danger">حدث خطأ أثناء التحديث: ' + xhr.responseText + '</div>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

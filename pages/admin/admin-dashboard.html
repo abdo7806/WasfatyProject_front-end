@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <title>لوحة التحكم | نظام وصفتي الإلكتروني</title>
+    <!-- [Meta] -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="نظام إدارة الوصفات الطبية الإلكترونية">
+    <meta name="keywords" content="وصفتي, وصفات طبية, إدارة صيدليات, نظام أطباء">
+    <meta name="author" content="وصفتي">
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tajawal:400,500,700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+
+    <!-- Custom RTL Styles -->
+    <style>
+        body {
+            font-family: 'Tajawal', 'Source Sans Pro', sans-serif;
+        }
+        /* تحسينات للقائمة الجانبية */
+
+        .main-sidebar {
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar {
+            padding-right: 0;
+        }
+        /* تحسينات للبطاقات الإحصائية */
+
+        .small-box {
+            transition: all 0.3s ease;
+        }
+
+        .small-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .small-box .icon {
+            left: 10px;
+            right: auto;
+            font-size: 70px;
+            top: 15px;
+        }
+
+        .small-box .inner {
+            padding: 10px 20px 10px 80px;
+        }
+        /* تحسينات للشريط العلوي */
+
+        .navbar-nav {
+            padding-right: 0;
+        }
+        /* تحسينات للهواتف */
+
+        @media (max-width: 767.98px) {
+            .main-sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar-collapse .main-sidebar {
+                transform: translateX(0);
+            }
+            .brand-text {
+                font-size: 1rem;
+            }
+            .small-box .inner {
+                padding: 10px 15px 10px 70px;
+            }
+            .small-box .icon {
+                font-size: 60px;
+            }
+        }
+        /* تحسينات للجدول الزمني */
+
+        @media (max-width: 991.98px) {
+            .content-wrapper {
+                padding-top: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+
+
+    <div class="wrapper">
+
+        <!-- Pre-loader -->
+        <div class="preloader flex-column justify-content-center align-items-center">
+            <img class="animation__shake" src="../../dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+        </div>
+
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="./admin-dashboard.html" class="nav-link">الرئيسية</a>
+                </li>
+            </ul>
+
+            <!-- Right navbar links -->
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="far fa-bell"></i>
+                        <span class="badge badge-warning navbar-badge">15</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-left">
+                        <span class="dropdown-item dropdown-header">15 إشعار</span>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-prescription-bottle-alt ml-2"></i> 5 وصفات جديدة
+                            <span class="float-left text-muted text-sm">منذ 3 دقائق</span>
+                        </a>
+                    </div>
+                </li>
+
+
+                <!-- زر حساب المستخدم -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="d-none d-md-inline">حسابي</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-left">
+                        <div class="dropdown-item text-center">
+                            <p class="mb-0 mt-2 EmailUser">أحمد محمد</p>
+                            <small class="RoleUser">مدير النظام</small>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-user-cog ml-2"></i> إعدادات الحساب
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-lock ml-2"></i> تغيير كلمة المرور
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" onclick="logout('../auth/login.html')" class="dropdown-item text-danger">
+                            <i class="fas fa-sign-out-alt ml-2"></i> تسجيل الخروج
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
+            <a href="admin-dashboard.html" class="brand-link text-center">
+                <img src="../../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">نظام وصفتي</span>
+            </a>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+
+                <!-- معلومات المستخدم -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+
+                    <div class="info">
+                        <a href="#" class="d-block EmailUser">أحمد محمد</a>
+                        <small class="text-muted RoleUser">مدير النظام</small>
+                    </div>
+                </div>
+
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <li class="nav-item">
+
+                            <a href="./Users/User.html" class="nav-link">
+                                <i class="nav-icon fas fa-users"></i>
+
+                                <p>المستخدمون</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="./Doctor/Doctors.html" class="nav-link">
+                                <i class="nav-icon fas fa-user-md"></i>
+                                <p>الأطباء</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="./Patients/Patient.html" class="nav-link">
+                                <i class="nav-icon fas fa-procedures"></i>
+                                <p>المرضى</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="./Pharmacy/Pharmacys.html" class="nav-link">
+                                <i class="nav-icon fas fa-medkit"></i>
+                                <p>الصيدليات</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="./MedicalCenter/MedicalCenters.html" class="nav-link">
+                                <i class="nav-icon fas fa-hospital"></i>
+                                <p>المراكز الطبية</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="./Pharmacist/Pharmacists.html" class="nav-link">
+                                <i class="nav-icon fas fa-user"></i>
+                                <p>الصيادلة</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="./Medication/Medications.html" class="nav-link">
+                                <i class="nav-icon fas fa-pills"></i>
+                                <p>الأدوية</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="./Prescription/Prescriptions.html" class="nav-link">
+                                <i class="nav-icon fas fa-file-medical"></i>
+                                <p>الوصفات الطبية</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="./PrescriptionItem/PrescriptionItems.html" class="nav-link">
+                                <i class="nav-icon fas fa-list"></i>
+                                <p>عناصر الوصفة</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="./DispenseRecord/DispenseRecords.html" class="nav-link">
+                                <i class="nav-icon fas fa-clipboard-list"></i>
+                                <p>سجلات الصرف</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Content Header -->
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">لوحة تحكم المدير</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-left">
+                                <li class="breadcrumb-item"><a href="index.html">الرئيسية</a></li>
+                                <li class="breadcrumb-item active">لوحة التحكم</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="content">
+                <div class="container-fluid">
+                    <!-- Small Boxes -->
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
+                            <div class="small-box bg-info h-100">
+                                <div class="inner">
+                                    <h3 id="doctors-count">125</h3>
+                                    <p>الأطباء المسجلين</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                                <a href="#" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
+                            <div class="small-box bg-success h-100">
+                                <div class="inner">
+                                    <h3 id="pharmacists-count">78</h3>
+                                    <p>الصيادلة المسجلين</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-user-nurse"></i>
+                                </div>
+                                <a href="#" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
+                            <div class="small-box bg-warning h-100">
+                                <div class="inner">
+                                    <h3 id="patients-count">2,450</h3>
+                                    <p>المرضى المسجلين</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-procedures"></i>
+                                </div>
+                                <a href="#" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
+                            <div class="small-box bg-danger h-100">
+                                <div class="inner">
+                                    <h3 id="prescriptions-count">1,850</h3>
+                                    <p>الوصفات الشهرية</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-prescription-bottle-alt"></i>
+                                </div>
+                                <a href="#" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Row -->
+                    <div class="row">
+                        <!-- يمكنك إضافة المزيد من المحتوى هنا -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="main-footer text-center text-md-right">
+            <strong>Copyright &copy; 2023 <a href="#">نظام وصفتي الإلكتروني</a>.</strong> جميع الحقوق محفوظة
+            <div class="float-left d-none d-sm-inline-block">
+                <b>الإصدار</b> 1.0.0
+            </div>
+        </footer>
+    </div>
+
+    <!-- REQUIRED SCRIPTS -->
+    <!-- jQuery -->
+    <script src="../../plugins/jquery/jquery.min.js"></script>
+
+    <!-- Bootstrap 4 -->
+    <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- AdminLTE App -->
+    <script src="../../dist/js/adminlte.min.js"></script>
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/checkAccess.js"></script>
+
+    <!-- Custom Scripts -->
+    <script>
+        checkAccess(['Admin'], '../../shared/unauthorized.html');
+        getUserName();
+        $(document).ready(function() {
+            // إغلاق القائمة الجانبية تلقائياً على الهواتف
+            if ($(window).width() < 768) {
+                $('body').addClass('sidebar-collapse');
+            }
+
+            // تحديث الإحصائيات (يمكن استبدالها ببيانات حقيقية)
+            function updateStats() {
+                // هنا يمكنك إضافة كود AJAX لجلب البيانات الحقيقية
+                $('#doctors-count').text('125');
+                $('#pharmacists-count').text('78');
+                $('#patients-count').text('2,450');
+                $('#prescriptions-count').text('1,850');
+            }
+            updateStats();
+
+            // إعادة حساب الأبعاد عند تغيير حجم النافذة
+            $(window).resize(function() {
+                if ($(window).width() < 768) {
+                    $('body').addClass('sidebar-collapse');
+                } else {
+                    $('body').removeClass('sidebar-collapse');
+                }
+            });
+        });
+    </script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>تعديل الدواء</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="alert" id="error-message" style="display: none;" role="alert"></div>
+
+        <h2>تعديل الدواء</h2>
+        <form id="editMedicationForm">
+            <div class="form-group">
+                <label for="name">اسم الدواء:</label>
+                <input type="text" id="name" class="form-control" placeholder="اسم الدواء" />
+                <div id="nameError" class="text-danger"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">الوصف:</label>
+                <textarea id="description" class="form-control" placeholder="وصف الدواء"></textarea>
+                <div id="descriptionError" class="text-danger"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="dosageForm">شكل الجرعة:</label>
+                <input type="text" id="dosageForm" class="form-control" placeholder="مثال: أقراص، شراب" />
+                <div id="dosageFormError" class="text-danger"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="strength">التركيز:</label>
+                <input type="text" id="strength" class="form-control" placeholder="مثال: 500mg" />
+                <div id="strengthError" class="text-danger"></div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="updateMedication()">حفظ التعديلات</button>
+            <a href="Medications.html" class="btn btn-secondary">رجوع</a>
+        </form>
+    </div>
+
+
+
+
+    <script src="../../../js/Medication.js">
+    </script>
+
+    <script src="../../../js/checkAccess.js"></script>
+
+    <!-- Custom Scripts -->
+    <script>
+        checkAccess(['Admin'], '../../../shared/unauthorized.html');
+
+        const medicationId = new URLSearchParams(window.location.search).get('id');
+
+        async function loadMedication() {
+            try {
+                const response = await fetch(`https://localhost:7219/api/Medication/${medicationId}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                });
+                if (!response.ok) {
+                    throw new Error('فشل في جلب بيانات الدواء');
+                }
+                const medication = await response.json();
+                document.getElementById('name').value = medication.name;
+                document.getElementById('description').value = medication.description;
+                document.getElementById('dosageForm').value = medication.dosageForm;
+                document.getElementById('strength').value = medication.strength;
+            } catch (error) {
+                document.getElementById('error-message').style.display = "block";
+                document.getElementById('error-message').textContent = error.message;
+            }
+        }
+
+        function validateForm() {
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
+            const dosageForm = document.getElementById('dosageForm').value;
+            const strength = document.getElementById('strength').value;
+
+            document.getElementById('nameError').textContent = '';
+            document.getElementById('descriptionError').textContent = '';
+            document.getElementById('dosageFormError').textContent = '';
+            document.getElementById('strengthError').textContent = '';
+
+            let isValid = true;
+
+            if (!name) {
+                document.getElementById('nameError').textContent = 'اسم الدواء مطلوب!';
+                isValid = false;
+            }
+            if (!description) {
+                document.getElementById('descriptionError').textContent = 'الوصف مطلوب!';
+                isValid = false;
+            }
+            if (!dosageForm) {
+                document.getElementById('dosageFormError').textContent = 'شكل الجرعة مطلوب!';
+                isValid = false;
+            }
+            if (!strength) {
+                document.getElementById('strengthError').textContent = 'التركيز مطلوب!';
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+
+        // تحميل بيانات الدواء عند فتح الصفحة
+        loadMedication();
+    </script>
+</body>
+
+</html>

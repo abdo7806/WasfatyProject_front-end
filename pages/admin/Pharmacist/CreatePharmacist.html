@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>إضافة صيدلي جديد</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="alert alert-danger" id="error-message" style="display: none;" role="alert"></div>
+
+        <h2 class="my-4">إضافة صيدلي جديد</h2>
+        <form id="addUserForm">
+            <div class="form-group">
+                <label for="fullName">الاسم بالكامل:</label>
+                <input type="text" id="fullName" class="form-control" placeholder="الاسم الكامل" required />
+                <div id="fullNameError" class="text-danger"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">البريد الإلكتروني:</label>
+                <input type="email" id="email" class="form-control" placeholder="البريد الإلكتروني" required />
+                <div id="emailError" class="text-danger"></div>
+            </div>
+
+            <div class="form-group">
+                <label>كلمة المرور:</label>
+                <input type="password" id="password" class="form-control" placeholder="كلمة المرور" required />
+                <div id="passwordError" class="text-danger"></div>
+            </div>
+
+            <div class="form-group">
+                <label>تأكيد كلمة المرور:</label>
+                <input type="password" id="confirmPassword" class="form-control" placeholder="تأكيد كلمة المرور" required />
+                <div id="confirmPasswordError" class="text-danger"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="Pharmacy">الصيدلية:</label>
+                <select class="form-control" id="Pharmacy" required>
+                    <option value="">اختر صيدلية</option>
+                </select>
+                <div id="PharmacyError" class="text-danger"></div>
+            </div>
+
+            <div class="form-group">
+                <label>رقم الترخيص:</label>
+                <input type="text" id="licenseNumber" class="form-control" required />
+                <div id="licenseNumberError" class="text-danger"></div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="addUser()">إنشاء صيدلي</button>
+            <button class="btn btn-secondary" onclick="goBack()">🔙 رجوع</button>
+        </form>
+    </div>
+
+
+
+
+    <script src="../../../js/Pharmacist.js">
+    </script>
+
+    <script src="../../../js/checkAccess.js"></script>
+
+    <!-- Custom Scripts -->
+    <script>
+        checkAccess(['Admin'], '../../../shared/unauthorized.html');
+
+        function validateForm() {
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const pharmacyId = document.getElementById('Pharmacy').value;
+            const licenseNumber = document.getElementById('licenseNumber').value;
+
+            // إعادة تعيين رسائل الخطأ
+            document.getElementById('fullNameError').textContent = '';
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('passwordError').textContent = '';
+            document.getElementById('confirmPasswordError').textContent = '';
+            document.getElementById('licenseNumberError').textContent = '';
+            document.getElementById('error-message').style.display = "none ";
+
+            let isValid = true;
+
+            if (!fullName) {
+                document.getElementById('fullNameError').textContent = 'الاسم الكامل مطلوب!';
+                isValid = false;
+            }
+
+            if (!email) {
+                document.getElementById('emailError').textContent = 'البريد الإلكتروني مطلوب!';
+                isValid = false;
+            }
+
+            if (!password) {
+                document.getElementById('passwordError').textContent = 'كلمة المرور مطلوبة!';
+                isValid = false;
+            }
+
+            if (password !== confirmPassword) {
+                document.getElementById('confirmPasswordError').textContent = 'كلمات المرور غير متطابقة!';
+                isValid = false;
+            }
+
+            if (!pharmacyId) {
+                document.getElementById('error-message').style.display = "block ";
+                document.getElementById('error-message').textContent = 'يرجى اختيار الصيدلية.';
+                isValid = false;
+            }
+
+            if (!licenseNumber) {
+                document.getElementById('licenseNumberError').textContent = 'يرجى إدخال رقم الترخيص.';
+                isValid = false;
+            }
+
+            //  alert(isValid);
+            return isValid;
+        }
+
+
+        $(document).ready(function() {
+            fetchPharmacies();
+        });
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+
+</html>

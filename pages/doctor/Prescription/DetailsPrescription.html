@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <title>تفاصيل الوصفة الطبية</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .medication-item {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body dir="rtl">
+    <div class="container mt-5">
+        <h2 class="mb-4 text-center text-primary">💊 تفاصيل الوصفة الطبية</h2>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title text-success">معلومات الوصفة</h5>
+                <p><strong>رقم الوصفة:</strong> <span id="prescription-id" class="badge bg-secondary"></span></p>
+                <p><strong>المريض:</strong> <span id="patient-name"></span></p>
+                <p><strong>الطبيب:</strong> <span id="doctor-name"></span></p>
+                <p><strong>تاريخ الإنشاء:</strong> <span id="created-at"></span></p>
+            </div>
+        </div>
+
+        <h4 class="mb-3 text-info">📝 قائمة الأدوية</h4>
+        <div id="medication-list" class="mb-3"></div>
+
+        <div class="text-center">
+            <button class="btn btn-outline-primary" onclick="goBack()">🔙 رجوع</button>
+        </div>
+    </div>
+
+    <script>
+        let prescriptionId = getQueryParam('id');
+        let selectedMedications = [];
+
+        document.addEventListener('DOMContentLoaded', loadPrescriptionData);
+
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        async function loadPrescriptionData() {
+            try {
+                const response = await fetch(`https://localhost:7219/api/Prescription/${prescriptionId}`);
+                if (!response.ok) throw new Error('فشل تحميل البيانات');
+
+                const prescription = await response.json();
+
+                document.getElementById('prescription-id').textContent = prescription.id;
+                document.getElementById('patient-name').textContent = prescription.patient.user.fullName;
+                document.getElementById('doctor-name').textContent = prescription.doctor.user.fullName;
+                document.getElementById('created-at').textContent = new Date(prescription.createdAt).toLocaleDateString('ar-EG');
+
+                selectedMedications = await Promise.all(prescription.prescriptionItems.map(async item => {
+                    const res = await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`);
+                    const medication = await res.json();
+                    return {
+                        id: item.id,
+                        medicationId: item.medicationId,
+                        medicationName: medication.name,
+                        dosage: item.dosage,
+                        frequency: item.frequency,
+                        duration: item.duration
+                    };
+                }));
+                updateMedicationList();
+            } catch (error) {
+                alert('حدث خطأ أثناء تحميل تفاصيل الوصفة');
+                console.error(error);
+            }
+        }
+
+        function updateMedicationList() {
+            const medicationList = document.getElementById('medication-list');
+            medicationList.innerHTML = '';
+
+            selectedMedications.forEach(medication => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'medication-item';
+                itemDiv.innerHTML = `
+                    <h6><span class="badge bg-primary">${medication.medicationName}</span></h6>
+                    <p class="mb-1">💊 <strong>جرعة:</strong> ${medication.dosage}</p>
+                    <p class="mb-1">⏰ <strong>مرات يومية:</strong> ${medication.frequency}</p>
+                    <p class="mb-0">📅 <strong>مدة:</strong> ${medication.duration} يوم</p>
+                `;
+                medicationList.appendChild(itemDiv);
+            });
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+
+</html>
