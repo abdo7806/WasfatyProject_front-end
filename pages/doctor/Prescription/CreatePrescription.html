@@ -13,16 +13,16 @@
             text-align: center;
             margin-top: 20px;
         }
-        
+
         .alert-message {
             display: none;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
         }
-        
+
         .container {
             background-color: white;
             border-radius: 10px;
@@ -31,23 +31,23 @@
             margin-top: 30px;
             margin-bottom: 30px;
         }
-        
+
         h2 {
             color: #0d6efd;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
         }
-        
+
         .form-label {
             font-weight: 600;
         }
-        
+
         #medication-list {
             list-style-type: none;
             padding: 0;
         }
-        
+
         #medication-list li {
             background-color: #f8f9fa;
             padding: 10px;
@@ -76,7 +76,7 @@
 
             <div class="mb-3">
                 <label for="patient" class="form-label">اختيار المريض</label>
-                <select id="patient" class="form-select" required>
+                <select id="patient" class="form-select" require>
                     <option value="">-- اختر المريض --</option>
                     <!-- قائمة المرضى سيتم تعبئتها عبر JavaScript -->
                 </select>
@@ -189,13 +189,13 @@
         function populatePatientSelect(patientsList) {
             const patientSelect = document.getElementById('patient');
             patientSelect.innerHTML = '<option value="">-- اختر المريض --</option>';
-
             patientsList.forEach(patient => {
                 const option = document.createElement('option');
                 option.value = patient.id;
-                option.textContent = patient.user.fullName;
+                option.textContent = `${patient.user.fullName} - ${patient.user.email || ''} - ${patient.id }`;
                 patientSelect.appendChild(option);
             });
+
         }
 
         function populateMedicationSelect(medicationsList) {
@@ -213,9 +213,22 @@
         function searchPatients() {
             const searchTerm = document.getElementById('patient-search').value.toLowerCase();
             const filteredPatients = patients.filter(patient =>
-                patient.user.fullName.toLowerCase().includes(searchTerm)
+                patient.user.fullName.toLowerCase().includes(searchTerm) ||
+                (patient.user.email.toLowerCase().includes(searchTerm)) ||
+                (patient.id.toString().includes(searchTerm))
             );
             populatePatientSelect(filteredPatients.length ? filteredPatients : patients);
+        }
+
+        // البحث المحلي
+        function searchLocalPatients(searchTerm) {
+            return patients.filter(patient => {
+                return (
+                    patient.user.fullName.toLowerCase().includes(searchTerm) ||
+                    (patient.user.email && patient.user.email.toLowerCase().includes(searchTerm)) ||
+                    (patient.id.toString().includes(searchTerm))
+                );
+            });
         }
 
         function searchMedications() {
