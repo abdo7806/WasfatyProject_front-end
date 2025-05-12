@@ -1,138 +1,240 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>إضافة مستخدم جديد</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة مريض جديد</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .error-message {
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="alert alert-danger" id="error-message" style="display: none;" role="alert"></div>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">إضافة مريض جديد</h2>
 
-        <h2 class="my-4">إضافة مستخدم جديد</h2>
-        <form id="addUserForm">
-            <div class="form-group">
-                <label for="fullName">الاسم بالكامل:</label>
-                <input type="text" id="fullName" class="form-control" placeholder="الاسم الكامل" />
-                <div id="fullNameError" class="text-danger"></div>
+        <div class="alert alert-danger error-message" id="error-message" role="alert"></div>
+        <div class="alert alert-success error-message" id="success-message" role="alert"></div>
+
+        <form id="addPatientForm">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="fullName" class="form-label">الاسم الكامل</label>
+                        <input type="text" id="fullName" class="form-control" placeholder="الاسم الكامل">
+                        <div id="fullNameError" class="text-danger small mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">البريد الإلكتروني</label>
+                        <input type="email" id="email" class="form-control" placeholder="example@domain.com">
+                        <div id="emailError" class="text-danger small mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">كلمة المرور</label>
+                        <input type="password" id="password" class="form-control" placeholder="كلمة المرور">
+                        <div id="passwordError" class="text-danger small mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">تأكيد كلمة المرور</label>
+                        <input type="password" id="confirmPassword" class="form-control" placeholder="تأكيد كلمة المرور">
+                        <div id="confirmPasswordError" class="text-danger small mt-1"></div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="DateOfBirth" class="form-label">تاريخ الميلاد</label>
+                        <input type="date" id="DateOfBirth" class="form-control">
+                        <div id="DateOfBirthError" class="text-danger small mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="gender" class="form-label">الجنس</label>
+                        <select class="form-select" id="gender" required>
+                            <option value="" disabled selected>اختر الجنس</option>
+                            <option value="Male">ذكر</option>
+                            <option value="Female">أنثى</option>
+                        </select>
+                        <div id="genderError" class="text-danger small mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="bloodType" class="form-label">فصيلة الدم</label>
+                        <select class="form-select" id="bloodType" required>
+                            <option value="" disabled selected>اختر فصيلة الدم</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                        <div id="bloodTypeError" class="text-danger small mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phoneNumber" class="form-label">رقم الهاتف</label>
+                        <input type="tel" id="phoneNumber" class="form-control" placeholder="05XXXXXXXX">
+                        <div id="phoneError" class="text-danger small mt-1"></div>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="email">البريد الإلكتروني:</label>
-                <input type="email" id="email" class="form-control" placeholder="البريد الإلكتروني" />
-                <div id="emailError" class="text-danger"></div>
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-primary px-4" id="submitBtn" onclick="addUser()">
+                    <i class="bi bi-person-plus"></i> إضافة مريض
+                </button>
+                <a href="Patient.html" class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-arrow-right"></i> رجوع
+                </a>
             </div>
-
-            <div class="form-group">
-                <label>كلمة المرور:</label>
-                <input type="password" id="password" class="form-control" placeholder="كلمة المرور" />
-                <div id="passwordError" class="text-danger"></div>
-            </div>
-
-            <div class="form-group">
-                <label>تأكيد كلمة المرور:</label>
-                <input type="password" id="confirmPassword" class="form-control" placeholder="تأكيد كلمة المرور" />
-                <div id="confirmPasswordError" class="text-danger"></div>
-            </div>
-
-            <div class="form-group">
-                <label>تاريخ الميلاد:</label>
-                <input type="date" id="DateOfBirth" class="form-control" />
-                <div id="DateOfBirthError" class="text-danger"></div>
-            </div>
-
-            <div class="form-group">
-                <label for="gender">الجنس:</label>
-                <select class="form-control" id="gender" required>
-                    <option value="" disabled selected>اختر الجنس</option>
-                    <option value="ذكور">ذكور</option>
-                    <option value="إناث">إناث</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="bloodType">فصيلة الدم:</label>
-                <select class="form-control" id="bloodType" required>
-                    <option value="" disabled selected>اختر فصيلة الدم</option>
-                    <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
-                </select>
-            </div>
-
-            <button type="button" class="btn btn-primary" onclick="addUser()">إنشاء حساب</button>
-            <a href="Patient.html" class="btn btn-secondary">رجوع</a>
         </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">جار التحميل...</span>
+            </div>
+            <p class="mt-2">جارٍ حفظ البيانات...</p>
+        </div>
     </div>
 
+    <script src="../../../js/checkAccess.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
+        // التحقق من الصلاحيات
+        checkAccess(['Doctor'], '../../../shared/unauthorized.html');
+
+        function showLoading(isLoading) {
+            document.getElementById('loading').style.display = isLoading ? 'flex' : 'none';
+            document.getElementById('submitBtn').disabled = isLoading;
+        }
+
+        function showMessage(message, isError = true) {
+            const messageBox = isError ?
+                document.getElementById('error-message') :
+                document.getElementById('success-message');
+
+            messageBox.textContent = message;
+            messageBox.style.display = 'block';
+
+            if (!isError) {
+                setTimeout(() => {
+                    messageBox.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function resetErrors() {
+            document.querySelectorAll('.text-danger').forEach(el => {
+                el.textContent = '';
+            });
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.style.display = 'none';
+            });
+        }
+
         function validateForm() {
-            const fullName = document.getElementById('fullName').value;
-            const email = document.getElementById('email').value;
+            resetErrors();
+
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const dateOfBirth = document.getElementById('DateOfBirth').value;
             const gender = document.getElementById('gender').value;
             const bloodType = document.getElementById('bloodType').value;
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
 
-            // إعادة تعيين رسائل الخطأ
-            document.getElementById('fullNameError').textContent = '';
-            document.getElementById('emailError').textContent = '';
-            document.getElementById('passwordError').textContent = '';
-            document.getElementById('confirmPasswordError').textContent = '';
-            document.getElementById('DateOfBirthError').textContent = '';
-            document.getElementById('error-message').style.display = "none";
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phonePattern = /^05\d{8}$/;
 
             let isValid = true;
 
             if (!fullName) {
-                document.getElementById('fullNameError').textContent = 'الاسم الكامل مطلوب!';
+                document.getElementById('fullNameError').textContent = 'الاسم الكامل مطلوب';
                 isValid = false;
             }
 
             if (!email) {
-                document.getElementById('emailError').textContent = 'البريد الإلكتروني مطلوب!';
+                document.getElementById('emailError').textContent = 'البريد الإلكتروني مطلوب';
                 isValid = false;
             } else if (!emailPattern.test(email)) {
-                document.getElementById('emailError').textContent = 'يرجى إدخال بريد إلكتروني صحيح.';
+                document.getElementById('emailError').textContent = 'بريد إلكتروني غير صالح';
                 isValid = false;
             }
 
             if (!password) {
-                document.getElementById('passwordError').textContent = 'كلمة المرور مطلوبة!';
+                document.getElementById('passwordError').textContent = 'كلمة المرور مطلوبة';
+                isValid = false;
+            } else if (password.length < 6) {
+                document.getElementById('passwordError').textContent = 'يجب أن تكون كلمة المرور 6 أحرف على الأقل';
                 isValid = false;
             }
 
             if (password !== confirmPassword) {
-                document.getElementById('confirmPasswordError').textContent = 'كلمات المرور غير متطابقة!';
+                document.getElementById('confirmPasswordError').textContent = 'كلمة المرور غير متطابقة';
                 isValid = false;
             }
 
             if (!dateOfBirth) {
-                document.getElementById('DateOfBirthError').textContent = 'تاريخ الميلاد مطلوب!';
+                document.getElementById('DateOfBirthError').textContent = 'تاريخ الميلاد مطلوب';
                 isValid = false;
+            } else {
+                const birthDate = new Date(dateOfBirth);
+                const today = new Date();
+                if (birthDate >= today) {
+                    document.getElementById('DateOfBirthError').textContent = 'تاريخ الميلاد يجب أن يكون في الماضي';
+                    isValid = false;
+                }
             }
 
             if (!gender) {
-                document.getElementById('error-message').style.display = "block";
-                document.getElementById('error-message').textContent = 'يرجى اختيار الجنس.';
+                document.getElementById('genderError').textContent = 'الجنس مطلوب';
                 isValid = false;
             }
 
             if (!bloodType) {
-                document.getElementById('error-message').style.display = "block";
-                document.getElementById('error-message').textContent = 'يرجى اختيار فصيلة الدم.';
+                document.getElementById('bloodTypeError').textContent = 'فصيلة الدم مطلوبة';
+                isValid = false;
+            }
+
+            if (phoneNumber && !phonePattern.test(phoneNumber)) {
+                document.getElementById('phoneError').textContent = 'رقم الهاتف يجب أن يبدأ بـ 05 ويتكون من 10 أرقام';
                 isValid = false;
             }
 
@@ -140,68 +242,72 @@
         }
 
         async function addUser() {
-            const fullName = document.getElementById('fullName').value;
-            const email = document.getElementById('email').value;
+            if (!validateForm()) return;
+
+            showLoading(true);
+
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const dateOfBirth = document.getElementById('DateOfBirth').value;
             const gender = document.getElementById('gender').value;
             const bloodType = document.getElementById('bloodType').value;
-            const role = 3;
-
-            if (!validateForm()) {
-                return;
-            }
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const role = 3; // Patient Role
 
             try {
-                const response = await fetch('https://localhost:7219/api/Auth/register', {
+                // 1. تسجيل المستخدم
+                const userResponse = await fetch('https://localhost:7219/api/Auth/register', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },
                     body: JSON.stringify({
                         fullName,
                         email,
                         password,
-                        role: role
+                        role,
+                        phoneNumber
                     })
                 });
 
-                if (!response.ok) {
-                    throw new Error('فشل التسجيل');
+                if (!userResponse.ok) {
+                    const errorData = await userResponse.json();
+                    throw new Error(errorData.message || 'فشل في تسجيل المستخدم');
                 }
 
-                const createdUser = await response.json();
-                await addPatient(createdUser.id, dateOfBirth, gender, bloodType);
-                window.location.href = './Patient.html';
-            } catch (error) {
-                document.getElementById('error-message').style.display = "block";
-                document.getElementById('error-message').textContent = error.message;
-            }
-        }
+                const userData = await userResponse.json();
 
-        async function addPatient(userId, dateOfBirth, gender, bloodType) {
-            try {
-                const response = await fetch('https://localhost:7219/api/PatientController', {
+                // 2. إضافة بيانات المريض
+                const patientResponse = await fetch('https://localhost:7219/api/PatientController', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },
                     body: JSON.stringify({
-                        userId,
+                        userId: userData.id,
                         dateOfBirth,
                         gender,
                         bloodType
                     })
                 });
 
-                if (!response.ok) {
-                    throw new Error('فشل إضافة المريض');
+                if (!patientResponse.ok) {
+                    throw new Error('فشل في إضافة بيانات المريض');
                 }
 
-                await response.json();
+                showMessage('تم إضافة المريض بنجاح', false);
+                setTimeout(() => {
+                    window.location.href = './Patient.html';
+                }, 1500);
+
             } catch (error) {
-                document.getElementById('error-message').style.display = "block";
-                document.getElementById('error-message').textContent = error.message;
+                showMessage(error.message);
+                console.error('Error:', error);
+            } finally {
+                showLoading(false);
             }
         }
     </script>

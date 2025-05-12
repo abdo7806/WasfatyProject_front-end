@@ -5,111 +5,328 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>قائمة المرضى</title>
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tajawal:400,500,700&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tajawal:400,500,700&display=swap">
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Bootstrap RTL -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.rtl.min.css">
 
     <style>
         body {
-            color: #566787;
-            background: #f5f5f5;
-            font-family: 'Roboto', sans-serif;
+            font-family: Arial, sans-serif;
         }
-        
-        .table-responsive {
-            margin: 30px 0;
-        }
-        
-        .table-wrapper {
-            min-width: 1000px;
-            background: #fff;
-            padding: 20px;
-            box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
-        }
-        
-        .table-title {
-            padding-bottom: 10px;
-            margin: 0 0 10px;
-            min-width: 100%;
-        }
-        
-        .search-box {
-            position: relative;
-            float: right;
-        }
-        
-        .search-box select,
-        .search-box input {
-            height: 34px;
-            border-radius: 20px;
-            border-color: #ddd;
-            box-shadow: none;
-            margin-right: 5px;
-        }
-        
-        .search-box input:focus {
-            border-color: #3FBAE4;
-        }
-        
-        table.table tr th,
-        table.table tr td {
-            border-color: #e9e9e9;
-        }
-        
-        table.table-striped tbody tr:nth-of-type(odd) {
-            background-color: #fcfcfc;
-        }
-        
-        table.table-striped.table-hover tbody tr:hover {
-            background: #f5f5f5;
-        }
-        
-        table.table td:last-child {
-            width: 130px;
-        }
-        
-        .pagination {
-            float: right;
-            margin: 0 0 5px;
-        }
-        
-        .pagination li a {
-            border: none;
-            font-size: 95%;
-            width: 30px;
-            height: 30px;
-            color: #999;
-            margin: 0 2px;
-            line-height: 30px;
-            border-radius: 30px !important;
-            text-align: center;
-            padding: 0;
-        }
-        
-        .pagination li.active a {
-            background: #03A9F4;
+
+        .table-container {
+            margin-top: 30px;
         }
     </style>
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tajawal:400,500,700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="../../../dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="../../../css/doctor-dashboard.css">
+
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <div class="preloader flex-column justify-content-center align-items-center">
+            <img class="animation__shake" src="../../../dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+        </div>
+
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="../doctor-dashboard.html" class="nav-link">الرئيسية</a>
+                </li>
+            </ul>
+
+            <!-- Right navbar links -->
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="far fa-bell"></i>
+                        <span class="badge badge-warning navbar-badge">15</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-left">
+                        <span class="dropdown-item dropdown-header">15 إشعار</span>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-prescription-bottle-alt ml-2"></i> 5 وصفات جديدة
+                            <span class="float-left text-muted text-sm">منذ 3 دقائق</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- زر حساب المستخدم -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="d-none d-md-inline">حسابي</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-left">
+                        <div class="dropdown-item text-center">
+                            <p class="mb-0 mt-2 EmailUser">د. أحمد محمد</p>
+                            <small class="RoleUser">طبيب</small>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-user-cog ml-2"></i> إعدادات الحساب
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-lock ml-2"></i> تغيير كلمة المرور
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" onclick="logout()" class="dropdown-item text-danger">
+                            <i class="fas fa-sign-out-alt ml-2"></i> تسجيل الخروج
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
+            <a href="doctor-dashboard.html" class="brand-link text-center">
+                <img src="../../../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">نظام وصفتي</span>
+            </a>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- معلومات المستخدم -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+
+                    <div class="info">
+                        <a href="#" class="d-block EmailUser">د. أحمد محمد</a>
+                        <small class="text-muted RoleUser">طبيب</small>
+                    </div>
+                </div>
+
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <li class="nav-item">
+                            <a href="../doctor-dashboard.html" class="nav-link">
+                                <i class="nav-icon fas fa-home"></i>
+                                <p>الرئيسية</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="./CreatePrescription.html" oc class="nav-link">
+                                <i class="nav-icon fas fa-file-medical"></i>
+                                <p>إنشاء وصفة</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active">
+                                <i class="nav-icon fas fa-procedures"></i>
+                                <p>المرضى</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="../Prescription/Prescriptions.html" class="nav-link">
+                                <i class="nav-icon fas fa-prescription"></i>
+                                <p>الوصفات الطبية</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-calendar-check"></i>
+                                <p>المواعيد</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-chart-line"></i>
+                                <p>التقارير</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Content Header -->
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">إدارة المرضى</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-left">
+                                <li class="breadcrumb-item"><a href="index.html">الرئيسية</a></li>
+                                <li class="breadcrumb-item active">المرضى</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">قائمة المرضى المسجلين</h3>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <div class="table-wrapper">
+                                            <div class="table-title">
+                                                <div class="alert" id="msg" style="display: none;" role="alert"></div>
+                                                <div class="row">
+                                                    <div class="col-sm-8">
+                                                        <h2>تفاصيل <b>المرضى</b></h2>
+                                                    </div>
+                                                    <div class="col-sm-4">
+
+                                                        <div class="search-box">
+                                                            <select id="columnSelect" class="form-control" onchange="changeSearchColumn()">
+                                                              <option value="fullName">الاسم بالكامل</option>
+                                                              <option value="email">البريد الإلكتروني</option>
+                                                              <option value="role">الدور</option>
+                                                          </select>
+                                                            <input type="text" id="searchInput" class="form-control" placeholder="بحث&hellip;" oninput="searchPatients()">
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+
+                                                <a class="btn btn-success" href="CreatePatient.html">
+                                                    <i class="fas fa-plus"></i> إضافة مريض جديد
+                                                </a>
+                                            </div>
+
+                                            <table id="example2" class="table table-bordered table-striped table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>رقم الهوية</th>
+                                                        <th>الاسم بالكامل <i class="fa fa-sort"></i></th>
+                                                        <th>البريد الإلكتروني</th>
+                                                        <th>الجنس</th>
+                                                        <th>فصيلة الدم</th>
+                                                        <th>تاريخ التسجيل <i class="fa fa-sort"></i></th>
+                                                        <th>الإجراءات</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="patientsTableBody">
+                                                    <!-- بيانات المرضى ستظهر هنا -->
+                                                </tbody>
+                                            </table>
+
+                                            <div class="clearfix">
+                                                <div id="hintText" class="hint-text">عرض <b>3</b> من <b>3</b> إدخالات</div>
+                                                <ul class="pagination" id="pagination">
+                                                    <li class="page-item disabled"><a href="#" class="page-link">السابق</a></li>
+                                                    <li class="page-item active"><a href="#" class="page-link">1</a></li>
+                                                    <li class="page-item"><a href="#" class="page-link">2</a></li>
+                                                    <li class="page-item"><a href="#" class="page-link">3</a></li>
+                                                    <li class="page-item"><a href="#" class="page-link">التالي</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="main-footer text-center text-md-right">
+            <strong>Copyright &copy; 2023 <a href="#">نظام وصفتي الإلكتروني</a>.</strong> جميع الحقوق محفوظة
+            <div class="float-left d-none d-sm-inline-block">
+                <b>الإصدار</b> 1.0.0
+            </div>
+        </footer>
+    </div>
+
+    <!-- REQUIRED SCRIPTS -->
+    <!-- jQuery -->
+    <script src="../../../plugins/jquery/jquery.min.js"></script>
+
+    <!-- Bootstrap 4 -->
+    <script src="../../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- AdminLTE App -->
+    <script src="../../../dist/js/adminlte.min.js"></script>
 
 
+
+    <script src="../../../js/auth.js"></script>
+
+    <script src="../../../js/checkAccess.js"></script>
+
+    <!-- Custom Scripts -->
     <script>
+        checkAccess(['Doctor'], '../../../shared/unauthorized.html');
+        getUserName(); // تكتب اسم الايمال و الدور
+        $(document).ready(function() {
+            fetchPatients();
+        });
+
+        $(document).ready(function() {
+            // إغلاق القائمة الجانبية تلقائياً على الهواتف
+            if ($(window).width() < 768) {
+                $('body').addClass('sidebar-collapse');
+            }
+
+            // إعادة حساب الأبعاد عند تغيير حجم النافذة
+            $(window).resize(function() {
+                if ($(window).width() < 768) {
+                    $('body').addClass('sidebar-collapse');
+                } else {
+                    $('body').removeClass('sidebar-collapse');
+                }
+            });
+
+
+        });
+
+
+
         let patients = [];
         let currentPage = 1;
         const patientsPerPage = 5;
         let searchColumn = 'fullName'; // العمود الافتراضي للبحث
 
-        $(document).ready(function() {
-            fetchPatients();
-        });
 
         // وظيفة لجلب بيانات المرضى من API
         async function fetchPatients() {
             try {
-                const response = await fetch('https://localhost:7219/api/PatientController/All');
+                const response = await fetch('https://localhost:7219/api/PatientController/All', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                });
                 patients = await response.json();
                 displayPatients();
                 setupPagination();
@@ -130,18 +347,19 @@
             paginatedPatients.forEach(patient => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${patient.id}</td>
-                    <td>${patient.userId}</td>
-                    <td>${patient.user.fullName}</td>
-                    <td>${patient.user.email}</td>
-                    <td>${patient.gender}</td>
-                    <td>${patient.bloodType}</td>
-                    <td>${new Date(patient.user.createdAt).toLocaleDateString('ar-EG')}</td>
-                    <td>
-                        <a href="EditePatient.html?id=${patient.id}" class="edit" title="تعديل" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
-                        <a href="#" class="delete" title="حذف" data-toggle="tooltip" onclick="deletePatient(${patient.id})"><i class="material-icons">&#xE872;</i></a>
-                    </td>
-                `;
+						<td>${patient.id}</td>
+						<td>${patient.userId}</td>
+						<td>${patient.user.fullName}</td>
+						<td>${patient.user.email}</td>
+						<td>${patient.gender}</td>
+						<td>${patient.bloodType}</td>
+						<td>${new Date(patient.user.createdAt).toLocaleDateString('ar-EG')}</td>
+						<td>
+
+                <a href="./MedicalRecord.html?id=${patient.id}" class="btn btn-info btn-action" title="عرض"> الملف الطبي <i class="fas fa-eye"></i></a>
+
+
+						</td>`;
                 patientsTableBody.appendChild(row);
             });
 
@@ -190,18 +408,18 @@
             paginatedPatients.forEach(patient => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                        <td>${patient.id}</td>
-                    <td>${patient.userId}</td>
-                    <td>${patient.user.fullName}</td>
-                    <td>${patient.user.email}</td>
-                    <td>${patient.gender}</td>
-                    <td>${patient.bloodType}</td>
-                    <td>${new Date(patient.user.createdAt).toLocaleDateString('ar-EG')}</td>
-                    <td>
-                        <a href="EditePatient.html?id=${patient.id}" class="edit" title="تعديل" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
-                        <a href="#" class="delete" title="حذف" data-toggle="tooltip" onclick="deletePatient(${patient.id})"><i class="material-icons">&#xE872;</i></a>
-                    </td>
-                `;
+								<td>${patient.id}</td>
+						<td>${patient.userId}</td>
+						<td>${patient.user.fullName}</td>
+						<td>${patient.user.email}</td>
+						<td>${patient.gender}</td>
+						<td>${patient.bloodType}</td>
+						<td>${new Date(patient.user.createdAt).toLocaleDateString('ar-EG')}</td>
+						<td>
+								<a href="EditePatient.html?id=${patient.id}" class="edit" title="تعديل" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
+								<a href="#" class="delete" title="حذف" data-toggle="tooltip" onclick="deletePatient(${patient.id})"><i class="material-icons">&#xE872;</i></a>
+						</td>
+				`;
                 patientsTableBody.appendChild(row);
             });
 
@@ -219,85 +437,9 @@
             searchColumn = columnSelect.value;
             searchPatients(); // إعادة البحث عند تغيير العمود
         }
-
-        // وظيفة لحذف المريض
-        async function deletePatient(patientId) {
-            const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذا المريض؟");
-            if (confirmDelete) {
-                try {
-                    // حذف المريض من API
-                    const response = await fetch(`https://localhost:7219/api/PatientController/${patientId}`, {
-                        method: 'DELETE'
-                    });
-
-                    if (response.ok) {
-                        // تحديث القائمة بعد الحذف
-                        patients = patients.filter(patient => patient.id !== patientId);
-                        displayPatients();
-                        setupPagination();
-                    }
-                } catch (error) {
-                    console.error('خطأ في حذف المريض:', error);
-                    // console.log('خطأ في حذف المريض:');
-                }
-            }
-        }
     </script>
-</head>
 
-<body>
-    <div class="container-xl">
-        <div class="table-responsive">
-            <div class="table-wrapper">
-                <p>
-                    <a class="btn btn-success" href="CreatePatient.html">
-                        <i class="fas fa-plus"></i> إضافة مريض جديد
-                    </a>
-                </p>
-                <div class="table-title">
-                    <div class="alert" id="msg" style="display: none;" role="alert"></div>
-                    <div class="row">
-                        <div class="col-sm-8">
-                            <h2>تفاصيل <b>المرضى</b></h2>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="search-box">
-                                <select id="columnSelect" class="form-control" onchange="changeSearchColumn()">
-                                    <option value="fullName">الاسم بالكامل</option>
-                                    <option value="email">البريد الإلكتروني</option>
-                                    <option value="role">الدور</option>
-                                </select>
-                                <input type="text" id="searchInput" class="form-control" placeholder="بحث&hellip;" oninput="searchPatients()">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <table class="table table-striped table-hover table-bordered">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>رقم الهوية</th>
-                            <th>الاسم بالكامل <i class="fa fa-sort"></i></th>
-                            <th>البريد الإلكتروني</th>
-                            <th>الجنس</th>
-                            <th>فصيلة الدم</th>
-                            <th>تاريخ التسجيل <i class="fa fa-sort"></i></th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="patientsTableBody">
-                        <!-- بيانات المرضى ستظهر هنا -->
-                    </tbody>
-                </table>
-                <div class="clearfix">
-                    <div id="hintText" class="hint-text">عرض <b>0</b> من <b>0</b> إدخالات</div>
-                    <ul class="pagination" id="pagination">
-                        <!-- أزرار التقليب ستظهر هنا -->
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+
 </body>
 
 </html>
