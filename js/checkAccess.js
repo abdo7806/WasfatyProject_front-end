@@ -88,3 +88,36 @@ async function getDactorByUserId() {
 
     }));
 }
+
+
+
+
+async function getPatientByUserId() {
+
+    const userData = JSON.parse(localStorage.getItem("userData"));
+
+    let userId = userData.userId;
+
+    const response = await fetch(`https://localhost:7219/api/PatientController/GetPatientByUserId/${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+
+    });
+
+    // إخفاء مؤشر تحميل
+
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'البريد الإلكتروني أو كلمة المرور غير صحيحة');
+
+    }
+
+    const data = await response.json();
+
+    console.log(data);
+    localStorage.setItem('patientData', JSON.stringify(data));
+}

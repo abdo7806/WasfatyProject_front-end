@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الوصفات الطبية - النظام الصحي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <style>
+         :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .prescription-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .prescription-card {
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .dispensed-card {
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .not-dispensed-card {
+            border-left: 4px solid var(--warning-color);
+        }
+        
+        .badge-dispensed {
+            background-color: var(--success-color);
+        }
+        
+        .badge-not-dispensed {
+            background-color: var(--warning-color);
+        }
+        
+        .medication-item {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .filter-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .no-prescriptions {
+            text-align: center;
+            padding: 50px;
+            color: var(--dark-color);
+        }
+        
+        .doctor-info,
+        .medical-center-info {
+            background-color: #f0f8ff;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .prescription-card {
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="prescription-header py-3 mb-4">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h4 mb-0"><i class="fas fa-prescription-bottle-alt"></i> الوصفات الطبية</h1>
+                <button id="logout-btn" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="./patient-dashboard.html"><i class="fas fa-home"></i> الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="fas fa-prescription-bottle-alt"></i> الوصفات الطبية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-user-edit"></i> الملف الشخصي</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="filter-section">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="search-input" class="form-label"><i class="fas fa-search"></i> بحث</label>
+                    <input type="text" class="form-control" id="search-input" placeholder="ابحث برقم الوصفة أو اسم الطبيب...">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="status-filter" class="form-label"><i class="fas fa-filter"></i> حالة الصرف</label>
+                    <select class="form-select" id="status-filter">
+                        <option value="all">الكل</option>
+                        <option value="dispensed">تم الصرف</option>
+                        <option value="not-dispensed">لم يصرف</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="date-filter" class="form-label"><i class="fas fa-calendar-alt"></i> ترتيب حسب التاريخ</label>
+                    <select class="form-select" id="date-filter">
+                        <option value="newest">الأحدث أولاً</option>
+                        <option value="oldest">الأقدم أولاً</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="prescriptions-container">
+            <!-- سيتم ملؤها بواسطة JavaScript -->
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">جاري التحميل...</span>
+                </div>
+                <p class="mt-2">جاري تحميل الوصفات الطبية...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- نموذج عرض التفاصيل -->
+    <div class="modal fade" id="prescriptionDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تفاصيل الوصفة الطبية #<span id="prescription-id"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="doctor-info">
+                                <h6><i class="fas fa-user-md"></i> معلومات الطبيب</h6>
+                                <p><strong>الاسم:</strong> <span id="doctor-name"></span></p>
+                                <p><strong>التخصص:</strong> <span id="doctor-specialization"></span></p>
+                                <p><strong>رقم الرخصة:</strong> <span id="doctor-license"></span></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="medical-center-info">
+                                <h6><i class="fas fa-hospital"></i> معلومات المركز الطبي</h6>
+                                <p><strong>الاسم:</strong> <span id="medical-center-name"></span></p>
+                                <p><strong>العنوان:</strong> <span id="medical-center-address"></span></p>
+                                <p><strong>الهاتف:</strong> <span id="medical-center-phone"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h6><i class="fas fa-calendar-alt"></i> معلومات الوصفة</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><strong>تاريخ الإصدار:</strong> <span id="issued-date"></span></p>
+                            </div>
+                            <div class="col-md-4">
+                                <p><strong>حالة الصرف:</strong> <span id="dispensed-status" class="badge"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h6><i class="fas fa-pills"></i> الأدوية الموصوفة</h6>
+                        <div id="medications-list" class="mt-3">
+                            <!-- سيتم ملؤها بواسطة JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                    <button type="button" class="btn btn-primary" id="print-prescription-btn">
+                        <i class="fas fa-print"></i> طباعة الوصفة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script srx="../../js/auth.js"></script>
+    <script srx="../../js/checkAccess.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async() => {
+            // checkAccess(['Patient']);
+
+            // عناصر DOM
+            const prescriptionsContainer = document.getElementById('prescriptions-container');
+            const searchInput = document.getElementById('search-input');
+            const statusFilter = document.getElementById('status-filter');
+            const dateFilter = document.getElementById('date-filter');
+
+            // متغير لتخزين الوصفات
+            let prescriptions = [];
+
+            // جلب الوصفات من API
+            async function fetchPrescriptions() {
+                try {
+                    let patientData = JSON.parse(localStorage.getItem("patientData"));
+
+                    console.log(patientData)
+                        // const urlParams = new URLSearchParams(window.location.search);
+                        // patientId = urlParams.get('id');
+                    const response = await fetch(`https://localhost:7219/api/Prescription/GetByPatientId/${patientData.id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('فشل في جلب الوصفات الطبية');
+                    }
+
+                    prescriptions = await response.json();
+                    renderPrescriptions(prescriptions);
+                } catch (error) {
+                    console.error('Error:', error);
+                    prescriptionsContainer.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i> حدث خطأ أثناء جلب الوصفات الطبية
+                </div>
+            `;
+                }
+            }
+
+            // عرض الوصفات
+            function renderPrescriptions(prescriptionsToRender) {
+                if (prescriptionsToRender.length === 0) {
+                    prescriptionsContainer.innerHTML = `
+                <div class="no-prescriptions">
+                    <i class="fas fa-file-medical" style="font-size: 3rem; color: var(--primary-color);"></i>
+                    <h4 class="mt-3">لا توجد وصفات طبية</h4>
+                    <p class="text-muted">ليس لديك أي وصفات طبية مسجلة حالياً</p>
+                </div>
+            `;
+                    return;
+                }
+
+                let html = '<div class="row">';
+
+                prescriptionsToRender.forEach(prescription => {
+                    const issuedDate = new Date(prescription.issuedDate);
+                    const formattedDate = issuedDate.toLocaleDateString('ar-EG', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+
+                    const doctorName = prescription.doctor.user.fullName;
+                    const medicalCenterName = prescription.doctor.medicalCenter.name;
+
+                    html += `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card prescription-card ${prescription.isDispensed ? 'dispensed-card' : 'not-dispensed-card'}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title">الوصفة #${prescription.id}</h5>
+                                <span class="badge ${prescription.isDispensed ? 'badge-dispensed' : 'badge-not-dispensed'}">
+                                    ${prescription.isDispensed ? 'تم الصرف' : 'لم يصرف'}
+                                </span>
+                            </div>
+                            <p class="card-text"><i class="fas fa-user-md"></i> الطبيب: ${doctorName}</p>
+                            <p class="card-text"><i class="fas fa-hospital"></i> المركز: ${medicalCenterName}</p>
+                            <p class="card-text"><i class="fas fa-calendar-alt"></i> التاريخ: ${formattedDate}</p>
+                            <p class="card-text"><i class="fas fa-pills"></i> عدد الأدوية: ${prescription.prescriptionItems.length}</p>
+                            <button class="btn btn-outline-primary btn-sm view-details-btn" 
+                                data-id="${prescription.id}"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#prescriptionDetailsModal">
+                                <i class="fas fa-eye"></i> عرض التفاصيل
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+                });
+
+                html += '</div>';
+                prescriptionsContainer.innerHTML = html;
+
+                // إضافة مستمعين لأزرار عرض التفاصيل
+                document.querySelectorAll('.view-details-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const prescriptionId = btn.getAttribute('data-id');
+                        showPrescriptionDetails(prescriptionId);
+                    });
+                });
+            }
+
+            // عرض تفاصيل الوصفة في المودال
+            function showPrescriptionDetails(prescriptionId) {
+                const prescription = prescriptions.find(p => p.id == prescriptionId);
+                if (!prescription) return;
+
+                const issuedDate = new Date(prescription.issuedDate);
+                const formattedDate = issuedDate.toLocaleDateString('ar-EG', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                // تعبئة بيانات الطبيب والمركز الطبي
+                document.getElementById('prescription-id').textContent = prescription.id;
+                document.getElementById('doctor-name').textContent = prescription.doctor.user.fullName;
+                document.getElementById('doctor-specialization').textContent = prescription.doctor.specialization;
+                document.getElementById('doctor-license').textContent = prescription.doctor.licenseNumber;
+
+                document.getElementById('medical-center-name').textContent = prescription.doctor.medicalCenter.name;
+                document.getElementById('medical-center-address').textContent = prescription.doctor.medicalCenter.address;
+                document.getElementById('medical-center-phone').textContent = prescription.doctor.medicalCenter.phone;
+
+                document.getElementById('issued-date').textContent = formattedDate;
+
+                const dispensedStatus = document.getElementById('dispensed-status');
+                dispensedStatus.textContent = prescription.isDispensed ? 'تم الصرف' : 'لم يصرف';
+                dispensedStatus.className = 'badge ' + (prescription.isDispensed ? 'badge-dispensed' : 'badge-not-dispensed');
+
+                // تعبئة قائمة الأدوية
+                const medicationsList = document.getElementById('medications-list');
+                medicationsList.innerHTML = '';
+
+                if (prescription.prescriptionItems.length === 0) {
+                    medicationsList.innerHTML = '<p class="text-muted">لا توجد أدوية في هذه الوصفة</p>';
+                    return;
+                }
+
+                prescription.prescriptionItems.forEach(item => {
+                    const medItem = document.createElement('div');
+                    medItem.className = 'medication-item';
+                    medItem.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <h6>الدواء #${item.medicationId || 'غير معروف'}</h6>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-4"><strong>الجرعة:</strong> ${item.dosage}</div>
+                    <div class="col-md-4"><strong>التكرار:</strong> ${item.frequency} مرات يومياً</div>
+                    <div class="col-md-4"><strong>المدة:</strong> ${item.duration} يوم</div>
+                </div>
+            `;
+                    medicationsList.appendChild(medItem);
+                });
+            }
+
+            // تصفية الوصفات
+            function filterPrescriptions() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const status = statusFilter.value;
+                const dateOrder = dateFilter.value;
+
+                let filtered = prescriptions.filter(p => {
+                    const matchesSearch =
+                        p.id.toString().includes(searchTerm) ||
+                        p.doctor.user.fullName.toLowerCase().includes(searchTerm);
+
+                    const matchesStatus =
+                        status === 'all' ||
+                        (status === 'dispensed' && p.isDispensed) ||
+                        (status === 'not-dispensed' && !p.isDispensed);
+
+                    return matchesSearch && matchesStatus;
+                });
+
+                // ترتيب حسب التاريخ
+                filtered.sort((a, b) => {
+                    const dateA = new Date(a.issuedDate);
+                    const dateB = new Date(b.issuedDate);
+                    return dateOrder === 'newest' ? dateB - dateA : dateA - dateB;
+                });
+
+                renderPrescriptions(filtered);
+            }
+
+            // مستمعين لأحداث التصفية
+            searchInput.addEventListener('input', filterPrescriptions);
+            statusFilter.addEventListener('change', filterPrescriptions);
+            dateFilter.addEventListener('change', filterPrescriptions);
+
+            // مستمع لزر تسجيل الخروج
+            // document.getElementById('logout-btn').addEventListener('click', logout);
+
+            // مستمع لزر الطباعة
+            document.getElementById('print-prescription-btn').addEventListener('click', () => {
+                window.print();
+            });
+
+            // جلب البيانات عند تحميل الصفحة
+            fetchPrescriptions();
+        });
+    </script>
+
+</body>
+
+</html>

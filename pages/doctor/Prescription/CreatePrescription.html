@@ -13,16 +13,16 @@
             text-align: center;
             margin-top: 20px;
         }
-
+        
         .alert-message {
             display: none;
         }
-
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
         }
-
+        
         .container {
             background-color: white;
             border-radius: 10px;
@@ -31,23 +31,23 @@
             margin-top: 30px;
             margin-bottom: 30px;
         }
-
+        
         h2 {
             color: #0d6efd;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
         }
-
+        
         .form-label {
             font-weight: 600;
         }
-
+        
         #medication-list {
             list-style-type: none;
             padding: 0;
         }
-
+        
         #medication-list li {
             background-color: #f8f9fa;
             padding: 10px;
@@ -67,15 +67,15 @@
         <div class="alert alert-success alert-message" id="success-message"></div>
 
         <form id="prescription-form">
-            <input type="hidden" id="doctorId" value="">
+            <input type="text" id="doctorId" value="" hidden>
 
             <div class="mb-3">
-                <label for="patient-search" class="form-label">البحث عن المريض</label>
+                <label for="patient-search" class="form-label" id="lblPatient">البحث عن المريض</label>
                 <input type="text" id="patient-search" class="form-control" placeholder="ابحث عن المريض بإسمه الكامل" oninput="searchPatients()">
             </div>
 
             <div class="mb-3">
-                <label for="patient" class="form-label">اختيار المريض</label>
+                <label for="patient" class="form-label" id="lblPatient-list">اختيار المريض</label>
                 <select id="patient" class="form-select" require>
                     <option value="">-- اختر المريض --</option>
                     <!-- قائمة المرضى سيتم تعبئتها عبر JavaScript -->
@@ -389,9 +389,67 @@
             }, 5000);
         }
 
+        async function GetPatientsById(patientId) {
+            try {
+                const prescriptionsResponse = await fetch(`https://localhost:7219/api/Prescription/GetByPatientId/${patientId}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+
+                if (!prescriptionsResponse.ok) throw new Error('فشل في تحميل الوصفات الطبية');
+
+                allPrescriptions = await prescriptionsResponse.json();
+
+                if (allPrescriptions.length === 0) {
+                    //  showMessage('لا توجد وصفات طبية لهذا المريض', false);
+                    /*  document.getElementById('prescriptions-list').innerHTML = `
+                        <div class="no-prescriptions">
+                            <p>لا توجد وصفات طبية مسجلة لهذا المريض</p>
+                        </div>
+                    `;
+                    document.getElementById('stats-section').classList.add('d-none');
+                    document.getElementById('pagination').classList.add('d-none');*/
+
+                    alert("المريض غير موجود!");
+                    return;
+                }
+
+                const patient = allPrescriptions[0].patient;
+
+
+                const patientSelect = document.getElementById('patient');
+                patientSelect.innerHTML = '';
+
+                const option = document.createElement('option');
+                option.value = patient.id;
+                option.textContent = `${patient.user.fullName} - ${patient.user.email || ''} - ${patient.id }`;
+                patientSelect.appendChild(option);
+
+
+
+            } catch (error) {
+                alert("المريض غير موجود!");
+
+            }
+        }
         window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const patientId = urlParams.get('doctorId');
+
             if (doctorData) {
                 document.getElementById('doctorId').value = doctorData.id;
+            } //patient-search lblPatient
+
+            if (patientId) {
+                document.getElementById('patient-search').value = patientId;
+                document.getElementById('lblPatient').textContent = "رقم المريض";
+                let a = document.createAttribute("readonly");
+                document.getElementById('patient-search').setAttributeNode(a);
+                searchPatients();
+                GetPatientsById(patientId);
+                document.getElementById('lblPatient-list').textContent = "بيانات المريض";
+
             }
             loadPatients();
             loadMedications();
