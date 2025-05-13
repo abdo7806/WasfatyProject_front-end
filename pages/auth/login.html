@@ -5,110 +5,101 @@
     <meta charset="UTF-8">
     <title>تسجيل الدخول - وصفتي</title>
     <link rel="stylesheet" href="../../css/style.css">
-
-    <!-- [Favicon] icon -->
-    <link rel="icon" href="../../assets/images/favicon.svg" type="image/x-icon">
-    <!-- [Google Font] Family -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
-    <!-- [Tabler Icons] -->
-    <link rel="stylesheet" href="../../assets/fonts/tabler-icons.min.css">
-    <!-- [Feather Icons] -->
-    <link rel="stylesheet" href="../../assets/fonts/feather.css">
-    <!-- [Font Awesome Icons] -->
-    <link rel="stylesheet" href="../../assets/fonts/fontawesome.css">
-    <!-- [Material Icons] -->
-    <link rel="stylesheet" href="../../assets/fonts/material.css">
-    <!-- [Template CSS Files] -->
-    <link rel="stylesheet" href="../../assets/css/style.css" id="main-style-link">
-    <link rel="stylesheet" href="../../assets/css/style-preset.css">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
 </head>
 
-<body>
-
-    <!-- [ Pre-loader ] start -->
-    <div class="loader-bg">
-        <div class="loader-track">
-            <div class="loader-fill"></div>
-        </div>
-    </div>
-    <!-- [ Pre-loader ] End -->
-
-    <div class="auth-main">
-        <div class="auth-wrapper v3">
-            <div class="auth-form">
-                <div class="auth-header">
-                    <a href="#"><img src="../../assets/images/logo-dark.svg" alt="شعار"></a>
-                </div>
-                <div class="card my-5">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-end mb-4">
-                            <h3 class="mb-0"><b>تسجيل الدخول</b></h3>
-                            <a href="#" class="link-primary">ليس لديك حساب؟</a>
-                        </div>
-                        <div id="error-message" class="text-danger mb-3"></div>
-                        <div class="form-group mb-3">
-                            <label class="form-label">البريد الإلكتروني</label>
-                            <input type="email" id="email" class="form-control" placeholder="البريد الإلكتروني" />
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="form-label">كلمة المرور</label>
-                            <input type="password" id="password" class="form-control" placeholder="كلمة المرور" />
-                        </div>
-                        <div class="d-flex mt-1 justify-content-between">
-                            <div class="form-check">
-                                <input class="form-check-input input-primary" type="checkbox" id="customCheckc1" checked>
-                                <label class="form-check-label text-muted" for="customCheckc1">ابقني مسجلاً للدخول</label>
-                            </div>
-                        </div>
-                        <div class="d-grid mt-4">
-                            <button type="button" class="btn btn-primary" onclick="login()">تسجيل الدخول</button>
-                        </div>
-                        <div class="saprator mt-3">
-                            <span>تسجيل الدخول باستخدام</span>
-                        </div>
-                        <div class="row">
-                            <div class="col-4">
-                                <div class="d-grid">
-                                    <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
-                                        <img src="../../assets/images/authentication/google.svg" alt="جوجل"> <span class="d-none d-sm-inline-block"> جوجل</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="d-grid">
-                                    <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
-                                        <img src="../../assets/images/authentication/twitter.svg" alt="تويتر"> <span class="d-none d-sm-inline-block"> تويتر</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="d-grid">
-                                    <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
-                                        <img src="../../assets/images/authentication/facebook.svg" alt="فيسبوك"> <span class="d-none d-sm-inline-block"> فيسبوك</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="auth-footer row">
-                    <div class="col my-1">
-                        <p class="m-0">حقوق الطبع والنشر © <a href="#">Codedthemes</a></p>
-                    </div>
-                    <div class="col-auto my-1">
-                        <ul class="list-inline footer-link mb-0">
-                            <li class="list-inline-item"><a href="#">الصفحة الرئيسية</a></li>
-                            <li class="list-inline-item"><a href="#">سياسة الخصوصية</a></li>
-                            <li class="list-inline-item"><a href="#">اتصل بنا</a></li>
-                        </ul>
-                    </div>
-                </div>
+<body class="hold-transition login-page">
+    <div class="login-box">
+        <!-- /.login-logo -->
+        <div class="card card-outline card-primary">
+            <div class="card-header text-center">
+                <a href="../../index2.html" class="h1"><b>Admin</b>LTE</a>
             </div>
+
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-end mb-4">
+                    <h3 class="login-box-msg"><b>تسجيل الدخول</b></h3>
+                    <a href="#" class="link-primary">ليس لديك حساب؟</a>
+                </div>
+
+                <div id="error-message" class="text-danger mb-3"></div>
+
+                <div class="input-group mb-3">
+                    <input type="email" id="email" class="form-control" placeholder="البريد الإلكتروني" />
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-envelope"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group mb-3">
+                    <input type="password" id="password" class="form-control" placeholder="كلمة المرور" />
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-8">
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="remember">
+                            <label for="remember">ابقني مسجلاً للدخول </label>
+                        </div>
+                    </div>
+
+
+
+
+                    <!-- /.col -->
+                    <div class="col-4">
+                        <button type="button" class="btn btn-primary btn-block" onclick="login()">تسجيل الدخول
+
+                        </button>
+                    </div>
+                    <!-- /.col -->
+                </div>
+
+                <div class="social-auth-links text-center mt-2 mb-3">
+                    <a href="#" class="btn btn-block btn-primary">
+                        <i class="fab fa-facebook mr-2"></i> Sign in using Facebook
+                    </a>
+                    <a href="#" class="btn btn-block btn-danger">
+                        <i class="fab fa-google-plus mr-2"></i> Sign in using Google+
+                    </a>
+                </div>
+
+
+                <p class="mb-1">
+                    <a href="forgot-password.html">I forgot my password</a>
+                </p>
+                <p class="mb-0">
+                    <a href="./register.html" class="text-center">ليس لديك حساب؟</a>
+                </p>
+            </div>
+
+
+
         </div>
     </div>
 
+    <!-- jQuery -->
+    <script src="../../plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="../../dist/js/adminlte.min.js"></script>
     <script src="../../js/auth.js"></script>
-
 </body>
 
 </html>

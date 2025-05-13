@@ -27,6 +27,8 @@ function parseJwt(token) {
 
 
 async function login() {
+
+
     // الحصول على قيم المدخلات
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
@@ -129,10 +131,11 @@ async function register() {
         email: document.getElementById('email').value.trim(),
         password: document.getElementById('password').value,
         confirmPassword: document.getElementById('confirmPassword').value,
-        role: document.getElementById('role').value
+        role: 3
     };
 
     // التحقق من الصحة
+
     const errors = validateRegistration(formData);
     if (Object.keys(errors).length > 0) {
         displayErrors(errors);
@@ -141,7 +144,7 @@ async function register() {
 
     try {
         // إظهار مؤشر تحميل
-        showLoader();
+        // showLoader();
 
         const response = await fetch('https://localhost:7219/api/Auth/register', {
             method: 'POST',
@@ -156,8 +159,10 @@ async function register() {
             })
         });
 
+
+
         // إخفاء مؤشر تحميل
-        hideLoader();
+        //hideLoader();
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
@@ -180,9 +185,11 @@ async function register() {
 }
 
 function validateRegistration(data) {
+
     const errors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    // const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+
 
     if (!data.fullName) errors.fullName = 'الاسم الكامل مطلوب!';
     if (!data.email) {
@@ -192,8 +199,8 @@ function validateRegistration(data) {
     }
     if (!data.password) {
         errors.password = 'كلمة المرور مطلوبة!';
-    } else if (!passwordRegex.test(data.password)) {
-        errors.password = 'كلمة المرور يجب أن تحتوي على الأقل 8 أحرف وتشمل حروف وأرقام!';
+    } else if (data.password.length < 6) {
+        errors.password = 'كلمة المرور يجب أن تحتوي على الأقل 6 أحرف وتشمل حروف وأرقام!';
     }
     if (data.password !== data.confirmPassword) {
         errors.confirmPassword = 'كلمات المرور غير متطابقة!';
