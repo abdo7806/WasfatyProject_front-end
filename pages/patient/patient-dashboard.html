@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة تحكم المريض - النظام الصحي</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+
+    
     <style>
-         :root {
+        :root {
             --primary-color: #3498db;
             --secondary-color: #2980b9;
             --accent-color: #e74c3c;
@@ -17,16 +19,10 @@
             --warning-color: #f39c12;
         }
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
         body {
             background-color: #f5f5f5;
             color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         header {
@@ -41,6 +37,7 @@
         
         header h1 {
             font-size: 1.5rem;
+            margin-bottom: 0;
         }
         
         #logout-btn {
@@ -69,6 +66,8 @@
             display: flex;
             list-style: none;
             gap: 2rem;
+            margin-bottom: 0;
+            padding-left: 0;
         }
         
         nav a {
@@ -133,6 +132,7 @@
             font-size: 2rem;
             font-weight: bold;
             color: var(--primary-color);
+            margin-bottom: 0;
         }
         
         .latest-prescription {
@@ -149,25 +149,22 @@
             border-bottom: 1px solid #eee;
         }
         
-        .prescription-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
+        .prescription-card {
+            border-left: 4px solid var(--primary-color);
+            margin-bottom: 1rem;
         }
         
-        .prescription-info p {
-            margin-bottom: 0.5rem;
+        .prescription-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            background-color: rgba(52, 152, 219, 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125);
         }
         
-        .prescription-info strong {
-            color: var(--dark-color);
-        }
-        
-        .no-prescription {
-            text-align: center;
-            padding: 2rem;
-            color: var(--warning-color);
+        .prescription-card .card-body {
+            padding: 1.25rem;
         }
         
         .quick-actions {
@@ -194,85 +191,220 @@
             background-color: var(--secondary-color);
         }
         
+        /* تحسينات للتجاوب */
         @media (max-width: 768px) {
             nav ul {
                 gap: 0.5rem;
                 justify-content: space-between;
             }
+            
             .stats {
                 grid-template-columns: 1fr;
             }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* أنماط إضافية للتحسينات الجديدة */
+        #loading-indicator {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        #error-alert {
+            margin: 1rem 0;
+        }
+        
+        .dispensed-card {
+            border-left-color: var(--success-color);
+        }
+        
+        .not-dispensed-card {
+            border-left-color: var(--warning-color);
+        }
+        
+        .bg-success {
+            background-color: var(--success-color) !important;
+        }
+        
+        .bg-warning {
+            background-color: var(--warning-color) !important;
         }
     </style>
 </head>
-
 <body>
     <header>
         <h1><i class="fas fa-user-injured"></i> لوحة تحكم المريض</h1>
         <button id="logout-btn">
-            <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+            <i class="fas fa-sign-out-alt" onclick="logout2()"></i> تسجيل الخروج
         </button>
     </header>
 
-    <nav>
-        <ul>
-            <li><a href="#" class="active"><i class="fas fa-home"></i> الرئيسية</a></li>
-            <li><a href="prescriptions.html"><i class="fas fa-prescription-bottle-alt"></i> الوصفات الطبية</a></li>
-            <li><a href="/pages/patient/profile.html"><i class="fas fa-user-edit"></i> الملف الشخصي</a></li>
-        </ul>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="./patient-dashboard.html"><i class="fas fa-home"></i> الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./prescriptions.html"><i class="fas fa-prescription-bottle-alt"></i> الوصفات الطبية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-user-edit"></i> الملف الشخصي</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </nav>
-
+    
     <main>
-        <section class="welcome-section">
-            <h2><i class="fas fa-heart"></i> مرحباً بك في النظام الصحي</h2>
-            <p>هذه لوحة التحكم الخاصة بك حيث يمكنك متابعة وصفاتك الطبية والبيانات الشخصية.</p>
-        </section>
-
-        <section class="stats">
-            <div class="stat-card">
-                <h3><i class="fas fa-prescription-bottle-alt"></i> عدد الوصفات</h3>
-                <p id="total-prescriptions">0</p>
-            </div>
-
-            <div class="stat-card">
-                <h3><i class="fas fa-pills"></i> الأدوية المصروفة</h3>
-                <p id="dispensed-meds">0</p>
-            </div>
-
-            <div class="stat-card">
-                <h3><i class="fas fa-calendar-check"></i> آخر زيارة</h3>
-                <p id="last-visit">--</p>
-            </div>
-        </section>
-
-        <section class="latest-prescription">
-            <h2><i class="fas fa-file-medical"></i> أحدث وصفة طبية</h2>
-            <div id="latest-prescription-container">
-                <div class="no-prescription">
-                    <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                    <p>لا توجد وصفات طبية مسجلة</p>
+        <!-- مؤشر التحميل -->
+        <div id="loading-indicator" class="text-center py-4">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2">جاري تحميل البيانات...</p>
+        </div>
+        
+        <!-- رسالة الخطأ -->
+        <div id="error-alert" class="alert alert-danger d-none"></div>
+        
+        <!-- محتوى لوحة التحكم -->
+        <div id="dashboard-content">
+            <section class="welcome-section">
+                <h2><i class="fas fa-heart"></i> مرحباً بك في النظام الصحي</h2>
+                <p>هذه لوحة التحكم الخاصة بك حيث يمكنك متابعة وصفاتك الطبية والبيانات الشخصية.</p>
+            </section>
+            
+            <section class="stats">
+                <div class="stat-card">
+                    <h3><i class="fas fa-prescription-bottle-alt"></i> عدد الوصفات</h3>
+                    <p id="total-prescriptions">0</p>
                 </div>
+                
+                <div class="stat-card">
+                    <h3><i class="fas fa-pills"></i> الأدوية المصروفة</h3>
+                    <p id="dispensed-meds">0</p>
+                </div>
+                
+                <div class="stat-card">
+                    <h3><i class="fas fa-calendar-check"></i> آخر زيارة</h3>
+                    <p id="last-visit">--</p>
+                </div>
+            </section>
+            
+            <section class="latest-prescription" id="latest-prescription">
+                <h2><i class="fas fa-file-medical"></i> أحدث وصفة طبية</h2>
+                <div id="latest-prescription-container">
+                    <div class="no-prescription">
+                        <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>لا توجد وصفات طبية مسجلة</p>
+                    </div>
+                </div>
+            </section>
+            
+            <div class="quick-actions">
+                <button class="action-btn" onclick="window.location.href='/pages/patient/prescriptions.html'">
+                    <i class="fas fa-list"></i> عرض جميع الوصفات
+                </button>
+                <button class="action-btn" onclick="window.location.href='/pages/patient/profile.html'">
+                    <i class="fas fa-user-cog"></i> تحديث البيانات الشخصية
+                </button>
             </div>
-        </section>
-
-        <div class="quick-actions">
-            <button class="action-btn" onclick="window.location.href='/pages/patient/prescriptions.html'">
-                <i class="fas fa-list"></i> عرض جميع الوصفات
-            </button>
-            <button class="action-btn" onclick="window.location.href='/pages/patient/profile.html'">
-                <i class="fas fa-user-cog"></i> تحديث البيانات الشخصية
-            </button>
         </div>
     </main>
 
+        <!-- نموذج عرض التفاصيل -->
+    <div class="modal fade" id="prescriptionDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تفاصيل الوصفة الطبية #<span id="prescription-id"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="doctor-info">
+                                <h6><i class="fas fa-user-md"></i> معلومات الطبيب</h6>
+                                <p><strong>الاسم:</strong> <span id="doctor-name"></span></p>
+                                <p><strong>التخصص:</strong> <span id="doctor-specialization"></span></p>
+                                <p><strong>رقم الرخصة:</strong> <span id="doctor-license"></span></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="medical-center-info">
+                                <h6><i class="fas fa-hospital"></i> معلومات المركز الطبي</h6>
+                                <p><strong>الاسم:</strong> <span id="medical-center-name"></span></p>
+                                <p><strong>العنوان:</strong> <span id="medical-center-address"></span></p>
+                                <p><strong>الهاتف:</strong> <span id="medical-center-phone"></span></p>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="mt-4">
+                        <h6><i class="fas fa-calendar-alt"></i> معلومات الوصفة</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><strong>تاريخ الإصدار:</strong> <span id="issued-date"></span></p>
+                            </div>
+                            <div class="col-md-4">
+                                <p><strong>حالة الصرف:</strong> <span id="dispensed-status" class="badge"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h6><i class="fas fa-pills"></i> الأدوية الموصوفة</h6>
+                        <div id="medications-list" class="mt-3">
+                            <!-- سيتم ملؤها بواسطة JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                    <button type="button" class="btn btn-primary" id="print-prescription-btn">
+                        <i class="fas fa-print"></i> طباعة الوصفة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مكتبات JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- ملفات JavaScript الخاصة بالتطبيق -->
     <script src="../../js/auth.js"></script>
     <script src="../../js/checkAccess.js"></script>
+    <script src="../js/patient/dashboard.js"></script>
 
     <script>
-        getPatientByUserId();
+
+            checkAccess(['Patient'], '../../shared/unauthorized.html');
+
+          //  location.reload();
+
+        // تسجيل الخروج
+function logout2() {
+       // localStorage.removeItem('patientData');
+      // logout('../../auth/login.html');
+
+             localStorage.clear();
+    window.location.href = '../auth/login.html';
+}
+        
     </script>
 
 </body>
-
 </html>
