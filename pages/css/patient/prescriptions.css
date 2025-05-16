@@ -1,0 +1,139 @@
+:root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+        }
+        
+          body {
+            background-color: #f5f5f5;
+            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0;
+        }
+        
+        #logout-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.3s;
+        }
+        
+        #logout-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+          nav {
+            background-color: var(--dark-color);
+            padding: 0.5rem 2rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            margin-bottom: 0;
+            padding-left: 0;
+        }
+        
+        nav a {
+            color: var(--light-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        nav a:hover,
+        nav a.active {
+            background-color: var(--primary-color);
+        }
+        
+        .prescription-card {
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .dispensed-card {
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .not-dispensed-card {
+            border-left: 4px solid var(--warning-color);
+        }
+        
+        .badge-dispensed {
+            background-color: var(--success-color);
+        }
+        
+        .badge-not-dispensed {
+            background-color: var(--warning-color);
+        }
+        
+        .medication-item {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .filter-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .no-prescriptions {
+            text-align: center;
+            padding: 50px;
+            color: var(--dark-color);
+        }
+        
+        .doctor-info,
+        .medical-center-info {
+            background-color: #f0f8ff;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .prescription-card {
+                margin-bottom: 30px;
+            }
+        }

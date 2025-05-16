@@ -24,75 +24,21 @@
     <!-- AdminLTE CSS -->
     <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
 
-    <!-- Custom RTL Styles -->
-    <style>
-        body {
-            font-family: 'Tajawal', 'Source Sans Pro', sans-serif;
-        }
-        /* تحسينات للقائمة الجانبية */
-
-        .main-sidebar {
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
+  <style>
+            
+   
+                
+     /* أنماط إضافية للتحسينات الجديدة */
+        #loading-indicator {
+            text-align: center;
+            padding: 2rem;
         }
 
-        .sidebar {
-            padding-right: 0;
-        }
-        /* تحسينات للبطاقات الإحصائية */
-
-        .small-box {
-            transition: all 0.3s ease;
+         #error-alert {
+            margin: 1rem 0;
         }
 
-        .small-box:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .small-box .icon {
-            left: 10px;
-            right: auto;
-            font-size: 70px;
-            top: 15px;
-        }
-
-        .small-box .inner {
-            padding: 10px 20px 10px 80px;
-        }
-        /* تحسينات للشريط العلوي */
-
-        .navbar-nav {
-            padding-right: 0;
-        }
-        /* تحسينات للهواتف */
-
-        @media (max-width: 767.98px) {
-            .main-sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar-collapse .main-sidebar {
-                transform: translateX(0);
-            }
-            .brand-text {
-                font-size: 1rem;
-            }
-            .small-box .inner {
-                padding: 10px 15px 10px 70px;
-            }
-            .small-box .icon {
-                font-size: 60px;
-            }
-        }
-        /* تحسينات للجدول الزمني */
-
-        @media (max-width: 991.98px) {
-            .content-wrapper {
-                padding-top: 1rem;
-            }
-        }
-    </style>
+  </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -270,8 +216,23 @@
                 </div>
             </div>
 
+        <main>
+        <!-- مؤشر التحميل -->
+        <div id="loading-indicator" class="text-center py-4">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2">جاري تحميل البيانات...</p>
+        </div>
+        
+        <!-- رسالة الخطأ -->
+        <div id="error-alert" class="alert alert-danger d-none"></div>
+        
+        <!-- محتوى لوحة التحكم 
+        <div id="dashboard-content">
+        
+        </div>-->
+    </main>
             <!-- Main Content -->
-            <div class="content">
+            <div class="content" id="dashboard-content">
                 <div class="container-fluid">
                     <!-- Small Boxes -->
                     <div class="row">
@@ -284,7 +245,7 @@
                                 <div class="icon">
                                     <i class="fas fa-user-md"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                                <a href="./Doctor/Doctors.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
                             </div>
                         </div>
 
@@ -297,7 +258,7 @@
                                 <div class="icon">
                                     <i class="fas fa-user-nurse"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                                <a href="./Pharmacist/Pharmacists.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
                             </div>
                         </div>
 
@@ -310,7 +271,7 @@
                                 <div class="icon">
                                     <i class="fas fa-procedures"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                                <a href="./Patients/Patient.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
                             </div>
                         </div>
 
@@ -323,7 +284,7 @@
                                 <div class="icon">
                                     <i class="fas fa-prescription-bottle-alt"></i>
                                 </div>
-                                <a href="#" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                                <a href="./Prescription/Prescriptions.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
                             </div>
                         </div>
                     </div>
@@ -354,8 +315,9 @@
 
     <!-- AdminLTE App -->
     <script src="../../dist/js/adminlte.min.js"></script>
-    <script src="../../js/auth.js"></script>
-    <script src="../../js/checkAccess.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/checkAccess.js"></script>
+    <script src="../js/admin/dashboard.js"></script>
 
     <!-- Custom Scripts -->
     <script>

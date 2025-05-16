@@ -1,0 +1,66 @@
+  body {
+            font-family: 'Tajawal', 'Source Sans Pro', sans-serif;
+        }
+        /* تحسينات للقائمة الجانبية */
+
+        .main-sidebar {
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar {
+            padding-right: 0;
+        }
+        /* تحسينات للبطاقات الإحصائية */
+
+        .small-box {
+            transition: all 0.3s ease;
+        }
+
+        .small-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .small-box .icon {
+            left: 10px;
+            right: auto;
+            font-size: 70px;
+            top: 15px;
+        }
+
+        .small-box .inner {
+            padding: 10px 20px 10px 80px;
+        }
+        /* تحسينات للشريط العلوي */
+
+        .navbar-nav {
+            padding-right: 0;
+        }
+        /* تحسينات للهواتف */
+
+        @media (max-width: 767.98px) {
+            .main-sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar-collapse .main-sidebar {
+                transform: translateX(0);
+            }
+            .brand-text {
+                font-size: 1rem;
+            }
+            .small-box .inner {
+                padding: 10px 15px 10px 70px;
+            }
+            .small-box .icon {
+                font-size: 60px;
+            }
+        }
+        /* تحسينات للجدول الزمني */
+
+        @media (max-width: 991.98px) {
+            .content-wrapper {
+                padding-top: 1rem;
+            }
+        }

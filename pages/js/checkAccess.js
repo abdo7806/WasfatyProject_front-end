@@ -1,4 +1,6 @@
 function checkAccess(allowedRoles, url) {
+
+
     const token = localStorage.getItem('token');
     if (!token) {
         window.location.href = url;
@@ -40,6 +42,7 @@ function parseJwt(token) {
 
 
 function getUserName() {
+
 
     const userData = JSON.parse(localStorage.getItem("userData"));
     let email = document.getElementsByClassName("EmailUser");

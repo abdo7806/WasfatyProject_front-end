@@ -46,9 +46,9 @@ function displayPrescriptionItems(data) {
 						<td>${item.duration}</td>
 						<td>
 
-                            <a href="EditPrescriptionItem.html?id=${item.id}"class="btn btn-info btn-action" title="عرض"><i class="fas fa-eye"></i></a>
+                            <a href="DetailsPrescriptionItem.html?id=${item.id}" class="btn btn-info btn-action" title="عرض"><i class="fas fa-eye"></i></a>
                 <a href="#" class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deletePrescriptionItem(${item.id})" title="حذف"><i class="fas fa-trash"></i></a>
-								<a href="DetailsPrescriptionItem.html?id=${item.id}  class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
+								<a href="EditPrescriptionItem.html?id=${item.id}"  class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
 
 						</td>
 				`;
