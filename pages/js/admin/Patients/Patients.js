@@ -492,7 +492,7 @@ async function loadUserData(patientId) {
     }
 }
 
-async function updateUser(userId, fullName, email, role = 2) {
+async function updateUser(userId, fullName, email, role = 3) {
     const userData = {
         fullName,
         email,
@@ -552,7 +552,7 @@ async function updatePatient() {
         }
 
         const updatedPatient = await response.json();
-        const userUpdated = await updateUser(updatedPatient.userId, fullName, email, 2);
+        const userUpdated = await updateUser(updatedPatient.userId, fullName, email, 3);
 
         if (userUpdated) {
             alert("تم تعديل البيانات بنجاح");
