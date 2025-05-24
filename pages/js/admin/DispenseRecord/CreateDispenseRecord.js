@@ -124,8 +124,7 @@ checkAccess(['Admin'], '../../../shared/unauthorized.html');
                     dispensedDate: $('#dispensedDate').val()
                 };
 
-                alert(data.pharmacistId);
-
+          
                 $.ajax({
                     url: 'https://localhost:7219/api/DispenseRecord/CreateDispenseRecord',
                     method: 'POST',

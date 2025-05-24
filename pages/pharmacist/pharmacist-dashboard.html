@@ -1,76 +1,290 @@
 <!DOCTYPE html>
-<html lang="ar">
-
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة تحكم الصيدلي</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        :root {
+            --primary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --secondary-color: #166088;
+            --danger-color: #dc3545;
+            --light-bg: #f8f9fa;
+            --pharma-primary: #3498db;
+            --pharma-secondary: #2c3e50;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            margin: 0;
-            padding: 0;
+            background-color: #f8f9fa;
+            font-family: 'Tajawal', sans-serif;
         }
         
-        header {
-            background-color: #2c3e50;
-            color: #fff;
-            padding: 10px 20px;
+        /* Header Styles */
+        .pharma-header {
+            background: linear-gradient(135deg, var(--pharma-primary), var(--pharma-secondary));
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
-        main {
-            padding: 20px;
+        /* Navigation */
+        .pharma-navbar {
+            background-color: var(--dark-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
-        .card {
-            background: white;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .nav-link.active {
+            font-weight: bold;
+            border-bottom: 3px solid var(--primary-color);
         }
         
-        .logout-btn {
-            float: left;
-            background: #d9534f;
-            color: white;
-            padding: 5px 10px;
+        /* Stats Cards */
+        .stat-card {
+            transition: all 0.3s;
+            border-radius: 10px;
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            height: 100%;
+            border-left: 4px solid transparent;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-card.pending {
+            border-left-color: var(--warning-color);
+        }
+        
+        .stat-card.dispensed {
+            border-left-color: var(--success-color);
+        }
+        
+        .stat-card.medications {
+            border-left-color: var(--info);
+        }
+        
+        .stat-icon {
+            font-size: 1.8rem;
+            opacity: 0.8;
+        }
+        
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        /* Quick Actions */
+        .quick-action-btn {
+            transition: all 0.3s;
+            border-radius: 8px;
+            padding: 15px 10px;
+            font-weight: 500;
+            border: 1px solid #dee2e6;
+        }
+        
+        .quick-action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .stat-card {
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+        
+        /* Loading Indicator */
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
         }
     </style>
 </head>
-
 <body>
-    <header>
-        <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
-        <h1>لوحة تحكم الصيدلي</h1>
+    <!-- Header -->
+    <header class="pharma-header text-white p-3">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <img src="/assets/images/pharmacy-logo.png" alt="Logo" height="40" class="me-3">
+                    <h1 class="h4 mb-0"><i class="fas fa-prescription-bottle-alt me-2"></i>لوحة تحكم الصيدلي</h1>
+                </div>
+                <div>
+                    <span id="new-prescriptions-badge" class="badge bg-danger d-none me-2">
+                        <i class="fas fa-bell"></i> وصفات جديدة
+                    </span>
+                    <button id="logout-btn" class="btn btn-outline-light">
+                        <i class="fas fa-sign-out-alt me-1"></i> تسجيل الخروج
+                    </button>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <main>
-        <div class="card">
-            <h2>الوصفات المنتظرة</h2>
-            <a href="/pages/pharmacist/prescriptions/pending.html">عرض الوصفات المنتظرة</a>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg pharma-navbar navbar-dark">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="./pharmacist-dashboard.html"><i class="fas fa-home me-1"></i> الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./prescriptions/pending.html"><i class="fas fa-clock me-1"></i> الوصفات المعلقة</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./prescriptions/history.html"><i class="fas fa-history me-1"></i> سجل الصرف</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div class="card">
-            <h2>سجل الصرف</h2>
-            <a href="/pages/pharmacist/prescriptions/history.html">عرض سجل الصرف</a>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container my-4">
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="text-center py-5">
+            <div class="spinner-border text-primary loading-spinner"></div>
+            <p class="mt-3">جاري تحميل البيانات...</p>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="error-alert" class="alert alert-danger d-none"></div>
+
+        <!-- Dashboard Content (hidden by default) -->
+        <div id="dashboard-content" class="d-none">
+            <!-- Stats Section -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4 col-sm-6">
+                    <div class="stat-card card text-white bg-warning h-100 pending">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="card-title mb-1">الوصفات المعلقة</h6>
+                                    <h2 id="pending-prescriptions" class="mb-0">0</h2>
+                                    <small class="opacity-75">بانتظار الصرف</small>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 col-sm-6">
+                    <div class="stat-card card text-white bg-success h-100 dispensed">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="card-title mb-1">الوصفات المصروفة</h6>
+                                    <h2 id="dispensed-prescriptions" class="mb-0">0</h2>
+                                    <small class="opacity-75">تم صرفها</small>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 col-sm-6">
+                    <div class="stat-card card text-white bg-info h-100 medications">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="card-title mb-1">الأدوية المصروفة</h6>
+                                    <h2 id="monthly-medications" class="mb-0">0</h2>
+                                    <small class="opacity-75">هذا الشهر</small>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-pills"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white border-bottom">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-pie me-2"></i>أكثر الأدوية صرفاً
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="topMedicationsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4 col-sm-6">
+                    <a href="./prescriptions/pending.html" class="btn btn-outline-primary w-100 quick-action-btn">
+                        <i class="fas fa-clock fa-lg me-2"></i> الوصفات المعلقة
+                    </a>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <a href="./prescriptions/history.html" class="btn btn-outline-secondary w-100 quick-action-btn">
+                        <i class="fas fa-history fa-lg me-2"></i> سجل الصرف
+                    </a>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <a href="#" class="btn btn-outline-success w-100 quick-action-btn">
+                        <i class="fas fa-search fa-lg me-2"></i> بحث متقدم
+                    </a>
+                </div>
+            </div>
         </div>
     </main>
 
-    <script src="../../js/checkAccess.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+     <!-- ملفات JavaScript الخاصة بالتطبيق -->
+    <script src="../js/auth.js"></script>
+    <script src="../js/checkAccess.js"></script>
+  
+    <script src="../js/pharmacist/pharmacist-dashboard.js"></script>
+
     <script>
-        checkAccess(['Pharmacist']);
 
-        function logout() {
-            localStorage.removeItem('token');
-            localStorage.removeItem('userData');
-            window.location.href = '../auth/login.html';
-
-        }
+    
     </script>
 </body>
-
 </html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سجل صرف الوصفات - نظام الصيدلية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --pharma-primary: #3498db;
+            --pharma-secondary: #2c3e50;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        .pharma-header {
+            background: linear-gradient(135deg, var(--pharma-primary), var(--pharma-secondary));
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .pharma-navbar {
+            background-color: var(--dark-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .nav-link.active {
+            font-weight: bold;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .history-card {
+            border-radius: 8px;
+            border-left: 4px solid var(--success-color);
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+        
+        .history-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .medication-badge {
+            font-size: 0.8rem;
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        
+        .filter-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .filter-section .col-md-3 {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="pharma-header text-white p-3">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h4 mb-0"><i class="fas fa-history me-2"></i>سجل صرف الوصفات</h1>
+                <div>
+                    <button id="logout-btn" class="btn btn-outline-light">
+                        <i class="fas fa-sign-out-alt me-1"></i> تسجيل الخروج
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg pharma-navbar navbar-dark">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../pharmacist-dashboard.html"><i class="fas fa-home me-1"></i> الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./pending.html"><i class="fas fa-clock me-1"></i> الوصفات المعلقة</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="fas fa-history me-1"></i> سجل الصرف</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container my-4">
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="text-center py-5">
+            <div class="spinner-border text-primary loading-spinner"></div>
+            <p class="mt-3">جاري تحميل سجل الصرف...</p>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="error-alert" class="alert alert-danger d-none"></div>
+
+        <!-- Filters Section -->
+        <div id="filters-section" class="filter-section mb-4 d-none">
+            <div class="row">
+                <div class="col-md-3 mb-2">
+                    <label for="date-filter" class="form-label">التاريخ</label>
+                    <select id="date-filter" class="form-select">
+                        <option value="all">الكل</option>
+                        <option value="today">اليوم</option>
+                        <option value="week">هذا الأسبوع</option>
+                        <option value="month">هذا الشهر</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <label for="patient-filter" class="form-label">اسم المريض</label>
+                    <input type="text" id="patient-filter" class="form-control" placeholder="ابحث باسم المريض">
+                </div>
+                <div class="col-md-3 mb-2">
+                    <label for="doctor-filter" class="form-label">اسم الطبيب</label>
+                    <input type="text" id="doctor-filter" class="form-control" placeholder="ابحث باسم الطبيب">
+                </div>
+                <div class="col-md-3 mb-2">
+                    <label for="status-filter" class="form-label">حالة الصرف</label>
+                    <select id="status-filter" class="form-select">
+                        <option value="all">الكل</option>
+                        <option value="dispensed">تم الصرف</option>
+                        <option value="cancelled">ملغية</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 d-flex justify-content-between">
+                    <button id="reset-filters" class="btn btn-outline-secondary">
+                        <i class="fas fa-undo me-1"></i> إعادة تعيين
+                    </button>
+                    <button id="apply-filters" class="btn btn-primary">
+                        <i class="fas fa-filter me-1"></i> تطبيق الفلاتر
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Content -->
+        <div id="history-content" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">إجمالي الوصفات: <span id="total-count">0</span></h5>
+                <div class="d-flex">
+                    <div class="input-group ms-3" style="width: 250px;">
+                        <input type="text" id="search-input" class="form-control" placeholder="ابحث برقم الوصفة...">
+                        <button class="btn btn-outline-secondary" type="button" id="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <button id="export-btn" class="btn btn-success ms-2">
+                        <i class="fas fa-file-export me-1"></i> تصدير
+                    </button>
+                </div>
+            </div>
+
+            <div id="history-list" class="row">
+                <!-- سيتم ملؤها بالبيانات -->
+            </div>
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center" id="pagination">
+                    <!-- سيتم ملؤها بالجافاسكريبت -->
+                </ul>
+            </nav>
+        </div>
+
+        <!-- No Results -->
+        <div id="no-results" class="text-center py-5 d-none">
+            <i class="fas fa-file-medical fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">لا توجد وصفات في السجل</h4>
+            <button class="btn btn-primary mt-2" id="try-again-btn">
+                <i class="fas fa-redo me-1"></i> المحاولة مرة أخرى
+            </button>
+        </div>
+    </main>
+
+    <!-- Prescription Details Modal -->
+    <div class="modal fade" id="prescriptionDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تفاصيل الوصفة #<span id="prescription-id"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="fas fa-user-injured me-1"></i>معلومات المريض</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>الاسم:</strong> <span id="patient-name"></span></p>
+                                    <p><strong>رقم الهوية:</strong> <span id="patient-id"></span></p>
+                                    <p><strong>العمر:</strong> <span id="patient-age"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="fas fa-user-md me-1"></i>معلومات الصرف</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>تاريخ الصرف:</strong> <span id="dispensed-date"></span></p>
+                                    <p><strong>الصيدلي:</strong> <span id="pharmacist-name"></span></p>
+                                    <p><strong>الصيدلية:</strong> <span id="pharmacy-name"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="fas fa-notes-medical me-1"></i>ملاحظات الطبيب</h6>
+                        </div>
+                        <div class="card-body">
+                            <p id="doctor-notes">لا توجد ملاحظات</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0"><i class="fas fa-pills me-1"></i>الأدوية الموصوفة</h6>
+                            <span class="badge bg-primary" id="medications-count">0 دواء</span>
+                        </div>
+                        <div class="card-body">
+                            <div id="medications-list" class="list-group">
+                                <!-- سيتم ملؤها بالجافاسكريبت -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> إغلاق
+                    </button>
+                    <button type="button" class="btn btn-primary" id="print-btn">
+                        <i class="fas fa-print me-1"></i> طباعة الوصفة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="../../js/checkAccess.js"></script>
+
+    <script src="../../js/pharmacist/history.js"></script>
+</body>
+</html>
