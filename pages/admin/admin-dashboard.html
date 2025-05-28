@@ -23,6 +23,7 @@
 
     <!-- AdminLTE CSS -->
     <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tajawal...">
 
   <style>
             
@@ -215,7 +216,6 @@
                     </div>
                 </div>
             </div>
-
         <main>
         <!-- مؤشر التحميل -->
         <div id="loading-indicator" class="text-center py-4">
@@ -232,69 +232,164 @@
         </div>-->
     </main>
             <!-- Main Content -->
-            <div class="content" id="dashboard-content">
-                <div class="container-fluid">
-                    <!-- Small Boxes -->
-                    <div class="row">
-                        <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
-                            <div class="small-box bg-info h-100">
-                                <div class="inner">
-                                    <h3 id="doctors-count">125</h3>
-                                    <p>الأطباء المسجلين</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-user-md"></i>
-                                </div>
-                                <a href="./Doctor/Doctors.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
-                            <div class="small-box bg-success h-100">
-                                <div class="inner">
-                                    <h3 id="pharmacists-count">78</h3>
-                                    <p>الصيادلة المسجلين</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-user-nurse"></i>
-                                </div>
-                                <a href="./Pharmacist/Pharmacists.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
-                            <div class="small-box bg-warning h-100">
-                                <div class="inner">
-                                    <h3 id="patients-count">2,450</h3>
-                                    <p>المرضى المسجلين</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-procedures"></i>
-                                </div>
-                                <a href="./Patients/Patient.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
-                            <div class="small-box bg-danger h-100">
-                                <div class="inner">
-                                    <h3 id="prescriptions-count">1,850</h3>
-                                    <p>الوصفات الشهرية</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-prescription-bottle-alt"></i>
-                                </div>
-                                <a href="./Prescription/Prescriptions.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
-                            </div>
-                        </div>
+            <!-- Main Content -->
+<div class="content" id="dashboard-content">
+    <div class="container-fluid">
+        <!-- Small Boxes -->
+        <div class="row">
+            <!-- بطاقة الأطباء -->
+            <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
+                <div class="small-box bg-info h-100">
+                    <div class="inner">
+                        <h3 id="totalDoctors">0</h3>
+                        <p>الأطباء المسجلين</p>
                     </div>
+                    <div class="icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <a href="./Doctor/Doctors.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                </div>
+            </div>
 
-                    <!-- Main Row -->
-                    <div class="row">
-                        <!-- يمكنك إضافة المزيد من المحتوى هنا -->
+            <!-- بطاقة الصيادلة -->
+            <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
+                <div class="small-box bg-success h-100">
+                    <div class="inner">
+                        <h3 id="totalPharmacists">0</h3>
+                        <p>الصيادلة المسجلين</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-user-nurse"></i>
+                    </div>
+                    <a href="./Pharmacist/Pharmacists.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                </div>
+            </div>
+
+            <!-- بطاقة المرضى -->
+            <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
+                <div class="small-box bg-warning h-100">
+                    <div class="inner">
+                        <h3 id="totalPatients">0</h3>
+                        <p>المرضى المسجلين</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-procedures"></i>
+                    </div>
+                    <a href="./Patients/Patient.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                </div>
+            </div>
+
+            <!-- بطاقة الوصفات -->
+            <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
+                <div class="small-box bg-danger h-100">
+                    <div class="inner">
+                        <h3 id="totalPrescriptions">0</h3>
+                        <p>إجمالي الوصفات</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-prescription-bottle-alt"></i>
+                    </div>
+                    <a href="./Prescription/Prescriptions.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- تقارير إضافية -->
+        <div class="row">
+            <!-- الصيدليات -->
+            <div class="col-12 col-sm-6 col-md-4 mb-4">
+                <div class="small-box bg-secondary h-100">
+                    <div class="inner">
+                        <h3 id="totalPharmacies">0</h3>
+                        <p>الصيدليات المسجلة</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-medkit"></i>
+                    </div>
+                    <a href="./Pharmacy/Pharmacys.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                </div>
+            </div>
+
+            <!-- الوصفات المستلمة -->
+            <div class="col-12 col-sm-6 col-md-4 mb-4">
+                <div class="small-box bg-primary h-100">
+                    <div class="inner">
+                        <h3 id="totalDispensedPrescriptions">0</h3>
+                        <p>الوصفات المستلمة</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <a href="./DispenseRecord/DispenseRecords.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                </div>
+            </div>
+
+            <!-- الوصفات المنتظرة -->
+            <div class="col-12 col-sm-6 col-md-4 mb-4">
+                <div class="small-box bg-purple h-100">
+                    <div class="inner">
+                        <h3 id="totalPendingPrescriptions">0</h3>
+                        <p>الوصفات المنتظرة</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <a href="./Prescription/Prescriptions.html?status=pending" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- تقارير إضافية -->
+        <div class="row">
+            <!-- الأدوية -->
+            <div class="col-12 col-sm-6 col-md-6 mb-4">
+                <div class="small-box bg-indigo h-100">
+                    <div class="inner">
+                        <h3 id="totalMedications">0</h3>
+                        <p>الأدوية المتاحة</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <a href="./Medication/Medications.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                </div>
+            </div>
+
+            <!-- المستخدمون -->
+            <div class="col-12 col-sm-6 col-md-6 mb-4">
+                <div class="small-box bg-teal h-100">
+                    <div class="inner">
+                        <h3 id="totalUsers">0</h3>
+                        <p>إجمالي المستخدمين</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <a href="./Users/User.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- رسوم بيانية -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-gradient-info">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-bar mr-1"></i>
+                            إحصائيات الوصفات الشهرية
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart">
+                            <canvas id="prescriptionsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
         </div>
 
         <!-- Footer -->
@@ -318,26 +413,19 @@
     <script src="../js/auth.js"></script>
     <script src="../js/checkAccess.js"></script>
     <script src="../js/admin/dashboard.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Custom Scripts -->
     <script>
         checkAccess(['Admin'], '../../shared/unauthorized.html');
         getUserName();
+    
         $(document).ready(function() {
             // إغلاق القائمة الجانبية تلقائياً على الهواتف
             if ($(window).width() < 768) {
                 $('body').addClass('sidebar-collapse');
             }
-
-            // تحديث الإحصائيات (يمكن استبدالها ببيانات حقيقية)
-            function updateStats() {
-                // هنا يمكنك إضافة كود AJAX لجلب البيانات الحقيقية
-                $('#doctors-count').text('125');
-                $('#pharmacists-count').text('78');
-                $('#patients-count').text('2,450');
-                $('#prescriptions-count').text('1,850');
-            }
-            updateStats();
 
             // إعادة حساب الأبعاد عند تغيير حجم النافذة
             $(window).resize(function() {
@@ -347,10 +435,15 @@
                     $('body').removeClass('sidebar-collapse');
                 }
             });
+
+            // زر إنشاء وصفة جديدة
+            $('.new-prescription-btn').click(function() {
+                window.location.href = './Doctor/Doctors.html';
+            });
         });
-    </script>
 
 
+</script>
 </body>
 
 </html>

@@ -1,8 +1,9 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     // جلب البيانات من الخادم
     function fetchDashboardData() {
         $.ajax({
-            url: 'https://localhost:7219/api/Admin/dashboard',
+            url: 'https://localhost:7219/api/Doctor/dashboard/2',
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
@@ -16,15 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // التحقق من وجود العناصر قبل تعبئتها
                 const elements = {
-                    'totalDoctors': data.totalDoctors,
-                    'totalPharmacists': data.totalPharmacists,
-                    'totalPatients': data.totalPatients,
                     'totalPrescriptions': data.totalPrescriptions,
-                    'totalPharmacies': data.totalPharmacies,
-                    'totalDispensedPrescriptions': data.totalDispensedPrescriptions,
-                    'totalPendingPrescriptions': data.totalPendingPrescriptions || 0,
-                    'totalMedications': data.totalMedications,
-                    'totalUsers': data.totalUsers
+                    'dispensedPrescriptions': data.dispensedPrescriptions,
+                    'pendingPrescriptions': data.pendingPrescriptions,
+                    'uniquePatients': data.uniquePatients,
+                    
                 };
 
                 Object.keys(elements).forEach(id => {

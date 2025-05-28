@@ -2,7 +2,7 @@
 <html lang="ar">
 
 <head>
-    <title>لوحة الطبيب | نظام وصفتي الإلكتروني</title>
+    <title>لوحة التحكم | نظام وصفتي الإلكتروني</title>
     <!-- [Meta] -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -23,12 +23,30 @@
 
     <!-- AdminLTE CSS -->
     <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
-    <link rel="stylesheet" href="../css/admin-style.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tajawal...">
 
+  <style>
+            
+   
+                
+     /* أنماط إضافية للتحسينات الجديدة */
+        #loading-indicator {
+            text-align: center;
+            padding: 2rem;
+        }
+
+         #error-alert {
+            margin: 1rem 0;
+        }
+
+  </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
+
+
     <div class="wrapper">
+
         <!-- Pre-loader -->
         <div class="preloader flex-column justify-content-center align-items-center">
             <img class="animation__shake" src="../../dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
@@ -42,7 +60,7 @@
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="./doctor-dashboard.html" class="nav-link">الرئيسية</a>
+                    <a href="./admin-dashboard.html" class="nav-link">الرئيسية</a>
                 </li>
             </ul>
 
@@ -63,6 +81,7 @@
                     </div>
                 </li>
 
+
                 <!-- زر حساب المستخدم -->
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-toggle="dropdown" href="#">
@@ -71,8 +90,8 @@
                     </a>
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-left">
                         <div class="dropdown-item text-center">
-                            <p class="mb-0 mt-2 EmailUser">د. أحمد محمد</p>
-                            <small class="RoleUser">طبيب</small>
+                            <p class="mb-0 mt-2 EmailUser">أحمد محمد</p>
+                            <small class="RoleUser">مدير النظام</small>
                         </div>
                         <div class="dropdown-divider"></div>
                         <a href="#" class="dropdown-item">
@@ -82,7 +101,7 @@
                             <i class="fas fa-lock ml-2"></i> تغيير كلمة المرور
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" onclick="logout()" class="dropdown-item text-danger">
+                        <a href="#" onclick="logout('../auth/login.html')" class="dropdown-item text-danger">
                             <i class="fas fa-sign-out-alt ml-2"></i> تسجيل الخروج
                         </a>
                     </div>
@@ -90,7 +109,7 @@
             </ul>
         </nav>
 
-        <!-- Main Sidebar Container -->
+    <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
             <a href="doctor-dashboard.html" class="brand-link text-center">
@@ -152,153 +171,119 @@
             </div>
         </aside>
 
-        <!-- المحتوى الرئيسي -->
+        <!-- Content Wrapper -->
         <div class="content-wrapper">
-            <!-- شريط العنوان -->
-            <section class="content-header">
+            <!-- Content Header -->
+            <div class="content-header">
                 <div class="container-fluid">
-                    <div class="dashboard-header">
-                        <h1 class="EmailUser"></h1>
-                        <div class="user-actions">
-                            <button class="btn new-prescription-btn">
-                                <i class="fas fa-plus"></i> وصفة جديدة
-                            </button>
-                            <div class="user-profile">
-                            </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">لوحة تحكم المدير</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-left">
+                                <li class="breadcrumb-item"><a href="./doctor-dashboard.html">الرئيسية</a></li>
+                                <li class="breadcrumb-item active">لوحة التحكم</li>
+                            </ol>
                         </div>
                     </div>
                 </div>
-            </section>
-
-            <!-- المحتوى الرئيسي -->
-            <section class="content">
-                <div class="container-fluid">
-                    <!-- بطاقات الإحصائيات -->
-                    <div class="stats-cards">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-file-prescription"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>48</h3>
-                                <p>وصفة هذا الشهر</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-user-injured"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>32</h3>
-                                <p>مريض جديد</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>92%</h3>
-                                <p>نسبة الصرف</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>5</h3>
-                                <p>مواعيد اليوم</p>
-                            </div>
-                        </div>
+            </div>
+        <main>
+        <!-- مؤشر التحميل -->
+        <div id="loading-indicator" class="text-center py-4">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2">جاري تحميل البيانات...</p>
+        </div>
+        
+        <!-- رسالة الخطأ -->
+        <div id="error-alert" class="alert alert-danger d-none"></div>
+        
+        <!-- محتوى لوحة التحكم 
+        <div id="dashboard-content">
+        
+        </div>-->
+    </main>
+            <!-- Main Content -->
+<div class="content" id="dashboard-content">
+    <div class="container-fluid">
+        <!-- Small Boxes -->
+        <div class="row">
+            <!-- بطاقة المرضى -->
+            <div class="col-12 col-sm-6 col-md-6 col-lg-3 mb-4">
+                <div class="small-box bg-warning h-100">
+                    <div class="inner">
+                        <h3 id="uniquePatients">0</h3>
+                        <p>المرضى المسجلين</p>
                     </div>
-
-                    <!-- أحدث الوصفات -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">أحدث الوصفات</h3>
-                            <div class="card-tools">
-                                <a href="#" class="btn btn-sm btn-primary">عرض الكل</a>
-                            </div>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="prescriptions-table">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>رقم الوصفة</th>
-                                            <th>المريض</th>
-                                            <th>التاريخ</th>
-                                            <th>الحالة</th>
-                                            <th>الإجراءات</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>#PR-2023-0158</td>
-                                            <td>محمد علي</td>
-                                            <td>15/10/2023</td>
-                                            <td><span class="status-badge completed">تم الصرف</span></td>
-                                            <td>
-                                                <button class="action-btn view-btn"><i class="fas fa-eye"></i></button>
-                                                <button class="action-btn print-btn"><i class="fas fa-print"></i></button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>#PR-2023-0157</td>
-                                            <td>سارة أحمد</td>
-                                            <td>14/10/2023</td>
-                                            <td><span class="status-badge pending">قيد الانتظار</span></td>
-                                            <td>
-                                                <button class="action-btn view-btn"><i class="fas fa-eye"></i></button>
-                                                <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <div class="icon">
+                        <i class="fas fa-procedures"></i>
                     </div>
+                    <a href="./Patients/Patient.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                </div>
+            </div>
 
-                    <!-- المواعيد القادمة -->
-                    <div class="card mt-4">
-                        <div class="card-header">
-                            <h3 class="card-title">المواعيد القادمة</h3>
-                            <div class="card-tools">
-                                <a href="#" class="btn btn-sm btn-primary">عرض الكل</a>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="appointments-list">
-                                <div class="appointment-card">
-                                    <div class="appointment-time">
-                                        <span>10:00 ص</span>
-                                    </div>
-                                    <div class="appointment-info">
-                                        <h4>علي محمد</h4>
-                                        <p>كشف دوري</p>
-                                    </div>
-                                    <div class="appointment-actions">
-                                        <button class="btn start-btn">بدء الكشف</button>
-                                    </div>
-                                </div>
-                                <div class="appointment-card">
-                                    <div class="appointment-time">
-                                        <span>11:30 ص</span>
-                                    </div>
-                                    <div class="appointment-info">
-                                        <h4>لمى خالد</h4>
-                                        <p>متابعة علاج</p>
-                                    </div>
-                                    <div class="appointment-actions">
-                                        <button class="btn start-btn">بدء الكشف</button>
-                                    </div>
-                                </div>
-                            </div>
+            <!-- بطاقة الوصفات -->
+            <div class="col-12 col-sm-6 col-md-6 col-lg-3 mb-4">
+                <div class="small-box bg-danger h-100">
+                    <div class="inner">
+                        <h3 id="totalPrescriptions">0</h3>
+                        <p>إجمالي الوصفات</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-prescription-bottle-alt"></i>
+                    </div>
+                    <a href="./Prescription/Prescriptions.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                </div>
+            </div>
+
+            <!-- الوصفات المستلمة -->
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                <div class="small-box bg-primary h-100">
+                    <div class="inner">
+                        <h3 id="dispensedPrescriptions">0</h3>
+                        <p>الوصفات المستلمة</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <a href="./DispenseRecord/DispenseRecords.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                </div>
+            </div>
+
+            <!-- الوصفات المنتظرة -->
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                <div class="small-box bg-purple h-100">
+                    <div class="inner">
+                        <h3 id="pendingPrescriptions">0</h3>
+                        <p>الوصفات المنتظرة</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <a href="./Prescription/Prescriptions.html?status=pending" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
+                </div>
+            </div>
+
+            <!-- إحصائيات الوصفات الشهرية -->
+            <div class="col-12 col-md-12 col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header bg-gradient-info">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-bar mr-1"></i>
+                            إحصائيات الوصفات الشهرية
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart">
+                            <canvas id="prescriptionsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </div>
+    </div>
+</div>
         </div>
 
         <!-- Footer -->
@@ -321,14 +306,15 @@
     <script src="../../dist/js/adminlte.min.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/checkAccess.js"></script>
+    <script src="../js/doctor/dashboard.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Custom Scripts -->
     <script>
-        checkAccess(['Doctor'], '../../shared/unauthorized.html');
+       checkAccess(['Doctor'], '../../shared/unauthorized.html');
         getUserName();
-        getDactorByUserId();
-
-
+    
         $(document).ready(function() {
             // إغلاق القائمة الجانبية تلقائياً على الهواتف
             if ($(window).width() < 768) {
@@ -350,12 +336,13 @@
             });
         });
 
-        function logout() {
-            localStorage.removeItem('token');
-            localStorage.removeItem('userData');
-            window.location.href = '../auth/login.html';
-        }
-    </script>
+
+</script>
 </body>
 
 </html>
+
+
+
+
+ 
