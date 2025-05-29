@@ -42,7 +42,7 @@ function displayDoctors() {
 
 
                 <a href="#" class="btn btn-info btn-action" title="عرض"><i class="fas fa-eye"></i></a>
-                <a href="#" class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deleteDoctor(${doctor.id})" title="حذف"><i class="fas fa-trash"></i></a>
+                <button class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deleteDoctor(${doctor.id})" title="حذف"><i class="fas fa-trash"></i></button>
 								<a href="EditDoctor.html?id=${doctor.id}" class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
 
 
@@ -97,7 +97,7 @@ function searchDoctors() {
             <td>${doctor.medicalCenter?.address || ''}</td>
             <td>
                 <a href="EditDoctor.html?id=${doctor.id}" class="edit" title="تعديل"><i class="material-icons">&#xE254;</i></a>
-                <a href="#" class="delete" title="حذف" onclick="deleteDoctor(${doctor.id})"><i class="material-icons">&#xE872;</i></a>
+                <button class="delete" title="حذف" onclick="deleteDoctor(${doctor.id})"><i class="material-icons">&#xE872;</i></button>
             </td>
         `;
         tableBody.appendChild(row);

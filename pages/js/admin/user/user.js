@@ -32,19 +32,37 @@ function displayUsers() {
     const end = start + usersPerPage;
     const paginatedUsers = users.slice(start, end);
 
+
+
     paginatedUsers.forEach(user => {
+            let roleName = "";
+
+    switch (user.role) {
+        case 1:
+            roleName = "مدير النظام";
+            break;
+        case 2:
+            roleName = "طبيب";
+            break;
+        case 3: 
+            roleName = "مريض";
+            break;
+        case 4: 
+            roleName = "صيدلي";
+            break;
+    }
         const row = document.createElement('tr');
         row.innerHTML = `
 						<td>${user.id}</td>
 						<td>${user.fullName}</td>
 						<td>${user.email}</td>
-						<td>${user.role}</td>
+						<td>${roleName}</td>
 						<td>${user.createdAt}</td>
 						<td>
 
                                               
                 <a href="#" class="btn btn-info btn-action" title="عرض"><i class="fas fa-eye"></i></a>
-                <a href="#" class="btn btn-danger btn-action" onclick="deleteUser(${user.id})" title="حذف"><i class="fas fa-trash"></i></a>
+                <button href="#" class="btn btn-danger btn-action" onclick="deleteUser(${user.id})" title="حذف"><i class="fas fa-trash"></i></button>
 								<a href="EditeUser.html?id=${user.id}" class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
                                                     
                 </td>
@@ -68,7 +86,7 @@ function setupPagination() {
     for (let i = 1; i <= totalPages; i++) {
         const pageItem = document.createElement('li');
         pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
-        pageItem.innerHTML = `<a href="#" class="page-link" onclick="changePage(${i})">${i}</a>`;
+        pageItem.innerHTML = `<button  class="page-link" onclick="changePage(${i})">${i}</button>`;
         pagination.appendChild(pageItem);
     }
 }
@@ -96,6 +114,22 @@ function searchUsers() {
 
 
     paginatedUsers.forEach(user => {
+            let roleName = "";
+
+    switch (user.role) {
+        case 1:
+            roleName = "مدير النظام";
+            break;
+        case 2:
+            roleName = "طبيب";
+            break;
+        case 3: 
+            roleName = "مريض";
+            break;
+        case 4: 
+            roleName = "صيدلي";
+            break;
+    }
         const row = document.createElement('tr');
         row.innerHTML = `
 						<td>${user.id}</td>

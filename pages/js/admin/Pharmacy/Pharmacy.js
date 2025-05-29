@@ -38,7 +38,7 @@ function displayPharmacies() {
                     <td>
 
                   <a href="DetailsPharmacy.html?id=${p.id}" class="btn btn-info btn-action" title="عرض"><i class="fas fa-eye"></i></a>
-                <a href="#" class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deletePharmacy(${p.id})" title="حذف"><i class="fas fa-trash"></i></a>
+                <button href="#" class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deletePharmacy(${p.id})" title="حذف"><i class="fas fa-trash"></i></button>
 								<a href="CreateAndUpdatePharmacy.html?id=${p.id}"  class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
 
 
@@ -60,7 +60,7 @@ function setupPagination() {
     for (let i = 1; i <= totalPages; i++) {
         const pageItem = document.createElement('li');
         pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
-        pageItem.innerHTML = `<a href="#" class="page-link" onclick="changePage(${i})">${i}</a>`;
+        pageItem.innerHTML = `<button  class="page-link" onclick="changePage(${i})">${i}</button>`;
         pagination.appendChild(pageItem);
     }
 }
@@ -91,7 +91,7 @@ function searchPharmacies() {
                     <td>${p.phone || ''}</td>
                     <td>
                         <a href="CreateAndUpdatePharmacy.html?id=${p.id}" class="edit" title="تعديل"><i class="material-icons">&#xE254;</i></a>
-                        <a href="#" class="delete" title="حذف" onclick="deletePharmacy(${p.id})"><i class="material-icons">&#xE872;</i></a>
+                        <button class="delete" title="حذف" onclick="deletePharmacy(${p.id})"><i class="material-icons">&#xE872;</i></button>
                     </td>
                 `;
         body.appendChild(row);
