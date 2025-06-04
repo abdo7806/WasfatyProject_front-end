@@ -119,7 +119,7 @@ async function deleteDoctor(doctorId) {
 
         try {
             // جلب بيانات الصيدلي قبل الحذف
-            const response2 = await fetch(`https://localhost:7219/api/Doctor/${doctorId}`, {
+          /*  const response2 = await fetch(`https://localhost:7219/api/Doctor/${doctorId}`, {
                 headers: {
                     'Authorization': 'Bearer ' + localStorage.getItem('token')
                 }
@@ -128,7 +128,7 @@ async function deleteDoctor(doctorId) {
                 throw new Error('فشل في جلب بيانات الصيدلي');
             }
             const doctor = await response2.json();
-
+*/
             // حذف الصيدلي من API
             const response = await fetch(`https://localhost:7219/api/Doctor/${doctorId}`, {
                 method: 'DELETE',
@@ -144,7 +144,7 @@ async function deleteDoctor(doctorId) {
                 setupPagination();
 
                 // حذف المستخدم من API
-                const responseUser = await fetch(`https://localhost:7219/api/User/${doctor.userId}`, {
+             /*   const responseUser = await fetch(`https://localhost:7219/api/User/${doctor.userId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -154,7 +154,7 @@ async function deleteDoctor(doctorId) {
                 if (!responseUser.ok) {
                     throw new Error('فشل في حذف بيانات المستخدم');
                 }
-
+*/
                 alert('تم حذف الطبيب بنجاح.');
             } else {
                 throw new Error('فشل في حذف الطبيب');

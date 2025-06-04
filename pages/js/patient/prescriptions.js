@@ -205,7 +205,7 @@
             dateFilter.addEventListener('change', filterPrescriptions);
 
             // مستمع لزر تسجيل الخروج
-             document.getElementById('logout-btn').addEventListener('click', logout2);
+           //  document.getElementById('logout-btn').addEventListener('click', logout2);
 
             // مستمع لزر الطباعة
             document.getElementById('print-prescription-btn').addEventListener('click', () => {
@@ -221,10 +221,3 @@
 
 
 
-        // تسجيل الخروج
-function logout2() {
-        //localStorage.removeItem('patientData');
-      // logout('../auth/login.html');
-       localStorage.clear();
-    window.location.href = '../auth/login.html';
-}

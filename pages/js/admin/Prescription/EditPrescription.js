@@ -132,7 +132,6 @@
             console.log(existingPrescriptionItemIds);
 
             if (existingPrescriptionItemIds.includes(medication.id)) {
-                alert("1");
                 // حذف من الـ backend
                 fetch(`https://localhost:7219/api/PrescriptionItem/${medication.id}`, {
                         method: 'DELETE',
@@ -149,7 +148,6 @@
                     })
                     .catch(error => showMessage('حدث خطأ أثناء حذف الدواء ❌', true));
             } else {
-                alert("2");
 
                 // حذف محلي فقط
                 selectedMedications.splice(index, 1);
@@ -217,7 +215,6 @@
 
             await prescriptionResponse.json();
 
-            //  alert(existingPrescriptionItemIds.length);
             // تحديث PrescriptionItems
             for (let medication of selectedMedications) {
                 const prescriptionItemData = {

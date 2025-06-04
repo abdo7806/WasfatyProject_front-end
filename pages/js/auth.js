@@ -121,6 +121,38 @@ function logout(url) {
 }
 
 
+        // Logout Function
+        function logoutMassge(mode, url) {
+          // alert("sccd")
+            Swal.fire({
+                title: 'تأكيد تسجيل الخروج',
+                text: 'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'نعم، سجل خروج',
+                cancelButtonText: 'إلغاء',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    	localStorage.removeItem('token');
+            localStorage.removeItem('userData');
+            if(mode === "doctor"){
+            localStorage.removeItem('doctorData');
+            }
+            else if(mode === "patient"){
+            localStorage.removeItem('patientData');
+            }
+            else if(mode === "PharmacistData"){
+            localStorage.removeItem('PharmacistData');
+            }
+            window.location.href = url;;
+                
+                }
+            });
+        }
+
+
 
 
 async function register() {

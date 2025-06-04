@@ -129,7 +129,7 @@ async function deletePharmacist(pharmacistId) {
     if (confirmDelete) {
         try {
             // جلب بيانات الصيدلي قبل الحذف
-            const response2 = await fetch(`https://localhost:7219/api/Pharmacist/${pharmacistId}`, {
+          /*  const response2 = await fetch(`https://localhost:7219/api/Pharmacist/${pharmacistId}`, {
                 headers: {
                     'Authorization': 'Bearer ' + localStorage.getItem('token')
                 }
@@ -137,7 +137,7 @@ async function deletePharmacist(pharmacistId) {
             if (!response2.ok) {
                 throw new Error('فشل في جلب بيانات الصيدلي');
             }
-            const pharmacist = await response2.json();
+            const pharmacist = await response2.json();*/
 
             // حذف الصيدلي من API
             const response = await fetch(`https://localhost:7219/api/Pharmacist/${pharmacistId}`, {
@@ -154,7 +154,7 @@ async function deletePharmacist(pharmacistId) {
                 setupPagination();
 
                 // حذف المستخدم من API
-                const responseUser = await fetch(`https://localhost:7219/api/User/${pharmacist.userId}`, {
+               /* const responseUser = await fetch(`https://localhost:7219/api/User/${pharmacist.userId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -163,7 +163,7 @@ async function deletePharmacist(pharmacistId) {
 
                 if (!responseUser.ok) {
                     throw new Error('فشل في حذف بيانات المستخدم');
-                }
+                }*/
 
                 alert('تم حذف الصيدلي بنجاح.');
             } else {

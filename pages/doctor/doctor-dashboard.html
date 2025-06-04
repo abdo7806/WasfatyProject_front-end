@@ -11,10 +11,7 @@
     <meta name="keywords" content="وصفتي, وصفات طبية, إدارة صيدليات, نظام أطباء">
     <meta name="author" content="وصفتي">
 
-    <!-- Google Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tajawal:400,500,700&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-
+  
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -23,7 +20,6 @@
 
     <!-- AdminLTE CSS -->
     <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tajawal...">
 
   <style>
             
@@ -101,7 +97,7 @@
                             <i class="fas fa-lock ml-2"></i> تغيير كلمة المرور
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="#" onclick="logout('../auth/login.html')" class="dropdown-item text-danger">
+                        <a href="#" onclick="logoutMassge('doctor', '../auth/login.html')" class="dropdown-item text-danger">
                             <i class="fas fa-sign-out-alt ml-2"></i> تسجيل الخروج
                         </a>
                     </div>
@@ -307,13 +303,19 @@
     <script src="../js/auth.js"></script>
     <script src="../js/checkAccess.js"></script>
     <script src="../js/doctor/dashboard.js"></script>
+
+    
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Custom Scripts -->
     <script>
        checkAccess(['Doctor'], '../../shared/unauthorized.html');
         getUserName();
+        getDactorByUserId();
     
         $(document).ready(function() {
             // إغلاق القائمة الجانبية تلقائياً على الهواتف

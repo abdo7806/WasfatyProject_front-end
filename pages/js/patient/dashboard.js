@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // إدارة الأحداث
-    document.getElementById('logout-btn').addEventListener('click', logout);
+    //document.getElementById('logout-btn').addEventListener('click', logout);
 
 		       // عرض تفاصيل الوصفة في المودال
       async function showPrescriptionDetails(prescriptionId) {

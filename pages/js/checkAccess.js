@@ -43,7 +43,6 @@ function parseJwt(token) {
 
 function getUserName() {
 
-
     const userData = JSON.parse(localStorage.getItem("userData"));
     let email = document.getElementsByClassName("EmailUser");
     email[0].textContent = userData.email;
@@ -127,6 +126,7 @@ async function getPatientByUserId() {
 
 
 async function getPharmacistByUserId() {
+
 
     const userData = JSON.parse(localStorage.getItem("userData"));
 

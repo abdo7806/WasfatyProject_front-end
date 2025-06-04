@@ -15,14 +15,14 @@
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
                 <h1 class="h4 mb-0"><i class="fas fa-prescription-bottle-alt"></i> الوصفات الطبية</h1>
-                <button id="logout-btn" class="btn btn-danger" onclick="logout2()">
+                <button id="logout-btn" class="btn btn-danger" onclick="logoutMassge('patient', '../auth/login.html')">
                     <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
                 </button>
             </div>
         </div>
     </header>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+   <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -30,7 +30,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="./patient-dashboard.html"><i class="fas fa-home"></i> الرئيسية</a>
+                        <a class="nav-link " href="./patient-dashboard.html"><i class="fas fa-home"></i> الرئيسية</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="#"><i class="fas fa-prescription-bottle-alt"></i> الوصفات الطبية</a>
@@ -42,6 +42,7 @@
             </div>
         </div>
     </nav>
+    
 
     <div class="container">
         <div class="filter-section">
@@ -135,6 +136,7 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/auth.js"></script>
