@@ -24,7 +24,14 @@
                             'Authorization': `Bearer ${localStorage.getItem('token')}`
                         }
                     });
-
+                    if(response.status == 404){
+                                     prescriptionsContainer.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>  لا يوجد وصفات طبيه بعد 
+                </div>
+            `;
+            return;
+                    }
                     if (!response.ok) {
                         throw new Error('فشل في جلب الوصفات الطبية');
                     }
