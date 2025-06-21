@@ -59,9 +59,6 @@ function displayUsers() {
 						<td>${roleName}</td>
 						<td>${user.createdAt}</td>
 						<td>
-
-                                              
-                <a href="#" class="btn btn-info btn-action" title="عرض"><i class="fas fa-eye"></i></a>
                 <button href="#" class="btn btn-danger btn-action" onclick="deleteUser(${user.id})" title="حذف"><i class="fas fa-trash"></i></button>
 								<a href="EditeUser.html?id=${user.id}" class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
                                                     
@@ -251,7 +248,7 @@ async function addUser() {
     const roleNumber = parseInt(role);
 
     try {
-        const response = await fetch('https://localhost:7219/api/Auth/register', {
+        const response = await fetch('https://localhost:7219/api/User', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

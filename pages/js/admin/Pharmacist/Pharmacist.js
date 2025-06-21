@@ -41,10 +41,10 @@ function displayPharmacists(url = 'EditPharmacist.html') {
 						<td>${pharmacist.pharmacy.address}</td>
 						<td>${new Date(pharmacist.user.createdAt).toLocaleDateString('ar-EG')}</td>
 						<td>
-                <a href="#" class="btn btn-info btn-action" title="عرض"><i class="fas fa-eye"></i></a>
                 <button class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deletePharmacist(${pharmacist.id})" title="حذف"><i class="fas fa-trash"></i></button>
 								<a href="${url}?id=${pharmacist.id}"  class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
-						</td>
+						
+                                </td>
 				`;
         pharmacistsTableBody.appendChild(row);
     });
@@ -79,10 +79,24 @@ function changePage(page) {
 // وظيفة للبحث عن الصيادلة حسب العمود المحدد
 function searchPharmacists() {
     const searchInput = document.getElementById('searchInput').value.toLowerCase();
-    const filteredPharmacists = pharmacists.filter(pharmacist => {
+    let filteredPharmacists = [];
+    if(searchColumn === "address" || searchColumn === "name"){
+      filteredPharmacists = pharmacists.filter(pharmacist => {
+        return pharmacist.pharmacy[searchColumn].toLowerCase().includes(searchInput);
+    });
+    }
+    else if(searchColumn === "licenseNumber"){
+        filteredPharmacists = pharmacists.filter(pharmacist => {
+        return pharmacist[searchColumn].toLowerCase().includes(searchInput);
+    });
+    }
+    else{
+
+     filteredPharmacists = pharmacists.filter(pharmacist => {
         return pharmacist.user[searchColumn].toLowerCase().includes(searchInput);
     });
-
+}
+console.log("filter", filteredPharmacists)
     const pharmacistsTableBody = document.getElementById('pharmacistsTableBody');
     pharmacistsTableBody.innerHTML = '';
 
@@ -101,8 +115,9 @@ function searchPharmacists() {
 						<td>${pharmacist.pharmacy.address}</td>
 						<td>${new Date(pharmacist.user.createdAt).toLocaleDateString('ar-EG')}</td>
 						<td>
-								<a href="EditPharmacist.html?id=${pharmacist.id}" class="edit" title="تعديل" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
-								<a href="#" class="delete" title="حذف" data-toggle="tooltip" onclick="deletePharmacist(${pharmacist.id})"><i class="material-icons">&#xE872;</i></a>
+                <button class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deletePharmacist(${pharmacist.id})" title="حذف"><i class="fas fa-trash"></i></button>
+								<a href="EditPharmacist.html?id=${pharmacist.id}"  class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
+						 
 						</td>
 				`;
         pharmacistsTableBody.appendChild(row);
@@ -367,7 +382,6 @@ async function updatePharmacist() {
         const userUpdated = await updateUser(updatedPharmacist.userId, fullName, email, 4);
 
         if (userUpdated) {
-            alert("تم تعديل البيانات بنجاح");
             // window.location.href = './Pharmacists.html';
             window.history.back();
 

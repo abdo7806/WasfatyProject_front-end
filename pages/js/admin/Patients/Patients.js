@@ -41,7 +41,6 @@ function displayPatients() {
 						<td>${new Date(patient.user.createdAt).toLocaleDateString('ar-EG')}</td>
 						<td>
 
-                                       <a href="#" class="btn btn-info btn-action" title="عرض"><i class="fas fa-eye"></i></a>
                 <button class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deletePatient(${patient.id})" title="حذف"><i class="fas fa-trash"></i></button>
 								<a href="EditePatient.html?id=${patient.id}"  class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
 
@@ -80,11 +79,20 @@ function changePage(page) {
 
 // وظيفة للبحث عن المرضى حسب العمود المحدد
 function searchPatients() {
-
     const searchInput = document.getElementById('searchInput').value.toLowerCase();
-    const filteredPatients = patients.filter(patient => {
+   let filteredPatients = [];
+    if(searchColumn === "gender" || searchColumn === "bloodType"){
+ filteredPatients = patients.filter(patient => {
+        return patient[searchColumn].toLowerCase().includes(searchInput);
+    });    }
+    else{
+     filteredPatients = patients.filter(patient => {
         return patient.user[searchColumn].toLowerCase().includes(searchInput);
     });
+    }    
+    /*const filteredPatients = patients.filter(patient => {
+        return patient.user[searchColumn].toLowerCase().includes(searchInput);
+    });*/
 
     const patientsTableBody = document.getElementById('patientsTableBody');
     patientsTableBody.innerHTML = '';
@@ -104,8 +112,10 @@ function searchPatients() {
 						<td>${patient.bloodType}</td>
 						<td>${new Date(patient.user.createdAt).toLocaleDateString('ar-EG')}</td>
 						<td>
-								<a href="EditePatient.html?id=${patient.id}" class="edit" title="تعديل" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
-								<button href="#" class="delete" title="حذف" data-toggle="tooltip" onclick="deletePatient(${patient.id})"><i class="material-icons">&#xE872;</i></button>
+                        
+                <button class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deletePatient(${patient.id})" title="حذف"><i class="fas fa-trash"></i></button>
+				<a href="EditePatient.html?id=${patient.id}"  class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
+
 						</td>
 				`;
         patientsTableBody.appendChild(row);
@@ -409,7 +419,7 @@ async function addPatient(userId, dateOfBirth, gender, bloodType) {
 
             try {
                 // 1. تسجيل المستخدم
-                const userResponse = await fetch('https://localhost:7219/api/Auth/register', {
+                const userResponse = await fetch('https://localhost:7219/api/User', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -445,8 +455,7 @@ async function addPatient(userId, dateOfBirth, gender, bloodType) {
                         bloodType
                     })
                 });
-
-                if (!patientResponse.ok) {
+                if (patientResponse.status != 201) {
                     throw new Error('فشل في إضافة بيانات المريض');
                 }
 

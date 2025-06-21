@@ -1,116 +1,235 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>تعديل مستخدم</title>
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    
+    <!-- Bootstrap RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .btn {
+            min-width: 120px;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+        .text-danger {
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: #4e73df;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 
 <body>
     <div class="container">
-        <div class="alert alert-danger" id="error-message" style="display: none;" role="alert"></div>
-
-        <h2>تعديل مستخدم</h2>
-        <form id="editUserForm">
-            <div class="form-group">
-                <label for="fullName">الاسم بالكامل:</label>
-                <input type="text" id="fullName" class="form-control" placeholder="الاسم الكامل" required />
-                <div id="fullNameError" class="text-danger"></div>
+        <div class="card">
+            <div class="card-header py-3">
+                <h4 class="m-0 font-weight-bold text-center"><i class="fas fa-user-edit me-2"></i>تعديل مستخدم</h4>
             </div>
-            <div class="form-group">
-                <label for="email">البريد الإلكتروني:</label>
-                <input type="email" id="email" class="form-control" placeholder="البريد الإلكتروني" required />
-                <div id="emailError" class="text-danger"></div>
+            
+            <div class="card-body">
+                <div class="alert alert-danger" id="error-message" style="display: none;" role="alert"></div>
+                
+                <form id="editUserForm" class="needs-validation" novalidate>
+                    <input type="hidden" id="userId">
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="fullName" class="form-label">الاسم بالكامل</label>
+                            <input type="text" id="fullName" class="form-control" placeholder="أدخل الاسم الكامل" required>
+                            <div id="fullNameError" class="text-danger"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="email" class="form-label">البريد الإلكتروني</label>
+                            <input type="email" id="email" class="form-control" placeholder="أدخل البريد الإلكتروني" required>
+                            <div id="emailError" class="text-danger"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <label for="role" class="form-label">الدور</label>
+                            <select class="form-select" id="role" required>
+                                <option value="" selected disabled>اختر الدور</option>
+                                <option value="3">مريض</option>
+                                <option value="2">طبيب</option>
+                                <option value="4">صيدلي</option>
+                                <option value="1">مدير</option>
+                            </select>
+                            <div id="roleError" class="text-danger"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center mt-4">
+                        <button type="button" class="btn btn-primary px-4" onclick="updateUser()" id="updateBtn">
+                            <i class="fas fa-save me-2"></i>تحديث
+                        </button>
+                        <a href="User.html" class="btn btn-outline-secondary px-4">
+                            <i class="fas fa-arrow-right me-2"></i>رجوع
+                        </a>
+                    </div>
+                </form>
             </div>
-
-            <div class="form-group mb-3">
-                <label class="form-label">اختر الدور</label>
-                <select class="form-control" id="role" required>
-                    <option selected disabled>اختر الدور</option>
-                    <option value="3">مريض</option>
-                    <option value="2">طبيب</option>
-                    <option value="4">صيدلي</option>
-                    <option value="1">مدير</option>
-                </select>
-                <div id="roleError" class="text-danger"></div>
-            </div>
-
-            <button type="button" class="btn btn-primary" onclick="updateUser()">تحديث المستخدم</button>
-            <a href="User.html" class="btn btn-secondary">رجوع</a>
-        </form>
+        </div>
     </div>
-        <script src="../../js/checkAccess.js"></script>
 
-    <script src="../../js/admin/user/user.js"></script>
-
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    
     <!-- Custom Scripts -->
+    <script src="../../js/checkAccess.js"></script>
+    <script src="../../js/admin/user/user.js"></script>
+    
     <script>
         checkAccess(['Admin'], '../../../shared/unauthorized.html');
+
         // دالة لتحميل بيانات المستخدم
         async function loadUserData(userId) {
             try {
+                showLoading(true);
                 const response = await fetch(`https://localhost:7219/api/User/${userId}`, {
                     headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                        'Content-Type': 'application/json'
                     }
                 });
+                
+                if (!response.ok) {
+                    throw new Error('فشل في جلب بيانات المستخدم');
+                }
+                
                 const user = await response.json();
-                document.getElementById('fullName').value = user.fullName;
-                document.getElementById('email').value = user.email;
-                document.getElementById('role').value = user.role;
+                document.getElementById('userId').value = userId;
+                document.getElementById('fullName').value = user.fullName || '';
+                document.getElementById('email').value = user.email || '';
+                document.getElementById('role').value = user.role || '';
+                
             } catch (error) {
                 console.error('خطأ في تحميل بيانات المستخدم:', error);
+                showError('حدث خطأ أثناء تحميل بيانات المستخدم');
+            } finally {
+                showLoading(false);
             }
         }
 
         function validateForm() {
-            const fullName = document.getElementById('fullName').value;
-            const email = document.getElementById('email').value;
+            // Reset error messages
+            document.querySelectorAll('.text-danger').forEach(el => el.textContent = '');
+            
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
             const role = document.getElementById('role').value;
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-            // إعادة تعيين رسائل الخطأ
-            document.getElementById('fullNameError').textContent = '';
-            document.getElementById('emailError').textContent = '';
-            document.getElementById('roleError').textContent = '';
-
+            
             let isValid = true;
-
+            
+            // Validation checks
             if (!fullName) {
-                document.getElementById('fullNameError').textContent = 'الاسم الكامل مطلوب!';
+                document.getElementById('fullNameError').textContent = 'حقل الاسم الكامل مطلوب';
                 isValid = false;
             }
+            
             if (!email) {
-                document.getElementById('emailError').textContent = 'البريد الإلكتروني مطلوب!';
+                document.getElementById('emailError').textContent = 'حقل البريد الإلكتروني مطلوب';
                 isValid = false;
             } else if (!emailPattern.test(email)) {
-                document.getElementById('emailError').textContent = 'يرجى إدخال بريد إلكتروني صحيح.';
+                document.getElementById('emailError').textContent = 'صيغة البريد الإلكتروني غير صالحة';
                 isValid = false;
             }
+            
             if (!role) {
-                document.getElementById('roleError').textContent = 'يجب اختيار دور!';
+                document.getElementById('roleError').textContent = 'يجب اختيار دور للمستخدم';
                 isValid = false;
             }
-
+            
             return isValid;
         }
+        
+        function showLoading(show) {
+            const btn = document.getElementById('updateBtn');
+            if (show) {
+                btn.disabled = true;
+                btn.innerHTML = '<div class="loading-spinner"></div> جاري التحديث...';
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save me-2"></i>تحديث';
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
 
-
+        // عند تحميل الصفحة
         $(document).ready(function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const userId = urlParams.get('id'); // الحصول على القيمة المرتبطة بمفتاح 'id'
-
-            if (userId) {
-                loadUserData(userId); // استدعاء دالة تحميل بيانات المستخدم
-            } else {
-                alert('معرف المستخدم غير موجود في عنوان URL.');
+            const userId = urlParams.get('id');
+            
+            if (!userId) {
+                showError('معرف المستخدم غير موجود في عنوان URL.');
+                return;
             }
+            
+            loadUserData(userId);
+            
+            // Add Bootstrap validation classes
+            const forms = document.querySelectorAll('.needs-validation');
+            
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    form.classList.add('was-validated');
+                }, false);
+            });
         });
     </script>
 </body>
-
 </html>

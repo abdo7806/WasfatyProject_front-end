@@ -21,6 +21,7 @@ async function fetchDoctors() {
 }
 
 function displayDoctors() {
+  
     const tableBody = document.getElementById('doctorsTableBody');
     tableBody.innerHTML = '';
 
@@ -41,7 +42,6 @@ function displayDoctors() {
             <td>
 
 
-                <a href="#" class="btn btn-info btn-action" title="عرض"><i class="fas fa-eye"></i></a>
                 <button class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deleteDoctor(${doctor.id})" title="حذف"><i class="fas fa-trash"></i></button>
 								<a href="EditDoctor.html?id=${doctor.id}" class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
 
@@ -76,8 +76,13 @@ function changePage(page) {
 
 function searchDoctors() {
     const input = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = doctors.filter(doctor => (doctor[searchColumn] || '').toLowerCase().includes(input));
-
+    let filtered = [];
+    if(searchColumn === "fullName" || searchColumn === "email"){
+     filtered = doctors.filter(doctor => (doctor.user[searchColumn] || '').toLowerCase().includes(input));
+    }
+    else{
+     filtered = doctors.filter(doctor => (doctor[searchColumn] || '').toLowerCase().includes(input));
+    }
     const tableBody = document.getElementById('doctorsTableBody');
     tableBody.innerHTML = '';
 
@@ -96,8 +101,10 @@ function searchDoctors() {
             <td>${doctor.medicalCenter?.name || ''}</td>
             <td>${doctor.medicalCenter?.address || ''}</td>
             <td>
-                <a href="EditDoctor.html?id=${doctor.id}" class="edit" title="تعديل"><i class="material-icons">&#xE254;</i></a>
-                <button class="delete" title="حذف" onclick="deleteDoctor(${doctor.id})"><i class="material-icons">&#xE872;</i></button>
+
+                <button class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deleteDoctor(${doctor.id})" title="حذف"><i class="fas fa-trash"></i></button>
+								<a href="EditDoctor.html?id=${doctor.id}" class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
+
             </td>
         `;
         tableBody.appendChild(row);
@@ -334,7 +341,7 @@ async function updateDoctor() {
         const userUpdated = await updateUser(updatedDoctor.userId, fullName, email, 3);
 
         if (userUpdated) {
-            alert("تم تعديل البيانات بنجاح");
+          //  alert("تم تعديل البيانات بنجاح");
             window.location.href = './Doctors.html';
         }
 

@@ -115,29 +115,34 @@ function filterDispenseRecords(searchInput) {
     const column = document.getElementById('searchColumn').value;
 
     return dispenseRecords.filter(record => {
+                console.log(record)
+
         switch (column) {
             case 'id':
                 return record.id.toString().includes(lowerInput);
             case 'prescriptionId':
                 return record.prescriptionId.toString().includes(lowerInput);
             case 'pharmacistName':
-                return record.pharmacistName.toLowerCase().includes(lowerInput);
+                return record.pharmacist.user.fullName.toLowerCase().includes(lowerInput);
             case 'pharmacyName':
-                return record.pharmacyName.toLowerCase().includes(lowerInput);
+                return record.pharmacy.name.toLowerCase().includes(lowerInput);
             case 'dispensedDate':
                 return new Date(record.dispensedDate).toLocaleDateString().includes(lowerInput);
-            case 'totalItems':
-                return record.totalItems.toString().includes(lowerInput);
+            case 'doctor':
+                return record.prescription.doctor.user.fullName.toString().includes(lowerInput);
+            case 'patient':
+                return record.prescription.patient.user.fullName.toString().includes(lowerInput);
             case 'all':
             default:
                 return (
                     record.id.toString().includes(lowerInput) ||
                     record.prescriptionId.toString().includes(lowerInput) ||
-                    record.pharmacistName.toLowerCase().includes(lowerInput) ||
-                    record.pharmacyName.toLowerCase().includes(lowerInput) ||
+                    record.user.fullName.toLowerCase().includes(lowerInput) ||
+                    record.pharmacy.name.toLowerCase().includes(lowerInput) ||
                     new Date(record.dispensedDate).toLocaleDateString().includes(lowerInput) ||
                     record.totalItems.toString().includes(lowerInput)
                 );
         }
+
     });
 }

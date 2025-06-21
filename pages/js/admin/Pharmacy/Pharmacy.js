@@ -90,9 +90,13 @@ function searchPharmacies() {
                     <td>${p.address}</td>
                     <td>${p.phone || ''}</td>
                     <td>
-                        <a href="CreateAndUpdatePharmacy.html?id=${p.id}" class="edit" title="تعديل"><i class="material-icons">&#xE254;</i></a>
-                        <button class="delete" title="حذف" onclick="deletePharmacy(${p.id})"><i class="material-icons">&#xE872;</i></button>
-                    </td>
+                  
+                  <a href="DetailsPharmacy.html?id=${p.id}" class="btn btn-info btn-action" title="عرض"><i class="fas fa-eye"></i></a>
+                <button href="#" class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deletePharmacy(${p.id})" title="حذف"><i class="fas fa-trash"></i></button>
+								<a href="CreateAndUpdatePharmacy.html?id=${p.id}"  class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
+
+
+                        </td>
                 `;
         body.appendChild(row);
     });
@@ -198,7 +202,6 @@ async function addPharmacy() {
             throw new Error(error.message || 'فشل في إضافة الصيدلية.');
         }
 
-        alert('تمت إضافة الصيدلية بنجاح!');
         window.location.href = 'Pharmacys.html';
 
     } catch (error) {
@@ -210,7 +213,6 @@ async function addPharmacy() {
 
 
 async function UpdatePharmacy() {
-
     const urlParams = new URLSearchParams(window.location.search);
     const PharmacyId = urlParams.get('id'); // الحصول على القيمة المرتبطة بمفتاح 'id'
 
@@ -233,7 +235,6 @@ async function UpdatePharmacy() {
             throw new Error(error.message || 'فشل في تعديل الصيدلية.');
         }
 
-        alert('تمت تعديل الصيدلية بنجاح!');
         window.location.href = 'Pharmacys.html';
 
     } catch (error) {

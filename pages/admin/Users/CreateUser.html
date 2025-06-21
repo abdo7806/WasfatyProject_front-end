@@ -1,110 +1,189 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>إضافة مستخدم جديد</title>
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-
+    
+    <!-- Bootstrap RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .btn {
+            min-width: 120px;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+        .text-danger {
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: #4e73df;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+        }
+    </style>
 </head>
 
 <body>
     <div class="container">
-
-        <div class="alert" id="error-message" style="display: none;" role="alert"></div>
-
-        <h2>إضافة مستخدم جديد</h2>
-        <form id="addUserForm">
-            <div class="form-group">
-                <label for="fullName">الاسم بالكامل:</label>
-                <input type="text" id="fullName" class="form-control" placeholder="الاسم الكامل" />
-                <div id="fullNameError" class="text-danger"></div>
+        <div class="card">
+            <div class="card-header py-3">
+                <h4 class="m-0 font-weight-bold text-center"><i class="fas fa-user-plus me-2"></i>إضافة مستخدم جديد</h4>
             </div>
-            <div class="form-group">
-                <label for="email">البريد الإلكتروني:</label>
-                <input type="email" id="email" class="form-control" placeholder="البريد الإلكتروني" />
-                <div id="emailError" class="text-danger"></div>
+            
+            <div class="card-body">
+                <div class="alert alert-danger" id="error-message" style="display: none;" role="alert"></div>
+                
+                <form id="addUserForm" class="needs-validation" novalidate>
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="fullName" class="form-label">الاسم بالكامل</label>
+                            <input type="text" id="fullName" class="form-control" placeholder="أدخل الاسم الكامل" required>
+                            <div id="fullNameError" class="text-danger"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="email" class="form-label">البريد الإلكتروني</label>
+                            <input type="email" id="email" class="form-control" placeholder="أدخل البريد الإلكتروني" required>
+                            <div id="emailError" class="text-danger"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="password" class="form-label">كلمة المرور</label>
+                            <input type="password" id="password" class="form-control" placeholder="أدخل كلمة المرور" required>
+                            <div id="passwordError" class="text-danger"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="confirmPassword" class="form-label">تأكيد كلمة المرور</label>
+                            <input type="password" id="confirmPassword" class="form-control" placeholder="أعد إدخال كلمة المرور" required>
+                            <div id="confirmPasswordError" class="text-danger"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <label for="role" class="form-label">الدور</label>
+                            <select class="form-select" id="role" required>
+                                <option value="" selected disabled>اختر الدور</option>
+                                <option value="3">مريض</option>
+                                <option value="2">طبيب</option>
+                                <option value="4">صيدلي</option>
+                                <option value="1">مدير</option>
+                            </select>
+                            <div id="roleError" class="text-danger"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center mt-4">
+                        <button type="button" class="btn btn-primary px-4" onclick="addUser()">
+                            <i class="fas fa-save me-2"></i>حفظ
+                        </button>
+                        <a href="User.html" class="btn btn-outline-secondary px-4">
+                            <i class="fas fa-arrow-right me-2"></i>رجوع
+                        </a>
+                    </div>
+                </form>
             </div>
-
-            <div class="form-group">
-                <label class="form-label">كلمة المرور</label>
-                <input type="password" id="password" class="form-control" placeholder="كلمة المرور" />
-                <div id="passwordError" class="text-danger"></div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">تأكيد كلمة المرور</label>
-                <input type="password" id="confirmPassword" class="form-control" placeholder="تأكيد كلمة المرور" />
-                <div id="confirmPasswordError" class="text-danger"></div>
-            </div>
-
-            <div class="form-group mb-3">
-                <label class="form-label">اختر الدور</label>
-                <select class="form-control" id="role">
-									<option selected disabled>اختر الدور</option>
-									<option value="3">مريض</option>
-									<option value="2">طبيب</option>
-									<option value="4">صيدلي</option>
-									<option value="1">مدير</option>
-							</select>
-                <div id="roleError" class="text-danger"></div>
-            </div>
-
-            <button type="button" class="btn btn-primary" onclick="addUser()">إنشاء حساب</button>
-            <a href="User.html" class="btn btn-secondary">رجوع</a>
-        </form>
+        </div>
     </div>
-    </div>
 
-        <script src="../../js/checkAccess.js"></script>
-
-    <script src="../../js/admin/user/user.js"></script>
-
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    
     <!-- Custom Scripts -->
+    <script src="../../js/checkAccess.js"></script>
+    <script src="../../js/admin/user/user.js"></script>
+    
     <script>
         checkAccess(['Admin'], '../../../shared/unauthorized.html');
 
         function validateForm() {
-            const fullName = document.getElementById('fullName').value;
-            const email = document.getElementById('email').value;
+            // Reset error messages
+            document.querySelectorAll('.text-danger').forEach(el => el.textContent = '');
+            
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const role = document.getElementById('role').value;
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // إعادة تعيين رسائل الخطأ document.getElementById('fullNameError').textContent = ''; document.getElementById('emailError').textContent = '';
-            document.getElementById('passwordError').textContent = '';
-            document.getElementById('confirmPasswordError').textContent = '';
-            document.getElementById('roleError').textContent = '';
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
             let isValid = true;
+            
+            // Validation checks
             if (!fullName) {
-                document.getElementById('fullNameError').textContent = 'الاسم الكامل مطلوب!';
+                document.getElementById('fullNameError').textContent = 'حقل الاسم الكامل مطلوب';
                 isValid = false;
             }
+            
             if (!email) {
-                document.getElementById('emailError').textContent = 'البريد الإلكتروني مطلوب!';
+                document.getElementById('emailError').textContent = 'حقل البريد الإلكتروني مطلوب';
+                isValid = false;
+            } else if (!emailPattern.test(email)) {
+                document.getElementById('emailError').textContent = 'صيغة البريد الإلكتروني غير صالحة';
                 isValid = false;
             }
+            
             if (!password) {
-                document.getElementById('passwordError').textContent = 'كلمة المرور مطلوبة!';
+                document.getElementById('passwordError').textContent = 'حقل كلمة المرور مطلوب';
+                isValid = false;
+            } else if (password.length < 6) {
+                document.getElementById('passwordError').textContent = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
                 isValid = false;
             }
+            
             if (password !== confirmPassword) {
-                document.getElementById('confirmPasswordError').textContent = 'كلمات المرور غير متطابقة!';
+                document.getElementById('confirmPasswordError').textContent = 'كلمة المرور غير متطابقة';
                 isValid = false;
             }
+            
             if (!role) {
-                document.getElementById('roleError').textContent = 'يجب اختيار دور!';
+                document.getElementById('roleError').textContent = 'يجب اختيار دور للمستخدم';
                 isValid = false;
             }
-            if (!emailPattern.test(email)) {
-                document.getElementById('emailError').textContent = 'يرجى إدخال بريد إلكتروني صحيح.';
-                isValid = false;
-            }
+            
             return isValid;
         }
+        
+        // Add Bootstrap validation classes
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('.needs-validation');
+            
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        });
     </script>
 </body>
-
 </html>

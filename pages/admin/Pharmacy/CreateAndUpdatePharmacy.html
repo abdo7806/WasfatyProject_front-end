@@ -1,107 +1,157 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
-    <title>إضافة صيدلية</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-
+    <title>إدارة الصيدليات</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <!-- Bootstrap RTL CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 30px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: #4e73df;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 1rem 1.5rem;
+        }
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .btn {
+            min-width: 120px;
+        }
+        .text-danger {
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container mt-5">
-        <div class="card shadow-lg">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0" id="txtTitle">إضافة صيدلية جديدة</h4>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="m-0 font-weight-bold text-center">
+                    <i class="fas fa-clinic-medical me-2"></i>
+                    <span id="txtTitle">إضافة صيدلية جديدة</span>
+                </h4>
             </div>
+            
             <div class="card-body">
                 <div class="alert alert-danger" id="error-message" style="display: none;"></div>
-
-                <form id="addPharmacyForm">
-                    <div class="form-group">
-                        <label for="name">اسم الصيدلية:</label>
-                        <input type="text" id="name" class="form-control" placeholder="اسم الصيدلية">
-                        <div id="nameError" class="text-danger"></div>
+                <div class="alert alert-success" id="success-message" style="display: none;"></div>
+                
+                <form id="pharmacyForm" class="needs-validation" novalidate>
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="name" class="form-label">اسم الصيدلية</label>
+                            <input type="text" id="name" class="form-control" placeholder="أدخل اسم الصيدلية" required>
+                            <div id="nameError" class="text-danger"></div>
+                        </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="address">العنوان:</label>
-                        <input type="text" id="address" class="form-control" placeholder="عنوان الصيدلية">
-                        <div id="addressError" class="text-danger"></div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="address" class="form-label">العنوان</label>
+                            <input type="text" id="address" class="form-control" placeholder="أدخل عنوان الصيدلية" required>
+                            <div id="addressError" class="text-danger"></div>
+                        </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="phoneNumber">رقم الهاتف:</label>
-                        <input type="text" id="phoneNumber" class="form-control" placeholder="رقم الهاتف">
-                        <div id="phoneNumberError" class="text-danger"></div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <label for="phoneNumber" class="form-label">رقم الهاتف</label>
+                            <input type="text" id="phoneNumber" class="form-control" placeholder="أدخل رقم الهاتف" required>
+                            <div id="phoneNumberError" class="text-danger"></div>
+                        </div>
                     </div>
-
-                    <button type="button" class="btn btn-primary" onclick="Save()" id="btnSubmit">إضافة</button>
-                    <a href="Pharmacys.html" class="btn btn-secondary">رجوع</a>
+                    
+                    <div class="d-flex justify-content-center mt-4">
+                        <button type="button" class="btn btn-primary px-4 me-2" onclick="savePharmacy()" id="btnSubmit">
+                            <i class="fas fa-save me-2"></i>إضافة
+                        </button>
+                        <a href="Pharmacys.html" class="btn btn-outline-secondary px-4">
+                            <i class="fas fa-arrow-right me-2"></i>رجوع
+                        </a>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
-
-
-    <script src="../../js/admin/Pharmacy/Pharmacy.js">
-    </script>
-
-
-    <script src="../../../js/checkAccess.js"></script>
-
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    
     <!-- Custom Scripts -->
+    <script src="../../js/admin/Pharmacy/Pharmacy.js"></script>
+    <script src="../../js/checkAccess.js"></script>
+    
     <script>
         checkAccess(['Admin'], '../../../shared/unauthorized.html');
 
-        let mode = false;
-        async function Save() {
-            if (mode == true) {
-                UpdatePharmacy();
+        let isEditMode = false;
+        
+        async function savePharmacy() {
+            if (isEditMode) {
+                await UpdatePharmacy();
             } else {
-                addPharmacy();
+                await addPharmacy();
             }
         }
-        // دالة لتحميل بيانات المستخدم
-        async function loadPharmacyData(PharmacyId) {
 
-
-            document.getElementById('btnSubmit').textContent = "تعديل";
-            document.getElementById('txtTitle').textContent = "تعديل الصيدلية رقم = " + PharmacyId;
-
-
+        async function loadPharmacyData(pharmacyId) {
             try {
-                const response = await fetch(`https://localhost:7219/api/Pharmacy/${PharmacyId}`, {
+                const response = await fetch(`https://localhost:7219/api/Pharmacy/${pharmacyId}`, {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     }
                 });
-                const Pharmacy = await response.json();
-                document.getElementById('name').value = Pharmacy.name;
-                document.getElementById('address').value = Pharmacy.address;
-                document.getElementById('phoneNumber').value = Pharmacy.phone;
-
-
+                
+                if (!response.ok) {
+                    throw new Error('فشل في تحميل بيانات الصيدلية');
+                }
+                
+                const pharmacy = await response.json();
+                
+                document.getElementById('name').value = pharmacy.name;
+                document.getElementById('address').value = pharmacy.address;
+                document.getElementById('phoneNumber').value = pharmacy.phone;
+                
+                document.getElementById('btnSubmit').innerHTML = '<i class="fas fa-save me-2"></i>تحديث';
+                document.getElementById('txtTitle').textContent = `تعديل الصيدلية - ${pharmacy.name}`;
+                isEditMode = true;
+                
             } catch (error) {
-                console.error('خطأ في تحميل بيانات المستخدم:', error);
+                console.error('خطأ في تحميل بيانات الصيدلية:', error);
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-message').textContent = 'حدث خطأ أثناء تحميل بيانات الصيدلية';
             }
         }
 
         $(document).ready(function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const PharmacyId = urlParams.get('id'); // الحصول على القيمة المرتبطة بمفتاح 'id'
-
-            if (PharmacyId) {
-
-                loadPharmacyData(PharmacyId); // استدعاء دالة تحميل بيانات المستخدم
-                mode = true;
+            const pharmacyId = urlParams.get('id');
+            
+            if (pharmacyId) {
+                loadPharmacyData(pharmacyId);
             }
         });
     </script>
 </body>
-
 </html>

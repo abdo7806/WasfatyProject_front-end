@@ -155,6 +155,7 @@ checkAccess(['Admin'], '../../../shared/unauthorized.html');
                         $('#pharmacistSelect').val(null).trigger('change');
                         $('#prescriptionInfo').html('');
                         currentPrescription = null;
+
                     },
                     error: function(xhr) {
                         $('#message').html('<div class="alert alert-danger">حدث خطأ أثناء الإضافة: ' + xhr.responseText + '</div>');

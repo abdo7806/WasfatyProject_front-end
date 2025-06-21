@@ -90,9 +90,13 @@ function searchMedicalCenters() {
 					<td>${c.address}</td>
 					<td>${c.phone || ''}</td>
 					<td>
-							<a href="CreateAndUpdateMedicalCenters.html?id=${c.id}" class="edit" title="تعديل"><i class="material-icons">&#xE254;</i></a>
-							<button class="delete" title="حذف" onclick="deleteMedicalCenter(${c.id})"><i class="material-icons">&#xE872;</i></button>
-					</td>
+						
+                <a href="#" class="btn btn-info btn-action" title="عرض"><i class="fas fa-eye"></i></a>
+                <button  class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deleteMedicalCenter(${c.id}) "title="حذف"><i class="fas fa-trash"></i></button>
+								<a href="CreateAndUpdateMedicalCenters.html?id=${c.id}" class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
+                           
+						
+                            </td>
 			`;
         body.appendChild(row);
     });
@@ -104,7 +108,7 @@ function searchMedicalCenters() {
 }
 
 function changeSearchColumn() {
-    alert("d");
+    
     searchColumn = document.getElementById('columnSelect').value;
     searchMedicalCenters();
 }
