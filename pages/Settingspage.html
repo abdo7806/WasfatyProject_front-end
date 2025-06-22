@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعدادات الحساب</title>
+    <link rel="stylesheet" href="../css/Settingspage-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+           <button class="back-button" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> <!-- أيقونة السهم -->
+        رجوع
+    </button>      <h1>إعدادات الحساب</h1>
+        
+        <div class="profile-header">
+            <div class="profile-icon">
+                <span>👤</span>
+            </div>
+            <h2 id="username">مرحباً، محمد أحمد</h2>
+        </div>
+        
+        <div class="profile-info">
+            <h2>المعلومات الشخصية</h2>
+            
+            <div class="info-item">
+                <div class="info-label">الاسم الكامل:</div>
+                <div class="info-value" id="fullName">محمد أحمد</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label" >البريد الإلكتروني:</div>
+                <div class="info-value" id="email">example@example.com</div>
+            </div>
+         
+           <div class="info-item" >
+                <div class="info-label" >الدور :</div>
+                <div class="info-value" id="role" >....</div>
+            </div >
+             <div class="info-item" id="specialization-content" style="display: none;">
+                <div class="info-label">التخصص:</div>
+                <div class="info-value" id="specialization">...</div>
+            </div>
+        </div>
+             <div class="info-item" id="licenseNumber-content" style="display: none;">
+                <div class="info-label">رقم الترخيص:</div>
+                <div class="info-value" id="licenseNumber">...</div>
+            </div>
+                   <div class="info-item" id="pharmacy-content" style="display: none;">
+                <div class="info-label"> الصيدلية:</div>
+                <div class="info-value" id="pharmacy">...</div>
+            </div>
+        <div class="password-form">
+            <h2>تغيير كلمة المرور</h2>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label for="currentPassword">كلمة المرور الحالية</label>
+                    <input type="password" id="currentPassword" required placeholder="أدخل كلمة المرور الحالية">
+                    <span id="currentPasswordError" class="error"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="newPassword">كلمة المرور الجديدة</label>
+                    <input type="password" id="newPassword" required placeholder="أدخل كلمة المرور الجديدة (8 أحرف على الأقل)">
+                    <span id="newPasswordError" class="error"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">تأكيد كلمة المرور الجديدة</label>
+                    <input type="password" id="confirmPassword" required placeholder="أعد إدخال كلمة المرور الجديدة">
+                    <span id="confirmError" class="error"></span>
+                </div>
+                
+                <button type="submit">تغيير كلمة المرور</button>
+                <div id="passwordSuccess" class="success"></div>
+            </form>
+        </div>
+    </div>
+</div>
+    <script>
+        let userData = {}
+        // تعبئة بيانات المستخدم عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+                    // هذه البيانات يمكن جلبها من الخادم في تطبيق حقيقي
+         userData = JSON.parse( localStorage.getItem('userData'))
+        
+
+
+            document.getElementById('fullName').textContent = userData.fullName;
+            document.getElementById('email').textContent = userData.email;
+            document.getElementById('username').textContent = `مرحباً، ${userData.fullName}`;
+            document.getElementById('role').textContent = userData.role;
+         if(userData.role === "Doctor"){
+             doctorData = JSON.parse( localStorage.getItem('doctorData'))
+       
+            document.getElementById("specialization-content").style.display = "block";
+            document.getElementById("licenseNumber-content").style.display = "block";
+            document.getElementById('specialization').textContent = doctorData.specialization;
+            document.getElementById('licenseNumber').textContent = doctorData.licenseNumber;
+
+         } else if(userData.role === "Pharmacist"){
+            PharmacistData = JSON.parse( localStorage.getItem('PharmacistData'))
+       
+            document.getElementById("pharmacy-content").style.display = "block";
+            document.getElementById("licenseNumber-content").style.display = "block";
+            document.getElementById('pharmacy').textContent = PharmacistData.pharmacy.name;
+            document.getElementById('licenseNumber').textContent = PharmacistData.licenseNumber;
+
+         }
+          
+         
+         // إضافة الأحرف الأولى كأيقونة إذا لم تكن هناك صورة
+            const names = userData.fullName.split(' ');
+            const initials = names[0].charAt(0) + (names.length > 1 ? names[1].charAt(0) : '');
+            document.querySelector('.profile-icon span').textContent = initials;
+        });
+
+        
+// التحقق من صحة نموذج تغيير كلمة المرور
+document.getElementById('passwordForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    const currentPasswordError = document.getElementById('currentPasswordError');
+    const newPasswordError = document.getElementById('newPasswordError');
+    const confirmError = document.getElementById('confirmError');
+    const passwordSuccess = document.getElementById('passwordSuccess');
+    const submitBtn = document.querySelector('button[type="submit"]');
+    
+    // إعادة تعيين رسائل الخطأ والنجاح
+    currentPasswordError.textContent = '';
+    newPasswordError.textContent = '';
+    confirmError.textContent = '';
+    passwordSuccess.style.display = 'none';
+    
+    let isValid = true;
+    
+    // التحقق من كلمة المرور الحالية
+    if (currentPassword.length === 0) {
+        currentPasswordError.textContent = 'يجب إدخال كلمة المرور الحالية';
+        isValid = false;
+    }
+    
+    // التحقق من قوة كلمة المرور الجديدة
+    if (newPassword.length < 6) {
+        newPasswordError.textContent = 'يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل';
+        isValid = false;
+    }/* else if (!/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+        newPasswordError.textContent = 'يجب أن تحتوي على أحرف كبيرة وصغيرة وأرقام';
+        isValid = false;
+    }*/
+    
+    // التحقق من تطابق كلمتي المرور
+    if (newPassword !== confirmPassword) {
+        confirmError.textContent = 'كلمتا المرور غير متطابقتين';
+        isValid = false;
+    }
+    
+    if (isValid) {
+        // تعطيل الزر أثناء الإرسال لمنع إرسال متعدد
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'جاري التغيير...';
+        
+        // بيانات الطلب
+        const requestData = {
+            userId: userData.userId,
+            currentPassword: currentPassword,
+            newPassword: newPassword
+        };
+
+      
+        
+        // إرسال طلب API لتغيير كلمة المرور
+        fetch('https://localhost:7219/api/Auth/change-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token') // إذا كنت تستخدم نظام توثيق
+            },
+            body: JSON.stringify(requestData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                   // عرض رسائل الخطأ من الخادم
+                if (data.error === 'INCORRECT_PASSWORD') {
+                    currentPasswordError.textContent = 'كلمة المرور الحالية غير صحيحة';
+                } else if (data.error === 'WEAK_PASSWORD') {
+                    newPasswordError.textContent = 'كلمة المرور الجديدة ضعيفة جداً';
+                } else {
+                    newPasswordError.textContent = data.message || 'حدث خطأ أثناء تغيير كلمة المرور';
+                }
+                throw new Error('Network response was not ok');
+                
+            }
+
+      
+                
+                // إخفاء رسالة النجاح بعد 5 ثواني
+                setTimeout(() => {
+                    passwordSuccess.style.display = 'none';
+                }, 5000);
+           
+             passwordSuccess.textContent = 'تم تغيير كلمة المرور بنجاح!';
+                passwordSuccess.style.display = 'block';
+                document.getElementById('passwordForm').reset();
+                
+                    })
+      
+        .catch(error => {
+            console.error('Error:', error);
+            newPasswordError.textContent = 'حدث خطأ في الاتصال بالخادم';
+        })
+        .finally(() => {
+            // إعادة تمكين الزر بعد الانتهاء
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'تغيير كلمة المرور';
+        });
+    }
+});
+   
+        
+    </script>
+</body>
+</html>
+
+

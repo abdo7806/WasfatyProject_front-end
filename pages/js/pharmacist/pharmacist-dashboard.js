@@ -188,12 +188,12 @@
             await fetchDashboardData();
             
             // Check for new prescriptions every 30 seconds
-            setInterval(checkForNewPrescriptions, 30000);
+         //   setInterval(checkForNewPrescriptions, 30000);
             
             // Event listeners
             elements.logoutBtn.addEventListener('click', logout);
             
             // Refresh data every minute
-            setInterval(fetchDashboardData, 60000);
+           // setInterval(fetchDashboardData, 60000);
         });
     
