@@ -1,0 +1,321 @@
+ /* Reset وتنسيقات عامة */
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #1abc9c;
+            --dark: #34495e;
+            --light: #ecf0f1;
+            --sidebar-width: 280px;
+            --header-height: 70px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            direction: rtl;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        /* الهيدر العلوي */
+        .main-header {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: var(--header-height);
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+        
+        /* القائمة الجانبية */
+        .main-sidebar {
+            position: fixed;
+            top: var(--header-height);
+            right: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background-color: #2c3e50;
+            color: white;
+            transition: all 0.3s;
+            overflow-y: auto;
+            z-index: 900;
+        }
+        
+        /* المحتوى الرئيسي */
+        .content-wrapper {
+            margin-right: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 25px;
+            min-height: calc(100vh - var(--header-height));
+            transition: all 0.3s;
+        }
+        
+        /* بطاقات الإحصائيات */
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card .card-body {
+            padding: 25px;
+            position: relative;
+        }
+        
+        .stat-card .card-icon {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            font-size: 3.5rem;
+            opacity: 0.2;
+        }
+        
+        .stat-card .card-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .card-title {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+        }
+        
+        .stat-card .card-footer {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            border-top: 1px solid #eee;
+        }
+        
+        .stat-card .card-footer a {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        /* ألوان البطاقات */
+        .bg-primary .card-body { background-color: var(--primary); color: white; }
+        .bg-secondary .card-body { background-color: var(--secondary); color: white; }
+        .bg-danger .card-body { background-color: var(--danger); color: white; }
+        .bg-warning .card-body { background-color: var(--warning); color: white; }
+        .bg-info .card-body { background-color: var(--info); color: white; }
+        .bg-dark .card-body { background-color: var(--dark); color: white; }
+        
+        /* القائمة الجانبية */
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu li a {
+            display: block;
+            padding: 15px 25px;
+            color: #bdc3c7;
+            transition: all 0.3s;
+            font-size: 1.05rem;
+        }
+        
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-right: 4px solid var(--primary);
+        }
+        
+        .sidebar-menu li a i {
+            margin-left: 12px;
+            width: 25px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        
+        /* معلومات المستخدم */
+        .user-panel {
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            background-color: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .user-panel .user-info {
+            margin-right: 15px;
+        }
+        
+        .user-panel .user-name {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .user-panel .user-role {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+        }
+        
+        /* القائمة العلوية */
+        .navbar-nav {
+            display: flex;
+            list-style: none;
+        }
+        
+        .navbar-nav li {
+            margin-left: 20px;
+            position: relative;
+        }
+        
+        .navbar-nav li a {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+        
+        .navbar-nav li a:hover {
+            color: var(--primary);
+        }
+        
+        /* القائمة المنسدلة */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            padding: 10px 0;
+            min-width: 250px;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        
+        .dropdown-item {
+            display: block;
+            padding: 12px 20px;
+            color: #34495e;
+            transition: all 0.3s;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            padding-right: 25px;
+        }
+        
+        /* الإشعارات */
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            background-color: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* الرسومات البيانية */
+        .chart-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        
+        .chart-container h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-size: 1.3rem;
+        }
+        
+        .chart-container h3 i {
+            color: var(--primary);
+            margin-left: 10px;
+        }
+        
+        /* الفوتر */
+        .main-footer {
+            padding: 20px;
+            background-color: white;
+            text-align: center;
+            border-top: 1px solid #eee;
+            margin-right: var(--sidebar-width);
+        }
+        
+        /* عناوين الصفحة */
+        .page-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        /* زر القائمة الجانبية للجوال */
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #7f8c8d;
+            cursor: pointer;
+            display: none;
+        }
+        
+        /* التجاوب مع الشاشات الصغيرة */
+        @media (max-width: 992px) {
+            .main-sidebar {
+                right: -100%;
+            }
+            
+            .content-wrapper,
+            .main-footer {
+                margin-right: 0;
+            }
+            
+            .sidebar-toggle {
+                display: block;
+            }
+            
+            .sidebar-show .main-sidebar {
+                right: 0;
+            }
+            
+            .sidebar-show .content-wrapper,
+            .sidebar-show .main-footer {
+                margin-right: var(--sidebar-width);
+            }
+        }

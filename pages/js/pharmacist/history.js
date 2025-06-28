@@ -61,7 +61,7 @@
                 });
                 
                 state.dispenseRecord = response.data;
-								console.log(state.dispenseRecord)
+								console.log("D=", state.dispenseRecord)
                 state.filtereddispenseRecord = [...state.dispenseRecord];
 								console.log(state.filtereddispenseRecord)
                 
@@ -200,24 +200,54 @@ function showPrescriptionDetails(prescriptionId) {
 
 
 
+    console.log("data1", prescription.prescriptionItems)
 
     // قائمة الأدوية
     const medicationsList = document.getElementById('medications-list');
     medicationsList.innerHTML = '';
     if (Array.isArray(prescription.prescriptionItems) && prescription.prescriptionItems.length > 0) {
-        prescription.prescriptionItems.forEach(item => {
-            const medItem = document.createElement('div');
+        prescription.prescriptionItems.forEach(async (item) => {
+    console.log("data2", item)
+                if(!item.medicationId) {
+
+                                const medItem = document.createElement('div');
             medItem.className = 'list-group-item';
             medItem.innerHTML = `
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-1">${item.medication ? item.medication.name : 'دواء غير معروف'}</h6>
+                                <small class="badge bg-info ms-2">مخصص</small>
+                    
+                        <h6 class="mb-1">${ item.medicationName || 'دواء غير معروف'}</h6>
                         <small class="text-muted">الجرعة: ${item.dosage || '--'} | التكرار: ${item.frequency || '--'}</small>
                     </div>
                     <span class="badge bg-secondary">${item.duration || '--'} يوم</span>
                 </div>
             `;
             medicationsList.appendChild(medItem);
+                    }
+                    else{
+
+                    const response = await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
+                        headers: {
+                            'Authorization': 'Bearer ' + localStorage.getItem('token')
+                        }
+                    });
+                    const medication = await response.json();
+    console.log("medication", medication)
+
+            const medItem = document.createElement('div');
+            medItem.className = 'list-group-item';
+            medItem.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">${ medication.name || 'دواء غير معروف'}</h6>
+                        <small class="text-muted">الجرعة: ${item.dosage || '--'} | التكرار: ${item.frequency || '--'}</small>
+                    </div>
+                    <span class="badge bg-secondary">${item.duration || '--'} يوم</span>
+                </div>
+            `;
+            medicationsList.appendChild(medItem);
+        }
         });
 
 

@@ -1,136 +1,171 @@
- checkAccess(['Admin'], '../../../shared/unauthorized.html');
+$(document).ready(function() {
+    checkAccess(['Admin'], '../../../shared/unauthorized.html');
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    itemId = urlParams.get('id');
 
-        let itemId = null;
+    // تبديل بين الدواء الموجود والمخصص
+    $('#isCustomToggle').change(function() {
+        if ($(this).is(':checked')) {
+            $('#existingMedFields').hide();
+            $('#customMedFields').show();
+            $('#medicationId').val('').trigger('change');
+        } else {
+            $('#existingMedFields').show();
+            $('#customMedFields').hide();
+            $('#customName, #customDescription, #customDosageForm, #customStrength').val('');
+        }
+    });
 
-        $(document).ready(function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            itemId = urlParams.get('id');
+    if (itemId) {
+        fetchPrescriptionItem(itemId);
+    }
 
-            if (itemId) {
-                fetchPrescriptionItem(itemId);
-            }
+    $('#updateForm').submit(function(e) {
+        e.preventDefault();
+        updatePrescriptionItem();
+    });
+});
 
-            $('#updateForm').submit(function(e) {
-                e.preventDefault();
-                updatePrescriptionItem();
+function fetchPrescriptionItem(id) {
+    // تحميل الأدوية أولاً
+    $.ajax({
+        url: 'https://localhost:7219/api/Medication/All',
+        type: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        success: function(medications) {
+            const medicationData = medications.map(m => ({
+                id: m.id,
+                text: m.name
+            }));
+            
+            $('#medicationId').select2({
+                data: medicationData,
+                placeholder: 'اختر الدواء',
+                allowClear: true
             });
-        });
 
-        function fetchPrescriptionItem(id) {
-            // تحميل بيانات العنصر
+            // الآن جلب بيانات عنصر الوصفة
             $.ajax({
                 url: `https://localhost:7219/api/PrescriptionItem/${id}`,
                 method: 'GET',
                 headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token') // أضف التوكن إلى الهيدر
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
                 },
                 success: function(item) {
                     $('#prescriptionId').val(item.prescriptionId);
                     $('#dosage').val(item.dosage);
                     $('#frequency').val(item.frequency);
                     $('#duration').val(item.duration);
+
+                    if (item.medicationId) {
+                        // إذا كان دواءً موجوداً
+                        $('#isCustomToggle').prop('checked', false);
+                        $('#medicationId').val(item.medicationId).trigger('change');
+                        $('#existingMedFields').show();
+                        $('#customMedFields').hide();
+                    } else {
+                        // إذا كان دواءً مخصصاً
+                        $('#isCustomToggle').prop('checked', true);
+                        $('#existingMedFields').hide();
+                        $('#customMedFields').show();
+                        $('#customName').val(item.customMedicationName);
+                        $('#customDescription').val(item.customMedicationDescription);
+                        $('#customDosageForm').val(item.customDosageForm);
+                        $('#customStrength').val(item.customStrength);
+                    }
                 },
                 error: function() {
-                    showMessage('حدث خطأ أثناء جلب بيانات العنصر', 'danger');
+                    showMessage('فشل في تحميل بيانات عنصر الوصفة', 'danger');
                 }
             });
+        },
+        error: function() {
+            showMessage('فشل في تحميل قائمة الأدوية', 'danger');
+        }
+    });
+}
 
-            // تحميل بيانات الأدوية
-            const token = 'YOUR_TOKEN_HERE'; // استبدل هذا بالتوكن الخاص بك
+function updatePrescriptionItem() {
+    const isCustom = $('#isCustomToggle').is(':checked');
+    const dosage = $('#dosage').val().trim();
+    const frequency = $('#frequency').val().trim();
+    const duration = $('#duration').val().trim();
 
-            // تحميل الأدوية
-            $.ajax({
-                url: 'https://localhost:7219/api/Medication/All',
-                type: 'GET',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token') // أضف التوكن إلى الهيدر
-                },
-                success: function(medications) {
-                    const medicationData = medications.map(m => ({
-                        id: m.id,
-                        text: m.name
-                    }));
-                    $('#medicationId').select2({
-                        data: medicationData,
-                        placeholder: 'اختر الدواء',
-                        allowClear: true
-                    });
+    // التحقق من الحقول المطلوبة
+    if (!dosage) {
+        alert('يرجى إدخال الجرعة');
+        return;
+    }
 
-                    // بعد تحميل الأدوية، نضبط قيمة الدواء المختار
-                    $.ajax({
-                        url: `https://localhost:7219/api/PrescriptionItem/${id}`,
-                        method: 'GET',
-                        headers: {
-                            'Authorization': 'Bearer ' + localStorage.getItem('token') // أضف التوكن إلى الهيدر
-                        },
-                        success: function(item) {
-                            $('#medicationId').val(item.medicationId).trigger('change');
-                        },
-                        error: function() {
-                            showMessage('فشل في تحميل بيانات عنصر الوصفة', 'danger');
-                        }
-                    });
-                },
-                error: function() {
-                    showMessage('فشل في تحميل قائمة الأدوية', 'danger');
-                }
-            });
+    if (!frequency) {
+        alert('يرجى إدخال عدد مرات اليوم');
+        return;
+    }
+
+    if (!duration) {
+        alert('يرجى إدخال مدة الاستخدام');
+        return;
+    }
+
+    let updatedItem = {
+        dosage: dosage,
+        frequency: frequency,
+        duration: duration
+    };
+
+    if (isCustom) {
+        const customName = $('#customName').val().trim();
+        const customDesc = $('#customDescription').val().trim();
+        
+        if (!customName) {
+            alert('يرجى إدخال اسم الدواء المخصص');
+            return;
         }
 
-        function updatePrescriptionItem() {
-            const medicationId = $('#medicationId').val();
-            const dosage = $('#dosage').val();
-            const frequency = $('#frequency').val();
-            const duration = $('#duration').val();
-
-            if (!medicationId) {
-                alert('يرجى اختيار الدواء');
-                return;
-            }
-
-            if (!dosage.trim()) {
-                alert('يرجى إدخال الجرعة');
-                return;
-            }
-
-            if (!frequency.trim()) {
-                alert('يرجى إدخال عدد مرات اليوم');
-                return;
-            }
-
-            if (!duration.trim()) {
-                alert('يرجى إدخال مدة الاستخدام');
-                return;
-            }
-
-            const updatedItem = {
-                medicationId: parseInt(medicationId),
-                dosage: dosage.trim(),
-                frequency: frequency.trim(),
-                duration: duration.trim()
-            };
-
-            console.log(JSON.stringify(updatedItem));
-
-            $.ajax({
-                url: `https://localhost:7219/api/PrescriptionItem/${itemId}`,
-                method: 'PUT',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token') // أضف التوكن إلى الهيدر
-                },
-                contentType: 'application/json',
-                data: JSON.stringify(updatedItem),
-                success: function() {
-                    alert('تم تحديث العنصر بنجاح');
-                    window.location.href = 'PrescriptionItems.html';
-                },
-                error: function(xhr, status, error) {
-                    console.error('خطأ في التحديث:', error);
-                    alert('فشل في تحديث العنصر');
-                }
-            });
+        updatedItem.medicationId = null;
+        updatedItem.customMedicationName = customName;
+        updatedItem.customMedicationDescription = customDesc;
+        updatedItem.customDosageForm = $('#customDosageForm').val().trim();
+        updatedItem.customStrength = $('#customStrength').val().trim();
+    } else {
+        const medicationId = $('#medicationId').val();
+        
+        if (!medicationId) {
+            alert('يرجى اختيار الدواء');
+            return;
         }
 
-        function showMessage(message, type) {
-            $('#message').html(`<div class="alert alert-${type}">${message}</div>`);
+        updatedItem.medicationId = parseInt(medicationId);
+        updatedItem.customMedicationName = null;
+        updatedItem.customMedicationDescription = null;
+        updatedItem.customDosageForm = null;
+        updatedItem.customStrength = null;
+    }
+
+    $.ajax({
+        url: `https://localhost:7219/api/PrescriptionItem/${itemId}`,
+        method: 'PUT',
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+            'Content-Type': 'application/json'
+        },
+        data: JSON.stringify(updatedItem),
+        success: function() {
+            showMessage('تم تحديث العنصر بنجاح', 'success');
+            setTimeout(() => {
+                window.location.href = 'PrescriptionItems.html';
+            }, 1500);
+        },
+        error: function(xhr) {
+            console.error('Error:', xhr.responseText);
+            showMessage('فشل في تحديث العنصر: ' + (xhr.responseJSON?.message || xhr.statusText), 'danger');
         }
+    });
+}
+
+function showMessage(message, type) {
+    $('#message').html(`<div class="alert alert-${type}">${message}</div>`);
+}

@@ -27,6 +27,16 @@
                 document.getElementById('created-at').textContent = new Date(prescription.createdAt).toLocaleDateString('ar-EG');
 
                 selectedMedications = await Promise.all(prescription.prescriptionItems.map(async item => {
+                    if(!item.medicationId) {
+                    return {
+                        id: item.id,
+                        medicationId: item.medicationId,
+                        medicationName: item.customMedicationName,
+                        dosage: item.customDosageForm,
+                        frequency: item.frequency,
+                        duration: item.customStrength
+                    };
+                    }
                     const res = await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
                         headers: {
                             'Authorization': 'Bearer ' + localStorage.getItem('token')

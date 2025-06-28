@@ -40,13 +40,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         totalPrescriptionsEl.textContent = data.totalPrescriptions ?? '0';
         dispensedMedsEl.textContent = data.dispensedMeds ?? '0';
 
-				//alert(data.latestPrescription.isDispensed);
-				//alert(data.latestPrescription.id);
-				//alert(data.latestPrescription.doctor.user.fullName);
+
         // عرض أحدث وصفة مع تنسيق متقدم
         if (data.latestPrescription) {
             const prescriptionDate = new Date(data.latestPrescription.issuedDate);
-					//	alert(prescriptionDate.toLocaleDateString('ar-EG'))
             latestPrescriptionEl.innerHTML = `
                 <div class="prescription-card">
                     <div class="card-header">
@@ -99,9 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
-    // إدارة الأحداث
-    //document.getElementById('logout-btn').addEventListener('click', logout);
-
+   
 		       // عرض تفاصيل الوصفة في المودال
       async function showPrescriptionDetails(prescriptionId) {
     try {
@@ -169,6 +164,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             // جلب بيانات الأدوية بشكل متوازي
             const medicationRequests = prescription.prescriptionItems.map(async item => {
+                if(!item.medicationId) {
+                    return {
+                        id: item.id,
+                        medicationId: item.medicationId,
+                        name: item.customMedicationName,
+                        dosage: item.customDosageForm,
+                        frequency: item.frequency,
+                        duration: item.customStrength,
+                        isCustom: true
+                    };
+                    }
                 try {
                     const res = await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
                         headers: {
@@ -190,6 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 medItem.innerHTML = `
                     <div class="d-flex justify-content-between">
                     <h6>الدواء #${medication?.name  || 'غير معروف'}</h6>
+                    ${medication?.isCustom ? '<small class="badge bg-info ms-2">مخصص</small>' : ''}
                     </div>
                     <div class="row mt-2">
                         <div class="col-md-4"><strong>الجرعة:</strong> ${item.dosage}</div>

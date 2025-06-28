@@ -1,4 +1,6 @@
- let prescriptionId = getQueryParam('id');
+ //checkAccess(['Admin'], '../../../shared/unauthorized.html');
+
+        let prescriptionId = getQueryParam('id');
         let selectedMedications = [];
 
         document.addEventListener('DOMContentLoaded', loadPrescriptionData);
@@ -25,6 +27,16 @@
                 document.getElementById('created-at').textContent = new Date(prescription.createdAt).toLocaleDateString('ar-EG');
 
                 selectedMedications = await Promise.all(prescription.prescriptionItems.map(async item => {
+                    if(!item.medicationId) {
+                    return {
+                        id: item.id,
+                        medicationId: item.medicationId,
+                        medicationName: item.customMedicationName,
+                        dosage: item.customDosageForm,
+                        frequency: item.frequency,
+                        duration: item.customStrength
+                    };
+                    }
                     const res = await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
                         headers: {
                             'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -40,8 +52,6 @@
                         duration: item.duration
                     };
                 }));
-             
-                //console.log(selectedMedications);
                 updateMedicationList();
             } catch (error) {
                 alert('حدث خطأ أثناء تحميل تفاصيل الوصفة');

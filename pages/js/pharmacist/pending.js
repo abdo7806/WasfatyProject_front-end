@@ -364,7 +364,7 @@
                     document.getElementById('prescription-id').textContent = prescription.id;
                     
                     // تعبئة بيانات المركز الطبي
-                    document.getElementById('medical-center-name').textContent = prescription.doctor.medicalCenter.name;
+                    document.getElementById('medical-center-name').textContent =  prescription.doctor.medicalCenter.name;
                     document.getElementById('medical-center-address').textContent = prescription.doctor.medicalCenter.address;
                     document.getElementById('medical-center-phone').textContent = prescription.doctor.medicalCenter.phone;
                     
@@ -376,7 +376,28 @@
                     medicationsList.innerHTML = '';
                     
                     prescription.prescriptionItems.forEach(async  item => {
+    if(item.medicationId == null) {
 
+                        const medItem = document.createElement('div');
+                        medItem.className = 'medication-item';
+                        medItem.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                              <small class="badge bg-info ms-2">مخصص</small>
+                                <h6 class="mb-0">${item.medicationName || 'غير معروف'}</h6>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-4"><strong>الجرعة:</strong> ${item.dosage}</div>
+                                <div class="col-md-4"><strong>التكرار:</strong> ${item.frequency} مرات يومياً</div>
+                                <div class="col-md-4"><strong>المدة:</strong> ${item.duration} يوم</div>
+                            </div>
+                            ${item.notes ? `<div class="mt-2"><strong>ملاحظات:</strong> ${item.notes}</div>` : ''}
+                        `;
+                        medicationsList.appendChild(medItem);
+
+                    }
+                    else{
+
+                    console.log("iteme", item)
 				const res =  await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
                         headers: {
                             'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -388,7 +409,6 @@
                         medItem.innerHTML = `
                             <div class="d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">${medication.name || 'غير معروف'}</h6>
-                             
                             </div>
                             <div class="row mt-2">
                                 <div class="col-md-4"><strong>الجرعة:</strong> ${item.dosage}</div>
@@ -398,6 +418,8 @@
                             ${item.notes ? `<div class="mt-2"><strong>ملاحظات:</strong> ${item.notes}</div>` : ''}
                         `;
                         medicationsList.appendChild(medItem);
+
+                }
                     });
 									
                     

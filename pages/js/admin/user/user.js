@@ -135,8 +135,9 @@ function searchUsers() {
 						<td>${user.role}</td>
 						<td>${user.createdAt}</td>
 						<td>
-								<a href="EditeUser.html?id=${user.id}" class="edit" title="تعديل" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
-								<a href="#" class="delete" title="حذف" data-toggle="tooltip" onclick="deleteUser(${user.id})"><i class="material-icons">&#xE872;</i></a>                    </td>
+                <button href="#" class="btn btn-danger btn-action" onclick="deleteUser(${user.id})" title="حذف"><i class="fas fa-trash"></i></button>
+								<a href="EditeUser.html?id=${user.id}" class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
+                                    </td>
 						</td>
 				`;
         userTableBody.appendChild(row);

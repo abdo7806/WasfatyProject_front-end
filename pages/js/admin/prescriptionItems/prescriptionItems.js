@@ -39,7 +39,7 @@ function displayPrescriptionItems(data) {
 						<td>${item.id}</td>
 						<td>${item.prescriptionId}</td>
 						<td>${item.medicationId}</td>
-						<td>${item.medication.name}</td>
+						<td>${item.medication == null ? item.customMedicationName: item.medication.name}</td>
 
 						<td>${item.dosage}</td>
 						<td>${item.frequency}</td>

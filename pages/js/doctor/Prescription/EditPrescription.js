@@ -80,6 +80,16 @@
 
 
                 selectedMedications = await Promise.all(prescription.prescriptionItems.map(async item => {
+                    if(!item.medicationId) {
+                    return {
+                        id: item.id,
+                        medicationId: item.medicationId,
+                        medicationName: item.customMedicationName,
+                        dosage: item.customDosageForm,
+                        frequency: item.frequency,
+                        duration: item.customStrength
+                    };
+                    }
                     const medResponse = await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
                         headers: {
                             'Authorization': 'Bearer ' + localStorage.getItem('token')

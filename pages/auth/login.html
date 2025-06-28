@@ -1,77 +1,211 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
-    <title>تسجيل الدخول - وصفتي</title>
-    <link rel="stylesheet" href="../../css/style.css">
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - نظام وصفتي</title>
+    <!-- Google Font: Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
-    <!-- icheck bootstrap -->
-    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+    <!-- Custom CSS -->
+    <style>
+    :root {
+        --primary-color: #3498db;
+        --secondary-color: #2980b9;
+    }
+    
+    body {
+        font-family: 'Tajawal', sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        padding: 20px;
+    }
+    
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        min-height: 100%;
+    }
+    
+    .login-box {
+        width: 100%;
+        max-width: 420px;
+        animation: fadeIn 0.6s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .login-logo {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .login-logo a {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .card-header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1.5rem;
+        text-align: center;
+        border-bottom: none;
+    }
+    
+    .card-body {
+        padding: 2rem;
+    }
+    
+    .login-box-msg {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1.8rem;
+        text-align: right;
+    }
+    
+    .input-group {
+        margin-bottom: 1.5rem;
+        direction: ltr;
+    }
+    
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-right: none;
+        border-left: 1px solid #ced4da;
+    }
+    
+    .form-control {
+        border-left: none;
+        border-right: 1px solid #ced4da;
+        padding: 0.75rem 1rem;
+        height: calc(2.25rem + 8px);
+    }
+    
+    .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        border-color: var(--primary-color);
+    }
+    
+    .btn-login {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        padding: 0.75rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-login:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+        transform: translateY(-2px);
+    }
+    
+    .alert-danger {
+        text-align: right;
+        font-weight: 500;
+    }
+    
+    .forgot-pass {
+        display: block;
+        text-align: left;
+        margin-top: 0.5rem;
+        color: #6c757d;
+    }
+    
+    .register-link {
+        display: block;
+        text-align: center;
+        margin-top: 1.5rem;
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 576px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+    }
+    </style>
 </head>
 
-<body class="hold-transition login-page">
-    <div class="login-box">
-        <!-- /.login-logo -->
-        <div class="card card-outline card-primary">
-            <div class="card-header text-center">
-                <a href="../../index2.html" class="h1"><b>وصفتي</b></a>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-logo">
+                <a href="../../index2.html"><b>نظام وصفتي</b></a>
             </div>
-
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-end mb-4">
-                    <h3 class="login-box-msg"><b>تسجيل الدخول</b></h3>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-white mb-0">تسجيل الدخول</h3>
                 </div>
+                
+                <div class="card-body">
+                    <p class="login-box-msg">الرجاء إدخال بيانات الاعتماد الخاصة بك</p>
 
-                <div id="error-message" class="text-danger mb-3"></div>
+                    <div id="error-message" class="alert alert-danger d-none"></div>
 
-                <div class="input-group mb-3">
-                    <input type="email" id="email" class="form-control" placeholder="البريد الإلكتروني" />
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-envelope"></span>
+                    <div class="input-group mb-4">
+                        <input type="email" id="email" class="form-control" placeholder="البريد الإلكتروني" required>
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-envelope"></span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="input-group mb-3">
-                    <input type="password" id="password" class="form-control" placeholder="كلمة المرور" />
-                    <div class="input-group-append">
-                        <div class="input-group-text">
-                            <span class="fas fa-lock"></span>
+                    <div class="input-group mb-4">
+                        <input type="password" id="password" class="form-control" placeholder="كلمة المرور" required>
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-
-                <div class="row">
-             
-
-
-
-
-                    <!-- /.col -->
-                    <div class="col-12">
-                        <button type="button" class="btn btn-primary btn-block" onclick="login()">تسجيل الدخول
-
-                        </button>
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="button" class="btn btn-login" onclick="login()">
+                                <i class="fas fa-sign-in-alt ml-2"></i> تسجيل الدخول
+                            </button>
+                        </div>
+                        <div class="col-12">
+                            <a href="#" class="forgot-pass">نسيت كلمة المرور؟</a>
+                        </div>
                     </div>
-                    <!-- /.col -->
+
+                    <a href="./register.html" class="register-link">إنشاء حساب جديد</a>
                 </div>
-
-
-                <p class="mt-2">
-                    <a href="./register.html" class="text-center">ليس لديك حساب؟</a>
-                </p>
             </div>
-
-
-
         </div>
     </div>
 
@@ -79,9 +213,19 @@
     <script src="../../plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
     <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- AdminLTE App -->
-    <script src="../../dist/js/adminlte.min.js"></script>
-    <script src="../js/auth.js"></script>
+        <script src="../js/auth.js"></script>
+
+    <script>
+
+    // السماح بتسجيل الدخول عند الضغط على Enter
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    });
+    </script>
 </body>
 
 </html>

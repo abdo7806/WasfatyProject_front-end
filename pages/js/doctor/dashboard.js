@@ -1,9 +1,17 @@
 
-document.addEventListener('DOMContentLoaded', () => {
+
+document.addEventListener('DOMContentLoaded', async () => {
+       await getDactorByUserId();
+
     // جلب البيانات من الخادم
     function fetchDashboardData() {
+
+        const doctorId = JSON.parse(localStorage.getItem('doctorData')).id;
+        if (!doctorId) {
+            return console.error('Doctor ID not found in localStorage');
+        }
         $.ajax({
-            url: 'https://localhost:7219/api/Doctor/dashboard/2',
+            url: 'https://localhost:7219/api/Doctor/dashboard/'+doctorId,
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('token')
             },
@@ -33,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
 
-                createChart();
+                createChart(data);
                 $('#loading-indicator').addClass('d-none');
             },
             error: function(xhr, status, error) {
@@ -50,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // دالة لإنشاء الرسم البياني
-    function createChart() {
+    function createChart(data) {
         const ctx = document.getElementById('prescriptionsChart');
         if (!ctx) {
             console.error('Canvas element not found');
@@ -75,10 +83,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     scales: { y: { beginAtZero: true } }
                 }
             });
+       // الرسم البياني الدائري
+            const pieCtx = document.getElementById('prescriptionsPieChart').getContext('2d');
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: [ 'اجمالي الوصفات', 'الوصفات المستلمة','مكالوصفات المستلمةملة', 'الوصفات المنتظرة', 'المرضى المسجلين'],
+                    datasets: [{
+                        data: [ data.totalPrescriptions, data.dispensedPrescriptions,data.pendingPrescriptions, data.uniquePatients],
+                        backgroundColor: [
+                            '#2ecc71',
+                            '#f39c12',
+                            '#e74c3c',
+                            '#3498db'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'left'
+                        }
+                    }
+                }
+            });
+        
+            
         } catch (error) {
             console.error('Chart initialization error:', error);
         }
     }
-
     fetchDashboardData();
 });

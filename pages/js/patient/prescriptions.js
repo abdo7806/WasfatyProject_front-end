@@ -155,6 +155,35 @@
          
 
                 prescription.prescriptionItems.forEach( async item => {
+                if(!item.medicationId) {
+
+            const medication = {
+                        id: item.id,
+                        medicationId: item.medicationId,
+                        name: item.customMedicationName,
+                        dosage: item.customDosageForm,
+                        frequency: item.frequency,
+                        duration: item.customStrength
+                    };
+                    const medItem = document.createElement('div');
+                    medItem.className = 'medication-item';
+                    medItem.innerHTML = `
+                <div class="d-flex justify-content-between">
+
+                    <h6>الدواء #${medication.name || 'غير معروف'}</h6>
+
+                                <small class="badge bg-info ms-2">مخصص</small>
+
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-4"><strong>الجرعة:</strong> ${item.dosage}</div>
+                    <div class="col-md-4"><strong>التكرار:</strong> ${item.frequency} مرات يومياً</div>
+                    <div class="col-md-4"><strong>المدة:</strong> ${item.duration} يوم</div>
+                </div>
+            `;
+                    medicationsList.appendChild(medItem);
+
+                    }
                       const res =  await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
                         headers: {
                             'Authorization': 'Bearer ' + localStorage.getItem('token')

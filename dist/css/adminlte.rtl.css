@@ -1,0 +1,43 @@
+/* أساسيات RTL */
+html[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* تعديلات القائمة الجانبية */
+[dir="rtl"] .main-sidebar {
+  right: 0;
+  left: auto;
+}
+
+[dir="rtl"] .content-wrapper {
+  margin-right: 250px;
+  margin-left: 0;
+}
+
+[dir="rtl"] .navbar-nav {
+  padding-right: 0;
+}
+
+/* تعديلات البطاقات */
+[dir="rtl"] .card-header {
+  text-align: right;
+}
+
+[dir="rtl"] .card-title {
+  float: right;
+}
+
+/* تعديلات القوائم */
+[dir="rtl"] .nav {
+  padding-right: 0;
+}
+
+[dir="rtl"] .nav-sidebar .nav-item > .nav-link {
+  text-align: right;
+}
+
+[dir="rtl"] .nav-sidebar .nav-item > .nav-link > .right {
+  right: auto;
+  left: 1rem;
+}

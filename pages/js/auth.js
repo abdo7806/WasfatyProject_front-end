@@ -1,104 +1,145 @@
+/**
+ * تحليل توكن JWT
+ * @param {string} token - توكن JWT
+ * @returns {object|null} بيانات التوكن المفكوكة أو null في حالة الخطأ
+ */
 function parseJwt(token) {
     try {
         if (!token) throw new Error('No token provided');
+        if (typeof token !== 'string') throw new Error('Token must be a string');
 
-        const base64Url = token.split('.')[1];
-        if (!base64Url) throw new Error('Invalid token format');
+        const parts = token.split('.');
+        if (parts.length !== 3) throw new Error('Invalid token format');
 
+        const base64Url = parts[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const decodedData = atob(base64);
-
-        const jsonPayload = decodeURIComponent(
-            decodedData.split('')
-            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-            .join('')
+        
+        // استخدام TextDecoder لتفادي مشاكل Unicode
+        const decodedData = new TextDecoder().decode(
+            Uint8Array.from(atob(base64), c => c.charCodeAt(0))
         );
-
-        return JSON.parse(jsonPayload);
+        
+        return JSON.parse(decodedData);
     } catch (error) {
         console.error('Failed to parse JWT:', error);
         return null;
     }
 }
 
+/**
+ * التحقق من صيغة البريد الإلكتروني
+ * @param {string} email - البريد الإلكتروني
+ * @returns {boolean} صحيح إذا كان البريد صالحاً
+ */
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
 
-
-
-
+/**
+ * تسجيل الدخول إلى النظام
+ */
 async function login() {
-
-
-    // الحصول على قيم المدخلات
     const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
+    const password = document.getElementById('password').value.trim();
     const errorElement = document.getElementById('error-message');
-
-    // التحقق الأساسي من المدخلات
-    if (!email || !password) {
-        errorElement.textContent = 'يجب ملء جميع الحقول المطلوبة';
-        return;
-    }
-
-
+    const loginBtn = document.querySelector('.btn-login');
+    
     try {
-        // إظهار مؤشر تحميل
-        //  showLoader();
-
+        // التحقق من الحقول المطلوبة
+        if (!email || !password) {
+            showError('الرجاء إدخال البريد الإلكتروني وكلمة المرور');
+            return;
+        }
+        
+        // التحقق من صيغة البريد الإلكتروني
+        if (!validateEmail(email)) {
+            showError('صيغة البريد الإلكتروني غير صالحة');
+            return;
+        }
+        
+        // عرض حالة التحميل
+        loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> جاري المعالجة...';
+        loginBtn.disabled = true;
+        
+        // إرسال طلب تسجيل الدخول
         const response = await fetch('https://localhost:7219/api/Auth/login', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password }),
+            credentials: 'same-origin' // للأمان
         });
 
-        // إخفاء مؤشر تحميل
-        //  hideLoader();
-
+        // معالجة الاستجابة
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || 'البريد الإلكتروني أو كلمة المرور غير صحيحة');
+            const errorMessage = errorData.message || 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+            throw new Error(errorMessage);
         }
 
         const data = await response.json();
-
+        
         // التحقق من وجود التوكن
         if (!data.token) {
             throw new Error('لم يتم استلام توكن الدخول');
         }
 
-
-        // حفظ التوكن في localStorage
-        localStorage.setItem('token', data.token);
-
-        // فك تشفير التوكن
+        // حفظ التوكن وبيانات المستخدم
+        saveAuthData(data);
+        
+        // فك تشفير التوكن والتوجيه حسب الدور
         const decodedToken = parseJwt(data.token);
-        console.log(decodedToken);
         if (!decodedToken) {
             throw new Error('فشل تحليل بيانات التوكن');
         }
-
-        // حفظ بيانات المستخدم
-        localStorage.setItem('userData', JSON.stringify({
-            fullName: data.user.fullName,
-            userId: data.user.id,
-            email: decodedToken.email,
-            role: decodedToken.role,
-
-        }));
-
-
-
-        // التوجيه حسب الدور
+        
         redirectBasedOnRole(decodedToken.role);
-
+        
     } catch (error) {
-        // hideLoader();
-        errorElement.textContent = error.message;
+        showError(error.message);
         console.error('Login error:', error);
+        
+        // تسجيل الحدث في نظام التتبع
+        logError('Login', error);
+        
+    } finally {
+        // إعادة تعيين زر تسجيل الدخول
+        resetLoginButton(loginBtn);
     }
 }
 
+/**
+ * حفظ بيانات المصادقة في التخزين المحلي
+ * @param {object} authData - بيانات المصادقة
+ */
+function saveAuthData(authData) {
+    try {
+        localStorage.setItem('token', authData.token);
+        
+        const decodedToken = parseJwt(authData.token);
+        if (!decodedToken) return;
+        
+        const userData = {
+            fullName: authData.user?.fullName || '',
+            userId: authData.user?.id || '',
+            email: decodedToken.email || '',
+            role: decodedToken.role || ''
+        };
+        
+        localStorage.setItem('userData', JSON.stringify(userData));
+        
+    } catch (error) {
+        console.error('Failed to save auth data:', error);
+    }
+}
+
+/**
+ * التوجيه حسب دور المستخدم
+ * @param {string} role - دور المستخدم
+ */
 function redirectBasedOnRole(role) {
     const rolePages = {
         'Admin': '../admin/admin-dashboard.html',
@@ -107,173 +148,108 @@ function redirectBasedOnRole(role) {
         'Pharmacist': '../pharmacist/pharmacist-dashboard.html'
     };
 
-    if (rolePages[role]) {
-        window.location.href = rolePages[role];
+    const targetPage = rolePages[role];
+    if (targetPage) {
+        window.location.href = targetPage;
     } else {
-        alert('صلاحيات غير معروفة، سيتم تسجيل الخروج.');
-        logout();
+        showError('صلاحيات غير معروفة، سيتم تسجيل الخروج.');
+        setTimeout(() => logout('../login.html'), 3000);
     }
 }
 
+/**
+ * تسجيل الخروج
+ * @param {string} url - رابط الصفحة للتوجيه بعد التسجيل
+ */
 function logout(url) {
-    localStorage.clear();
-    window.location.href = url;
-}
-
-
-        // Logout Function
-        function logoutMassge(mode, url) {
-          // alert("sccd")
-            Swal.fire({
-                title: 'تأكيد تسجيل الخروج',
-                text: 'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'نعم، سجل خروج',
-                cancelButtonText: 'إلغاء',
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    	localStorage.removeItem('token');
-            localStorage.removeItem('userData');
-            if(mode === "doctor"){
-            localStorage.removeItem('doctorData');
-            }
-            else if(mode === "patient"){
-            localStorage.removeItem('patientData');
-            }
-            else if(mode === "PharmacistData"){
-            localStorage.removeItem('PharmacistData');
-            }
-            window.location.href = url;;
-                
-                }
-            });
-        }
-
-
-
-
-async function register() {
-    // جمع البيانات من النموذج
-    const formData = {
-        fullName: document.getElementById('fullName').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        password: document.getElementById('password').value,
-        confirmPassword: document.getElementById('confirmPassword').value,
-        role: 3
-    };
-
-    // التحقق من الصحة
-
-    const errors = validateRegistration(formData);
-    if (Object.keys(errors).length > 0) {
-        displayErrors(errors);
-        return;
-    }
-
     try {
-        // إظهار مؤشر تحميل
-        // showLoader();
-
-        const response = await fetch('https://localhost:7219/api/Auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                fullName: formData.fullName,
-                email: formData.email,
-                password: formData.password,
-                role: parseInt(formData.role)
-            })
-        });
-
-
-
-        // إخفاء مؤشر تحميل
-        //hideLoader();
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || 'فشل في عملية التسجيل');
+        // مسح جميع بيانات المصادقة
+        localStorage.removeItem('token');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('doctorData');
+        localStorage.removeItem('patientData');
+        localStorage.removeItem('PharmacistData');
+        
+        // التوجيه إلى صفحة تسجيل الدخول
+        if (url) {
+            window.location.href = url;
         }
-
-        // عرض رسالة نجاح
-        showSuccess('تم التسجيل بنجاح! سيتم توجيهك لصفحة تسجيل الدخول...');
-
-        // التوجيه بعد 3 ثواني
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 3000);
-
     } catch (error) {
-        hideLoader();
-        showError(error.message);
-        console.error('Registration error:', error);
+        console.error('Logout error:', error);
     }
 }
 
-function validateRegistration(data) {
-
-    const errors = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    // const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
-
-
-    if (!data.fullName) errors.fullName = 'الاسم الكامل مطلوب!';
-    if (!data.email) {
-        errors.email = 'البريد الإلكتروني مطلوب!';
-    } else if (!emailRegex.test(data.email)) {
-        errors.email = 'البريد الإلكتروني غير صالح!';
-    }
-    if (!data.password) {
-        errors.password = 'كلمة المرور مطلوبة!';
-    } else if (data.password.length < 6) {
-        errors.password = 'كلمة المرور يجب أن تحتوي على الأقل 6 أحرف وتشمل حروف وأرقام!';
-    }
-    if (data.password !== data.confirmPassword) {
-        errors.confirmPassword = 'كلمات المرور غير متطابقة!';
-    }
-    if (!data.role) {
-        errors.role = 'يجب اختيار دور!';
-    }
-
-    return errors;
-}
-
-function displayErrors(errors) {
-    // إعادة تعيين جميع رسائل الخطأ
-    document.querySelectorAll('.error-message').forEach(el => {
-        el.textContent = '';
-    });
-
-    // عرض الأخطاء الحالية
-    for (const [field, message] of Object.entries(errors)) {
-        const errorElement = document.getElementById(`${field}Error`);
-        if (errorElement) {
-            errorElement.textContent = message;
+/**
+ * تأكيد تسجيل الخروج
+ * @param {string} mode - نوع المستخدم
+ * @param {string} url - رابط الصفحة للتوجيه
+ */
+function logoutMassge(mode, url) {
+    Swal.fire({
+        title: 'تأكيد تسجيل الخروج',
+        text: 'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'نعم، سجل خروج',
+        cancelButtonText: 'إلغاء',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            logout(url);
         }
+    });
+}
+
+/**
+ * إعادة تعيين زر تسجيل الدخول
+ * @param {HTMLElement} btn - عنصر الزر
+ */
+function resetLoginButton(btn) {
+    if (btn) {
+        btn.innerHTML = '<i class="fas fa-sign-in-alt ml-2"></i> تسجيل الدخول';
+        btn.disabled = false;
     }
 }
 
-function showSuccess(message) {
-    const successElement = document.getElementById('success-message');
-    successElement.textContent = message;
-    successElement.style.display = 'block';
-
-    setTimeout(() => {
-        successElement.style.display = 'none';
-    }, 5000);
-}
-
+/**
+ * عرض رسالة خطأ
+ * @param {string} message - نص الرسالة
+ */
 function showError(message) {
     const errorElement = document.getElementById('error-message');
-    errorElement.textContent = message;
-    errorElement.style.display = 'block';
-
-    setTimeout(() => {
-        errorElement.style.display = 'none';
-    }, 5000);
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.classList.remove('d-none');
+        
+        setTimeout(() => {
+            errorElement.classList.add('d-none');
+        }, 5000);
+    }
 }
+
+/**
+ * تسجيل الأخطاء
+ * @param {string} context - سياق الخطأ
+ * @param {Error} error - كائن الخطأ
+ */
+function logError(context, error) {
+    // هنا يمكنك إضافة كود لإرسال الأخطاء إلى سيرفر للتتبع
+    console.error(`${context} Error:`, {
+        message: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString()
+    });
+}
+
+// السماح بتسجيل الدخول عند الضغط على Enter
+document.addEventListener('DOMContentLoaded', () => {
+    const passwordField = document.getElementById('password');
+    if (passwordField) {
+        passwordField.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    }
+});

@@ -2,21 +2,27 @@
         let patientId;
         let doctorData = JSON.parse(localStorage.getItem("doctorData"));
         let allPrescriptions = [];
-        let currentPage = 1;
-        const prescriptionsPerPage = 5;
+        let filteredPrescriptions = [];
 
         async function loadPatientData(id) {
-            showLoading(true);
             try {
+                console.log('بدء تحميل البيانات...');
+                showLoading(true);
+
+                console.log('جاري جلب الوصفات الطبية...');
                 const prescriptionsResponse = await fetch(`https://localhost:7219/api/Prescription/GetByPatientId/${id}`, {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     }
                 });
+                console.log('تم جلب الوصفات الطبية');
 
-                if (!prescriptionsResponse.ok) throw new Error('فشل في تحميل الوصفات الطبية');
+                if (!prescriptionsResponse.ok) {
+                    throw new Error('فشل في تحميل الوصفات الطبية');
+                }
 
                 allPrescriptions = await prescriptionsResponse.json();
+                filteredPrescriptions = [...allPrescriptions];
 
                 if (allPrescriptions.length === 0) {
                     showMessage('لا توجد وصفات طبية لهذا المريض', false);
@@ -26,21 +32,17 @@
                         </div>
                     `;
                     document.getElementById('stats-section').classList.add('d-none');
-                    document.getElementById('pagination').classList.add('d-none');
                     return;
                 }
 
                 const patient = allPrescriptions[0].patient;
-                displayPatientInfo(patient); // عرض بيانات المريض
-
-                updateStats(allPrescriptions); // عرض عدد الوصفات والوصفات الذي تم صرفها والوصفات الذي لم يتم صرفها
-
-
-
+                displayPatientInfo(patient);
+                updateStats(allPrescriptions);
                 setupEventListeners();
-                displayPrescriptions(allPrescriptions);
-
+                displayAllPrescriptions();
+                
             } catch (error) {
+                console.error('Error loading patient data:', error);
                 showMessage(error.message, true);
                 document.getElementById('prescriptions-list').innerHTML = `
                     <div class="no-prescriptions">
@@ -63,7 +65,6 @@
             document.getElementById('patient-id').textContent = patient.id;
         }
 
-        // عرض عدد الوصفات والوصفات الذي تم صرفها والوصفات الذي لم يتم صرفها
         function updateStats(prescriptions) {
             const total = prescriptions.length;
             const dispensed = prescriptions.filter(p => p.isDispensed).length;
@@ -74,36 +75,16 @@
         }
 
         function setupEventListeners() {
-            // البحث والتصفية
             document.getElementById('search-input').addEventListener('input', applyFilters);
             document.getElementById('status-filter').addEventListener('change', applyFilters);
             document.getElementById('date-filter').addEventListener('change', applyFilters);
-
-            // التصفح بين الصفحات
-            document.getElementById('prev-page').addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    applyFilters();
-                }
-            });
-
-            document.getElementById('next-page').addEventListener('click', () => {
-                const totalPages = Math.ceil(filteredPrescriptions.length / prescriptionsPerPage);
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    applyFilters();
-                }
-            });
+            applyFilters();
         }
-
-        let filteredPrescriptions = [];
 
         function applyFilters() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             const statusFilter = document.getElementById('status-filter').value;
             const dateOrder = document.getElementById('date-filter').value;
-
-            // التصفية حسب البحث وحالة الصرف
             filteredPrescriptions = allPrescriptions.filter(p => {
                 const matchesSearch =
                     p.doctor.user.fullName.toLowerCase().includes(searchTerm) ||
@@ -117,7 +98,6 @@
                 return matchesSearch && matchesStatus;
             });
 
-            // الترتيب حسب التاريخ
             filteredPrescriptions.sort((a, b) => {
                 return dateOrder === 'newest' ?
                     new Date(b.issuedDate) - new Date(a.issuedDate) :
@@ -125,46 +105,13 @@
             });
 
             updateStats(filteredPrescriptions);
-            updatePagination();
-            displayPrescriptions(filteredPrescriptions);
+            displayAllPrescriptions();
         }
 
-        function updatePagination() {
-            const totalPages = Math.ceil(filteredPrescriptions.length / prescriptionsPerPage);
-            const pagination = document.getElementById('pagination');
-            const prevPage = document.getElementById('prev-page');
-            const nextPage = document.getElementById('next-page');
-
-            if (filteredPrescriptions.length <= prescriptionsPerPage) {
-                pagination.classList.add('d-none');
-                return;
-            }
-
-            pagination.classList.remove('d-none');
-
-            // تحديث أزرار الصفحات
-            prevPage.classList.toggle('disabled', currentPage === 1);
-            nextPage.classList.toggle('disabled', currentPage === totalPages);
-
-            // تحديث أرقام الصفحات
-            const pageNumbers = document.querySelectorAll('.page-item:not(#prev-page):not(#next-page)');
-            pageNumbers.forEach(el => el.remove());
-
-            const pageList = document.createElement('li');
-            pageList.className = 'page-item active';
-            pageList.innerHTML = `<a class="page-link" href="#">${currentPage}</a>`;
-            prevPage.insertAdjacentElement('afterend', pageList);
-        }
-
-        // عر جميع الوصفات الطبية مع تقسيمها الى صفحات
-        async function displayPrescriptions(prescriptions) {
-            const startIndex = (currentPage - 1) * prescriptionsPerPage;
-            const endIndex = startIndex + prescriptionsPerPage;
-            const displayedPrescriptions = prescriptions.slice(startIndex, endIndex);
-
+        async function displayAllPrescriptions() {
             const prescriptionsList = document.getElementById('prescriptions-list');
 
-            if (displayedPrescriptions.length === 0) {
+            if (filteredPrescriptions.length === 0) {
                 prescriptionsList.innerHTML = `
                     <div class="no-prescriptions">
                         <p>لا توجد وصفات تطابق معايير البحث</p>
@@ -176,16 +123,14 @@
             let html = '';
             const medicationIds = [];
 
-            // جمع جميع IDs للأدوية
-            displayedPrescriptions.forEach(p => {
-                p.prescriptionItems.forEach(item => {
+            for (const prescription of filteredPrescriptions) {
+                prescription.prescriptionItems.forEach(item => {
                     if (item.medicationId && !medicationIds.includes(item.medicationId)) {
                         medicationIds.push(item.medicationId);
                     }
                 });
-            });
+            }
 
-            // جلب جميع الأدوية المطلوبة في طلب واحد
             let medications = {};
             if (medicationIds.length > 0) {
                 try {
@@ -204,7 +149,7 @@
                 }
             }
 
-            for (const prescription of displayedPrescriptions) {
+            for (const prescription of filteredPrescriptions) {
                 html += `
                     <div class="prescription-card">
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -223,15 +168,6 @@
                             </div>
                             <div class="col-md-6">
                                 <strong>التخصص:</strong> ${prescription.doctor.specialization || 'غير محدد'}
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <strong>المركز الطبي:</strong> ${prescription.doctor.medicalCenter.name || 'غير محدد'}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>ترخيص الطبيب:</strong> ${prescription.doctor.licenseNumber || 'غير محدد'}
                             </div>
                         </div>
 
@@ -256,38 +192,47 @@
             let html = '';
 
             for (const item of items) {
-                const medication = medicationsCache[item.medicationId];
-
-                if (medication) {
+                if (item.medicationId) {
+                    const medication = medicationsCache[item.medicationId];
                     html += `
                         <div class="medication-item">
                             <i class="bi bi-capsule me-2"></i>
                             <div style="flex-grow: 1;">
                                 <div class="d-flex justify-content-between">
                                     <div>
-                                        <strong>${medication.name || 'دواء غير معروف'}</strong>
-                                        <small class="text-muted ms-2">${medication.strength || ''}</small>
+                                        <strong>${medication?.name || 'دواء غير معروف'}</strong>
+                                        <small class="text-muted ms-2">${medication?.strength || ''}</small>
                                     </div>
-                                    <span>${medication.dosageForm || item.dosageForm || ''}</span>
+                                    <span>${medication?.dosageForm || ''}</span>
                                 </div>
                                 <div class="text-muted">
                                     ${item.frequency ? item.frequency + ' مرات/يوم' : ''}
                                     ${item.duration ? 'لمدة ' + item.duration : ''}
                                 </div>
-                                ${medication.description ? `<div class="text-muted small mt-1">${medication.description}</div>` : ''}
+                                ${medication?.description ? `<div class="text-muted small mt-1">${medication.description}</div>` : ''}
                             </div>
                         </div>
                     `;
                 } else {
                     html += `
-                        <div class="medication-item text-danger">
-                            <i class="bi bi-exclamation-triangle me-2"></i>
-                            <div>
-                                <strong>دواء غير متوفر (رقم ${item.medicationId})</strong>
+                        <div class="medication-item">
+                            <i class="bi bi-pencil-square me-2 text-primary"></i>
+                            <div style="flex-grow: 1;">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>${item.customMedicationName || 'دواء مخصص'}</strong>
+                                        <small class="badge bg-info ms-2">مخصص</small>
+                                    </div>
+                                    <span>${item.customDosageForm || ''}</span>
+                                </div>
+                                <div class="text-muted">
+                                    ${item.customStrength ? 'تركيز: ' + item.customStrength : ''}
+                                </div>
                                 <div class="text-muted">
                                     ${item.frequency ? item.frequency + ' مرات/يوم' : ''}
                                     ${item.duration ? 'لمدة ' + item.duration : ''}
                                 </div>
+                                ${item.customMedicationDescription ? `<div class="text-muted small mt-1">${item.customMedicationDescription}</div>` : ''}
                             </div>
                         </div>
                     `;
@@ -309,8 +254,16 @@
 
         function showLoading(isLoading) {
             const loadingElement = document.getElementById('loading');
-            if (loadingElement) {
-                loadingElement.style.display = isLoading ? 'flex' : 'none';
+            const contentElement = document.getElementById('prescriptions-list');
+            
+            if (loadingElement && contentElement) {
+                if (isLoading) {
+                    loadingElement.style.display = 'flex';
+                    contentElement.style.opacity = '0.5';
+                } else {
+                    loadingElement.style.display = 'none';
+                    contentElement.style.opacity = '1';
+                }
             }
         }
 
@@ -340,4 +293,4 @@
                     </div>
                 `;
             }
-        };
+        }

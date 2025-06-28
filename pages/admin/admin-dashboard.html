@@ -11,6 +11,13 @@
     <meta name="keywords" content="وصفتي, وصفات طبية, إدارة صيدليات, نظام أطباء">
     <meta name="author" content="وصفتي">
 
+   <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+
+    <!--  CSS -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tajawal:400,500,700&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -21,373 +28,467 @@
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
 
-    <!-- AdminLTE CSS -->
-    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tajawal...">
-
+<link rel="stylesheet" href="../css/doctor-style.css">
   <style>
-            
-   
-                
-     /* أنماط إضافية للتحسينات الجديدة */
-        #loading-indicator {
-            text-align: center;
-            padding: 2rem;
-        }
+:root {
+    --doctor-color: #17a2b8;
+    --pharmacist-color: #28a745;
+    --patient-color: #ffc107;
+    --prescription-color: #dc3545;
+    --pharmacy-color: #6c757d;
+    --medicine-color: #6610f2;
+    --users-color: #20c997;
+}
 
-         #error-alert {
-            margin: 1rem 0;
-        }
+/* تصميم البطاقات */
+.stat-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
 
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.stat-card .card-body {
+    padding: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-card .stat-title {
+    color: rgba(255,255,255,0.9);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.stat-card h3 {
+    color: white;
+    font-weight: 700;
+    font-size: 2rem;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    color: rgba(255,255,255,0.2);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover .stat-icon {
+    transform: scale(1.1);
+    color: rgba(255,255,255,0.3);
+}
+
+.stat-link {
+    display: inline-block;
+    color: white;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-top: 1rem;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    transition: all 0.2s ease;
+}
+
+.stat-link:hover {
+    color: white;
+    border-bottom-color: white;
+    padding-right: 5px;
+}
+
+/* ألوان البطاقات */
+.bg-doctor { background: linear-gradient(135deg, var(--doctor-color), #138496); }
+.bg-pharmacist { background: linear-gradient(135deg, var(--pharmacist-color), #1e7e34); }
+.bg-patient { background: linear-gradient(135deg, var(--patient-color), #e0a800); }
+.bg-prescription { background: linear-gradient(135deg, var(--prescription-color), #c82333); }
+.bg-pharmacy { background: linear-gradient(135deg, var(--pharmacy-color), #5a6268); }
+.bg-medicine { background: linear-gradient(135deg, var(--medicine-color), #5a0bd4); }
+.bg-users { background: linear-gradient(135deg, var(--users-color), #17a589); }
+
+/* بطاقة الرسم البياني */
+.chart-card {
+    background: white;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.chart-card .card-header {
+    background: white;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 1.25rem 1.5rem;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.chart-card .card-title {
+    color: #495057;
+    font-weight: 600;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.chart-card .card-body {
+    padding: 1.5rem;
+}
   </style>
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed">
+<body >
 
-
-    <div class="wrapper">
-
-        <!-- Pre-loader -->
-        <div class="preloader flex-column justify-content-center align-items-center">
-            <img class="animation__shake" src="../../dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
-        </div>
-
-        <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-            <!-- Left navbar links -->
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="./admin-dashboard.html" class="nav-link">الرئيسية</a>
-                </li>
-            </ul>
-
-            <!-- Right navbar links -->
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="#">
-                        <i class="far fa-bell"></i>
-                        <span class="badge badge-warning navbar-badge">15</span>
+    <!-- الهيدر العلوي -->
+    <header class="main-header">
+        <button class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <h1 class="logo">نظام وصفتي</h1>
+        
+        <ul class="navbar-nav">
+        
+            <li class="nav-item dropdown " style="padding-left: 100px;">
+                <a href="#" class="dropdown-toggle">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="d-none d-md-inline">حسابي</span>
+                </a>
+                <div class="dropdown-menu ">
+                    <div class="dropdown-item text-center py-3" style="margin-left: 100px;">
+                        <p class="user-name mb-1 EmailUser">د. أحمد محمد</p>
+                        <small class="user-role RoleUser">طبيب</small>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="../Settingspage.html" class="dropdown-item">
+                        <i class="fas fa-user-cog ml-2"></i> إعدادات الحساب
                     </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-left">
-                        <span class="dropdown-item dropdown-header">15 إشعار</span>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-prescription-bottle-alt ml-2"></i> 5 وصفات جديدة
-                            <span class="float-left text-muted text-sm">منذ 3 دقائق</span>
-                        </a>
-                    </div>
-                </li>
-
-
-                <!-- زر حساب المستخدم -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="#">
-                        <i class="fas fa-user-circle"></i>
-                        <span class="d-none d-md-inline">حسابي</span>
+                
+                    <div class="dropdown-divider"></div>
+                    <a href="#" onclick="logout('../auth/login.html')" class="dropdown-item text-danger">
+                        <i class="fas fa-sign-out-alt ml-2"></i> تسجيل الخروج
                     </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-left">
-                        <div class="dropdown-item text-center">
-                            <p class="mb-0 mt-2 EmailUser">أحمد محمد</p>
-                            <small class="RoleUser">مدير النظام</small>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <a href="../Settingspage.html" class="dropdown-item">
-                            <i class="fas fa-user-cog ml-2"></i> إعدادات الحساب
-                        </a>
-                        
-                        <div class="dropdown-divider"></div>
-                        <a href="#" onclick="logout('../auth/login.html')" class="dropdown-item text-danger">
-                            <i class="fas fa-sign-out-alt ml-2"></i> تسجيل الخروج
-                        </a>
-                    </div>
-                </li>
-            </ul>
-        </nav>
-
-        <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <!-- Brand Logo -->
-            <a href="admin-dashboard.html" class="brand-link text-center">
-                <img src="../../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-                <span class="brand-text font-weight-light">نظام وصفتي</span>
-            </a>
-
-            <!-- Sidebar -->
-            <div class="sidebar">
-
-                <!-- معلومات المستخدم -->
-                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-
-                    <div class="info">
-                        <a href="#" class="d-block EmailUser">أحمد محمد</a>
-                        <small class="text-muted RoleUser">مدير النظام</small>
-                    </div>
                 </div>
+            </li>
+        </ul>
+    </header>
 
-                <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <li class="nav-item">
 
-                            <a href="./Users/User.html" class="nav-link">
+
+       <!-- القائمة الجانبية -->
+    <aside class="main-sidebar">
+   
+        <div class="user-panel">
+                        
+            <div class="user-info">
+                <div class="user-name EmailUser">د. أحمد محمد</div>
+                <div class="user-role RoleUser">طبيب</div>
+            </div>
+        </div>
+        
+        <nav>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="./admin-dashboard.html" class="active">
+                        <i class="fas fa-home"></i>
+                        <span>الرئيسية</span>
+                    </a>
+                </li>
+                <li>
+                         <a href="./Users/User.html" class="nav-link">
                                 <i class="nav-icon fas fa-users"></i>
 
-                                <p>المستخدمون</p>
+                                <span>المستخدمون</span>
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="./Doctor/Doctors.html" class="nav-link">
+                </li>
+                <li>
+   <a href="./Doctor/Doctors.html" class="nav-link">
                                 <i class="nav-icon fas fa-user-md"></i>
-                                <p>الأطباء</p>
+                                <span>الأطباء</span>
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="./Patients/Patient.html" class="nav-link">
+                </li>
+                <li>
+                       <a href="./Patients/Patient.html" class="nav-link">
                                 <i class="nav-icon fas fa-procedures"></i>
-                                <p>المرضى</p>
+                                <span>المرضى</span>
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="./Pharmacy/Pharmacys.html" class="nav-link">
+                </li>
+                <li>
+                   <a href="./Pharmacy/Pharmacys.html" class="nav-link">
                                 <i class="nav-icon fas fa-medkit"></i>
-                                <p>الصيدليات</p>
+                                <span>الصيدليات</span>
                             </a>
-                        </li>
-                        <li class="nav-item">
+                </li>
+               
+                <li>
                             <a href="./MedicalCenter/MedicalCenters.html" class="nav-link">
                                 <i class="nav-icon fas fa-hospital"></i>
-                                <p>المراكز الطبية</p>
+                                <span>المراكز الطبية</span>
                             </a>
-                        </li>
-                        <li class="nav-item">
+                </li>
+                <li>
                             <a href="./Pharmacist/Pharmacists.html" class="nav-link">
                                 <i class="nav-icon fas fa-user"></i>
-                                <p>الصيادلة</p>
+                                <span>الصيادلة</span>
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="./Medication/Medications.html" class="nav-link">
-                                <i class="nav-icon fas fa-pills"></i>
-                                <p>الأدوية</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="./Prescription/Prescriptions.html" class="nav-link">
-                                <i class="nav-icon fas fa-file-medical"></i>
-                                <p>الوصفات الطبية</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="./PrescriptionItem/PrescriptionItems.html" class="nav-link">
-                                <i class="nav-icon fas fa-list"></i>
-                                <p>عناصر الوصفة</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="./DispenseRecord/DispenseRecords.html" class="nav-link">
-                                <i class="nav-icon fas fa-clipboard-list"></i>
-                                <p>سجلات الصرف</p>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </aside>
+                </li>
 
-        <!-- Content Wrapper -->
-        <div class="content-wrapper">
-            <!-- Content Header -->
-            <div class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1 class="m-0">لوحة تحكم المدير</h1>
-                        </div>
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-left">
-                                <li class="breadcrumb-item"><a href="./admin-dashboard.html">الرئيسية</a></li>
-                                <li class="breadcrumb-item active">لوحة التحكم</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <main>
-        <!-- مؤشر التحميل -->
+                <li>
+                        <a href="./Medication/Medications.html" class="nav-link">
+                                <i class="nav-icon fas fa-pills"></i>
+                                <span>الأدوية</span>
+                            </a>
+                </li>
+                <li>
+                           <a href="./Prescription/Prescriptions.html" class="nav-link">
+                                <i class="nav-icon fas fa-file-medical"></i>
+                                <span>الوصفات الطبية</span>
+                            </a>
+                </li>
+                <li>
+                        <a href="./PrescriptionItem/PrescriptionItems.html" class="nav-link">
+                                <i class="nav-icon fas fa-list"></i>
+                                <span>عناصر الوصفة</span>
+                            </a>
+                </li>
+                <li>            
+                    <a href="./DispenseRecord/DispenseRecords.html" class="nav-link">
+                                <i class="nav-icon fas fa-clipboard-list"></i>
+                                <span>سجلات الصرف</span>
+                            </a>
+                        </li>
+            </ul>
+        </nav>
+    </aside>
+
+       <!-- المحتوى الرئيسي -->
+    <div class="content-wrapper">
+        <div class="container-fluid">
+
+                            <h1 class="page-title">لوحة التحكم</h1>
+      <!-- مؤشر التحميل -->
         <div id="loading-indicator" class="text-center py-4">
             <div class="spinner-border text-primary"></div>
             <p class="mt-2">جاري تحميل البيانات...</p>
         </div>
-        
-        <!-- رسالة الخطأ -->
         <div id="error-alert" class="alert alert-danger d-none"></div>
-        
-        <!-- محتوى لوحة التحكم 
-        <div id="dashboard-content">
-        
-        </div>-->
-    </main>
-            <!-- Main Content -->
-            <!-- Main Content -->
+
+
+<!-- Main Content -->
 <div class="content" id="dashboard-content">
     <div class="container-fluid">
-        <!-- Small Boxes -->
+        <!-- الصف الأول: الإحصائيات الرئيسية -->
         <div class="row">
             <!-- بطاقة الأطباء -->
-            <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
-                <div class="small-box bg-info h-100">
-                    <div class="inner">
-                        <h3 id="totalDoctors">0</h3>
-                        <p>الأطباء المسجلين</p>
+            <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                <div class="stat-card bg-doctor h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 id="totalDoctors" class="mb-1">0</h3>
+                                <p class="stat-title">الأطباء المسجلين</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                        </div>
+                        <a href="./Doctor/Doctors.html" class="stat-link">
+                            عرض التفاصيل <i class="fas fa-chevron-left ms-1"></i>
+                        </a>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-user-md"></i>
-                    </div>
-                    <a href="./Doctor/Doctors.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
                 </div>
             </div>
 
             <!-- بطاقة الصيادلة -->
-            <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
-                <div class="small-box bg-success h-100">
-                    <div class="inner">
-                        <h3 id="totalPharmacists">0</h3>
-                        <p>الصيادلة المسجلين</p>
+            <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                <div class="stat-card bg-pharmacist h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 id="totalPharmacists" class="mb-1">0</h3>
+                                <p class="stat-title">الصيادلة المسجلين</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-user-nurse"></i>
+                            </div>
+                        </div>
+                        <a href="./Pharmacist/Pharmacists.html" class="stat-link">
+                            عرض التفاصيل <i class="fas fa-chevron-left ms-1"></i>
+                        </a>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-user-nurse"></i>
-                    </div>
-                    <a href="./Pharmacist/Pharmacists.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
                 </div>
             </div>
 
             <!-- بطاقة المرضى -->
-            <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
-                <div class="small-box bg-warning h-100">
-                    <div class="inner">
-                        <h3 id="totalPatients">0</h3>
-                        <p>المرضى المسجلين</p>
+            <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                <div class="stat-card bg-patient h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 id="totalPatients" class="mb-1">0</h3>
+                                <p class="stat-title">المرضى المسجلين</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-procedures"></i>
+                            </div>
+                        </div>
+                        <a href="./Patients/Patient.html" class="stat-link">
+                            عرض التفاصيل <i class="fas fa-chevron-left ms-1"></i>
+                        </a>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-procedures"></i>
-                    </div>
-                    <a href="./Patients/Patient.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
                 </div>
             </div>
 
             <!-- بطاقة الوصفات -->
-            <div class="col-12 col-sm-6 col-md-6 col-xl-3 mb-4">
-                <div class="small-box bg-danger h-100">
-                    <div class="inner">
-                        <h3 id="totalPrescriptions">0</h3>
-                        <p>إجمالي الوصفات</p>
+            <div class="col-12 col-sm-6 col-lg-3 mb-4">
+                <div class="stat-card bg-prescription h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 id="totalPrescriptions" class="mb-1">0</h3>
+                                <p class="stat-title">إجمالي الوصفات</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-prescription-bottle-alt"></i>
+                            </div>
+                        </div>
+                        <a href="./Prescription/Prescriptions.html" class="stat-link">
+                            عرض التفاصيل <i class="fas fa-chevron-left ms-1"></i>
+                        </a>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-prescription-bottle-alt"></i>
-                    </div>
-                    <a href="./Prescription/Prescriptions.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
                 </div>
             </div>
         </div>
 
-        <!-- تقارير إضافية -->
+        <!-- الصف الثاني: الإحصائيات الثانوية -->
         <div class="row">
             <!-- الصيدليات -->
-            <div class="col-12 col-sm-6 col-md-4 mb-4">
-                <div class="small-box bg-secondary h-100">
-                    <div class="inner">
-                        <h3 id="totalPharmacies">0</h3>
-                        <p>الصيدليات المسجلة</p>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                <div class="stat-card bg-pharmacy h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 id="totalPharmacies" class="mb-1">0</h3>
+                                <p class="stat-title">الصيدليات المسجلة</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-medkit"></i>
+                            </div>
+                        </div>
+                        <a href="./Pharmacy/Pharmacys.html" class="stat-link">
+                            عرض التفاصيل <i class="fas fa-chevron-left ms-1"></i>
+                        </a>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-medkit"></i>
-                    </div>
-                    <a href="./Pharmacy/Pharmacys.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
                 </div>
             </div>
 
             <!-- الوصفات المستلمة -->
-            <div class="col-12 col-sm-6 col-md-4 mb-4">
-                <div class="small-box bg-primary h-100">
-                    <div class="inner">
-                        <h3 id="totalDispensedPrescriptions">0</h3>
-                        <p>الوصفات المستلمة</p>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                <div class="stat-card bg-success h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 id="totalDispensedPrescriptions" class="mb-1">0</h3>
+                                <p class="stat-title">الوصفات المستلمة</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                        </div>
+                        <a href="./DispenseRecord/DispenseRecords.html" class="stat-link">
+                            عرض التفاصيل <i class="fas fa-chevron-left ms-1"></i>
+                        </a>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-clipboard-check"></i>
-                    </div>
-                    <a href="./DispenseRecord/DispenseRecords.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
                 </div>
             </div>
 
             <!-- الوصفات المنتظرة -->
-            <div class="col-12 col-sm-6 col-md-4 mb-4">
-                <div class="small-box bg-purple h-100">
-                    <div class="inner">
-                        <h3 id="totalPendingPrescriptions">0</h3>
-                        <p>الوصفات المنتظرة</p>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                <div class="stat-card bg-warning h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 id="totalPendingPrescriptions" class="mb-1">0</h3>
+                                <p class="stat-title">الوصفات المنتظرة</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                        </div>
+                        <a href="./Prescription/Prescriptions.html?status=pending" class="stat-link">
+                            عرض التفاصيل <i class="fas fa-chevron-left ms-1"></i>
+                        </a>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-hourglass-half"></i>
-                    </div>
-                    <a href="./Prescription/Prescriptions.html?status=pending" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
                 </div>
             </div>
-        </div>
 
-        <!-- تقارير إضافية -->
-        <div class="row">
             <!-- الأدوية -->
-            <div class="col-12 col-sm-6 col-md-6 mb-4">
-                <div class="small-box bg-indigo h-100">
-                    <div class="inner">
-                        <h3 id="totalMedications">0</h3>
-                        <p>الأدوية المتاحة</p>
+            <div class="col-12 col-sm-6 col-md-6 col-lg-3 mb-4">
+                <div class="stat-card bg-medicine h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 id="totalMedications" class="mb-1">0</h3>
+                                <p class="stat-title">الأدوية المتاحة</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-pills"></i>
+                            </div>
+                        </div>
+                        <a href="./Medication/Medications.html" class="stat-link">
+                            عرض التفاصيل <i class="fas fa-chevron-left ms-1"></i>
+                        </a>
                     </div>
-                    <div class="icon">
-                        <i class="fas fa-pills"></i>
-                    </div>
-                    <a href="./Medication/Medications.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
-                </div>
-            </div>
-
-            <!-- المستخدمون -->
-            <div class="col-12 col-sm-6 col-md-6 mb-4">
-                <div class="small-box bg-teal h-100">
-                    <div class="inner">
-                        <h3 id="totalUsers">0</h3>
-                        <p>إجمالي المستخدمين</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <a href="./Users/User.html" class="small-box-footer">المزيد <i class="fas fa-arrow-circle-left"></i></a>
                 </div>
             </div>
         </div>
 
-        <!-- رسوم بيانية -->
+        <!-- الصف الثالث: المستخدمون والرسوم البيانية -->
         <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header bg-gradient-info">
+            <!-- المستخدمون -->
+            <div class="col-12 col-md-6 mb-4">
+                <div class="stat-card bg-users h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 id="totalUsers" class="mb-1">0</h3>
+                                <p class="stat-title">إجمالي المستخدمين</p>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <a href="./Users/User.html" class="stat-link">
+                            عرض التفاصيل <i class="fas fa-chevron-left ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- رسوم بيانية -->
+            <div class="col-12 col-md-6 mb-4">
+                <div class="chart-card h-100">
+                    <div class="card-header">
                         <h3 class="card-title">
-                            <i class="fas fa-chart-bar mr-1"></i>
+                            <i class="fas fa-chart-bar me-2"></i>
                             إحصائيات الوصفات الشهرية
                         </h3>
                     </div>
                     <div class="card-body">
-                        <div class="chart">
-                            <canvas id="prescriptionsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                        </div>
+                        <canvas id="prescriptionsChart" height="250"></canvas>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
+            </div>
+      
+
         </div>
 
         <!-- Footer -->
@@ -397,7 +498,7 @@
                 <b>الإصدار</b> 1.0.0
             </div>
         </footer>
-    </div>
+
 
     <!-- REQUIRED SCRIPTS -->
     <!-- jQuery -->
@@ -407,7 +508,6 @@
     <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- AdminLTE App -->
-    <script src="../../dist/js/adminlte.min.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/checkAccess.js"></script>
     <script src="../js/admin/dashboard.js"></script>
@@ -419,27 +519,12 @@
         checkAccess(['Admin'], '../../shared/unauthorized.html');
         getUserName();
     
-        $(document).ready(function() {
-            // إغلاق القائمة الجانبية تلقائياً على الهواتف
-            if ($(window).width() < 768) {
-                $('body').addClass('sidebar-collapse');
-            }
 
-            // إعادة حساب الأبعاد عند تغيير حجم النافذة
-            $(window).resize(function() {
-                if ($(window).width() < 768) {
-                    $('body').addClass('sidebar-collapse');
-                } else {
-                    $('body').removeClass('sidebar-collapse');
-                }
-            });
-
-            // زر إنشاء وصفة جديدة
-            $('.new-prescription-btn').click(function() {
-                window.location.href = './Doctor/Doctors.html';
-            });
+        // تفعيل/تعطيل القائمة الجانبية للجوال
+        document.querySelector('.sidebar-toggle').addEventListener('click', function() {
+            document.body.classList.toggle('sidebar-show');
         });
-
+        
 
 </script>
 </body>
