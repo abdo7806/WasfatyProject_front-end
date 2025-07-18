@@ -167,16 +167,167 @@ function renderHistoryList() {
         btn.addEventListener('click', () => showPrescriptionDetails(btn.dataset.id));
     });
 }
+
+
+// دالة طباعة الوصفة
+function printPrescription(data) {
+    try {
+        const { prescription, enrichedItems } = data;
+        const patient = prescription.patient || {};
+        const doctor = prescription.doctor || {};
+        const medicalCenter = prescription.doctor.medicalCenter || {};
+        
+        // تنسيق التاريخ
+        const issuedDate = new Date(prescription.issuedDate);
+        const formattedDate = issuedDate.toLocaleDateString('ar-EG', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // إنشاء نافذة الطباعة
+        const printWindow = window.open('', '_blank');
+        
+        // بناء محتوى الطباعة
+        let itemsHtml = '';
+        if (enrichedItems && enrichedItems.length > 0) {
+            itemsHtml = enrichedItems.map(item => `
+                <div class="medication-item">
+                    <p><strong>${item.name || 'دواء غير معروف'}</strong></p>
+                    <p>الجرعة: ${item.dosage || '--'} | التكرار: ${item.frequency || '--'} | المدة: ${item.duration || '--'} يوم</p>
+                    ${item.notes ? `<p><small>ملاحظات: ${item.notes}</small></p>` : ''}
+                </div>
+            `).join('');
+        } else {
+            itemsHtml = '<div class="text-muted">لا توجد أدوية</div>';
+        }
+
+        // HTML كامل للطباعة
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html dir="rtl" lang="ar">
+            <head>
+                <title>وصفة طبية #${prescription.id || '--'}</title>
+                <style>
+                    body {
+                        font-family: 'Tajawal', Arial, sans-serif;
+                        line-height: 1.6;
+                        padding: 20px;
+                        color: #333;
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 20px;
+                        border-bottom: 2px solid #3498db;
+                        padding-bottom: 10px;
+                    }
+                    .info-section {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 20px;
+                    }
+                    .info-box {
+                        flex: 1;
+                        padding: 10px;
+                    }
+                    .medication-item {
+                        padding: 10px;
+                        border-bottom: 1px solid #eee;
+                        margin-bottom: 5px;
+                    }
+                    .signature-area {
+                        margin-top: 50px;
+                        display: flex;
+                        justify-content: space-between;
+                    }
+                    @media print {
+                        body {
+                            padding: 0 !important;
+                        }
+                        .no-print {
+                            display: none !important;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h2>وصفة طبية</h2>
+                    <p>${medicalCenter.name || 'مركز طبي'}</p>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-box">
+                        <h4>معلومات المريض</h4>
+                        <p><strong>الاسم:</strong> ${patient.user ? patient.user.fullName : '--'}</p>
+                        <p><strong>رقم الهوية:</strong> ${patient.id || '--'}</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>معلومات الوصفة</h4>
+                        <p><strong>رقم الوصفة:</strong> #${prescription.id || '--'}</p>
+                        <p><strong>التاريخ:</strong> ${formattedDate}</p>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-box">
+                        <h4>الطبيب المعالج</h4>
+                        <p><strong>الاسم:</strong> د. ${doctor.user ? doctor.user.fullName : '--'}</p>
+                        <p><strong>التخصص:</strong> ${doctor.specialization || '--'}</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>المركز الطبي</h4>
+                        <p><strong>الاسم:</strong> ${medicalCenter.name || '--'}</p>
+                        <p><strong>العنوان:</strong> ${medicalCenter.address || '--'}</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3>الأدوية الموصوفة</h3>
+                    ${itemsHtml}
+                </div>
+                
+                <div class="signature-area">
+                    <div>
+                        <p>توقيع الطبيب: ___________________</p>
+                        <p>الاسم: د. ${doctor.user ? doctor.user.fullName : '--'}</p>
+                    </div>
+                    <div>
+                        <p>توقيع الصيدلي: ___________________</p>
+                        <p>الاسم: ___________________</p>
+                    </div>
+                </div>
+                
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                            window.close();
+                        }, 200);
+                    }
+                </script>
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+    } catch (error) {
+        console.error('حدث خطأ أثناء الطباعة:', error);
+        alert('حدث خطأ أثناء محاولة الطباعة');
+    }
+}
+
+
 // ...existing code...
         // Show Prescription Details
-function showPrescriptionDetails(prescriptionId) {
+async function showPrescriptionDetails(prescriptionId) {
     // ابحث عن السجل في بيانات الصرف
     const record = state.dispenseRecord.find(r => r.prescription && r.prescription.id == prescriptionId);
     if (!record) {
         Swal.fire('خطأ', 'لم يتم العثور على تفاصيل الوصفة', 'error');
         return;
     }
-
+try {
     const prescription = record.prescription || {};
     const patient = prescription.patient || {};
     const doctor = prescription.doctor || {};
@@ -201,82 +352,75 @@ function showPrescriptionDetails(prescriptionId) {
 
 
     console.log("data1", prescription.prescriptionItems)
-
+    let medications = [];
     // قائمة الأدوية
     const medicationsList = document.getElementById('medications-list');
     medicationsList.innerHTML = '';
-    if (Array.isArray(prescription.prescriptionItems) && prescription.prescriptionItems.length > 0) {
-        prescription.prescriptionItems.forEach(async (item) => {
-    console.log("data2", item)
-                if(!item.medicationId) {
-
-                                const medItem = document.createElement('div');
-            medItem.className = 'list-group-item';
-            medItem.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                                <small class="badge bg-info ms-2">مخصص</small>
-                    
-                        <h6 class="mb-1">${ item.medicationName || 'دواء غير معروف'}</h6>
-                        <small class="text-muted">الجرعة: ${item.dosage || '--'} | التكرار: ${item.frequency || '--'}</small>
-                    </div>
-                    <span class="badge bg-secondary">${item.duration || '--'} يوم</span>
-                </div>
-            `;
-            medicationsList.appendChild(medItem);
-                    }
-                    else{
-
-                    const response = await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
-                        headers: {
-                            'Authorization': 'Bearer ' + localStorage.getItem('token')
-                        }
-                    });
-                    const medication = await response.json();
-    console.log("medication", medication)
-
-            const medItem = document.createElement('div');
-            medItem.className = 'list-group-item';
-            medItem.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="mb-1">${ medication.name || 'دواء غير معروف'}</h6>
-                        <small class="text-muted">الجرعة: ${item.dosage || '--'} | التكرار: ${item.frequency || '--'}</small>
-                    </div>
-                    <span class="badge bg-secondary">${item.duration || '--'} يوم</span>
-                </div>
-            `;
-            medicationsList.appendChild(medItem);
+      if (prescription.prescriptionItems.length === 0) {
+            medicationsList.innerHTML = '<p class="text-muted">لا توجد أدوية في هذه الوصفة</p>';
+            return;
         }
+
+        // جلب تفاصيل الأدوية
+        const enrichedItems = await enrichPrescriptionItems(prescription.prescriptionItems);
+        
+        // عرض الأدوية
+        enrichedItems.forEach(item => {
+            const medItem = document.createElement('div');
+            medItem.className = 'medication-item';
+            
+            medItem.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <h6>${item.name || 'دواء غير معروف'}</h6>
+                    ${item.isCustom ? '<small class="badge bg-info ms-2">مخصص</small>' : ''}
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-4"><strong>الجرعة:</strong> ${item.dosage || '--'}</div>
+                    <div class="col-md-4"><strong>التكرار:</strong> ${item.frequency || '--'} مرات يومياً</div>
+                    <div class="col-md-4"><strong>المدة:</strong> ${item.duration || '--'} يوم</div>
+                </div>
+                ${item.notes ? `<div class="mt-2"><strong>ملاحظات:</strong> ${item.notes}</div>` : ''}
+            `;
+            
+            medicationsList.appendChild(medItem);
         });
 
-
-			
-
-										
-    } else {
-        medicationsList.innerHTML = '<div class="text-muted">لا توجد أدوية</div>';
-    }
 
     document.getElementById('medications-count').textContent = 
         `${prescription.prescriptionItems ? prescription.prescriptionItems.length : 0} دواء`;
 
     // زر الطباعة
-    document.getElementById('print-btn').onclick = () => printPrescription(record);
+   // document.getElementById('print-btn').onclick = () => printPrescription(record);
 
     // عرض المودال
     const modal = new bootstrap.Modal(document.getElementById('prescriptionDetailsModal'));
     modal.show();
+
+           // تعيين دالة الطباعة مع البيانات الكاملة
+        document.getElementById('print-prescription-btn').onclick = () => {
+            printPrescription({
+                prescription: prescription,
+                enrichedItems: enrichedItems
+            });
+        };
+
+          } catch (error) {
+        console.error('Error:', error);
+        Swal.fire('خطأ', error.message || 'حدث خطأ أثناء جلب تفاصيل الوصفة', 'error');
+    }
 }
+
+
+
         // Print Prescription
-        function printPrescription(record) {
+       /* function printPrescription(record) {
     const prescription = record.prescription || {};
     const patient = prescription.patient || {};
     const doctor = prescription.doctor || {};
     const pharmacist = record.pharmacist || {};
     const pharmacy = record.pharmacy || {};
 
-    const printWindow = window.open('', '_blank');
+   const printWindow = window.open('', '_blank');
     printWindow.document.write(`
         <!DOCTYPE html>
         <html dir="rtl" lang="ar">
@@ -332,7 +476,8 @@ function showPrescriptionDetails(prescriptionId) {
                 <h3>الأدوية الموصوفة:</h3>
                 ${
                     Array.isArray(prescription.prescriptionItems) && prescription.prescriptionItems.length > 0
-                    ? prescription.prescriptionItems.map(item => `
+                    ? prescription.prescriptionItems.map(item => 
+                        `
                         <div class="medication-item">
                             <p><strong>${item.medication ? item.medication.name : 'دواء غير معروف'}</strong></p>
                             <p>الجرعة: ${item.dosage || '--'} | التكرار: ${item.frequency || '--'} | المدة: ${item.duration || '--'} يوم</p>
@@ -359,6 +504,51 @@ function showPrescriptionDetails(prescriptionId) {
     printWindow.document.close();
     printWindow.print();
 }
+*/
+
+// دالة مساعدة لجلب تفاصيل الأدوية
+async function enrichPrescriptionItems(items) {
+    const enrichedItems = [];
+    
+    for (const item of items) {
+        if (!item.medicationId) {
+            // دواء مخصص
+            enrichedItems.push({
+                ...item,
+                name: item.customMedicationName,
+                isCustom: true
+            });
+        } else {
+            try {
+                // جلب بيانات الدواء من API
+                const res = await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                });
+                
+                if (!res.ok) throw new Error('فشل في جلب بيانات الدواء');
+                
+                const medication = await res.json();
+                enrichedItems.push({
+                    ...item,
+                    ...medication,
+                    isCustom: false
+                });
+            } catch (error) {
+                console.error('خطأ في جلب بيانات الدواء:', error);
+                enrichedItems.push({
+                    ...item,
+                    name: 'دواء غير معروف',
+                    isCustom: false
+                });
+            }
+        }
+    }
+    
+    return enrichedItems;
+}
+
 
   function applyFilters() {
     state.filtereddispenseRecord = state.dispenseRecord.filter(record => {

@@ -24,7 +24,7 @@
                 document.getElementById('prescription-id').textContent = prescription.id;
                 document.getElementById('patient-name').textContent = prescription.patient.user.fullName;
                 document.getElementById('doctor-name').textContent = prescription.doctor.user.fullName;
-                document.getElementById('created-at').textContent = new Date(prescription.createdAt).toLocaleDateString('ar-EG');
+                document.getElementById('created-at').textContent = new Date(prescription.issuedDate).toLocaleDateString('ar-EG');
 
                 selectedMedications = await Promise.all(prescription.prescriptionItems.map(async item => {
                     if(!item.medicationId) {
