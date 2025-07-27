@@ -96,7 +96,7 @@ function searchPatients() {
 
     const patientsTableBody = document.getElementById('patientsTableBody');
     patientsTableBody.innerHTML = '';
-
+    currentPage = 1;
     const start = (currentPage - 1) * patientsPerPage;
     const end = start + patientsPerPage;
     const paginatedPatients = filteredPatients.slice(start, end);

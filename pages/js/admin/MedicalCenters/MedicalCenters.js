@@ -77,6 +77,7 @@ function searchMedicalCenters() {
 
     const body = document.getElementById('medicalCenterTableBody');
     body.innerHTML = '';
+    currentPage = 1;
 
     const start = (currentPage - 1) * centersPerPage;
     const end = start + centersPerPage;

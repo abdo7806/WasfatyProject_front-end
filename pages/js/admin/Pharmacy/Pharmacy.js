@@ -77,6 +77,7 @@ function searchPharmacies() {
 
     const body = document.getElementById('pharmacyTableBody');
     body.innerHTML = '';
+    currentPage = 1;
 
     const start = (currentPage - 1) * pharmaciesPerPage;
     const end = start + pharmaciesPerPage;

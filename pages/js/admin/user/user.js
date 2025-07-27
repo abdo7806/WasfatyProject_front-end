@@ -98,15 +98,35 @@ function changePage(page) {
 // وظيفة للبحث عن المستخدمين حسب العمود المحدد
 function searchUsers() {
     const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    console.log("user data", users)
     const filteredUsers = users.filter(user => {
+        if(searchColumn == "role"){
+                        let roleName = "";
+
+    switch (user.role) {
+        case 1:
+            roleName = "مدير النظام";
+            break;
+        case 2:
+            roleName = "طبيب";
+            break;
+        case 3: 
+            roleName = "مريض";
+            break;
+        case 4: 
+            roleName = "صيدلي";
+            break;
+    }
+    return roleName.toLowerCase().includes(searchInput);
+        }
         return user[searchColumn].toLowerCase().includes(searchInput);
     });
-
     const userTableBody = document.getElementById('userTableBody');
     userTableBody.innerHTML = '';
-
+  currentPage = 1;
     const start = (currentPage - 1) * usersPerPage;
     const end = start + usersPerPage;
+ 
     const paginatedUsers = filteredUsers.slice(start, end);
 
 
@@ -132,7 +152,7 @@ function searchUsers() {
 						<td>${user.id}</td>
 						<td>${user.fullName}</td>
 						<td>${user.email}</td>
-						<td>${user.role}</td>
+						<td>${roleName}</td>
 						<td>${user.createdAt}</td>
 						<td>
                 <button href="#" class="btn btn-danger btn-action" onclick="deleteUser(${user.id})" title="حذف"><i class="fas fa-trash"></i></button>

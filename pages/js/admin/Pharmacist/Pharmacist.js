@@ -99,7 +99,7 @@ function searchPharmacists() {
 console.log("filter", filteredPharmacists)
     const pharmacistsTableBody = document.getElementById('pharmacistsTableBody');
     pharmacistsTableBody.innerHTML = '';
-
+currentPage = 1;
     const start = (currentPage - 1) * pharmacistsPerPage;
     const end = start + pharmacistsPerPage;
     const paginatedPharmacists = filteredPharmacists.slice(start, end);

@@ -88,7 +88,8 @@
             filteredPrescriptions = allPrescriptions.filter(p => {
                 const matchesSearch =
                     p.doctor.user.fullName.toLowerCase().includes(searchTerm) ||
-                    formatDateTime(p.issuedDate).includes(searchTerm);
+                    formatDateTime(p.issuedDate).includes(searchTerm) ||
+                   p.id==searchTerm;
 
                 const matchesStatus =
                     statusFilter === 'all' ||
@@ -153,7 +154,7 @@
                 html += `
                     <div class="prescription-card">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5>وصفة طبية #${prescription.id}</h5>
+                            <h5 >وصفة طبية #${prescription.id}</h5>
                             <div>
                                 <span class="badge ${prescription.isDispensed ? 'bg-success' : 'bg-warning text-dark'} me-2">
                                     ${prescription.isDispensed ? 'تم صرفها' : 'قيد الانتظار'}
@@ -170,7 +171,11 @@
                                 <strong>التخصص:</strong> ${prescription.doctor.specialization || 'غير محدد'}
                             </div>
                         </div>
-
+                            <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="print-prescription-btn" onclick="printPrescription(${prescription.id})">
+                        <i class="fas fa-print"></i> طباعة الوصفة
+                    </button>
+                </div>
                         <div class="mt-3">
                             <h6>الأدوية الموصوفة:</h6>
                             <div class="mt-2">
@@ -294,3 +299,243 @@
                 `;
             }
         }
+
+
+            // طباعة الوصفة
+
+        async function getPrescriptionById(prescriptionId) {
+            try {
+                const response = await fetch(`https://localhost:7219/api/Prescription/${prescriptionId}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                });
+                if (!response.ok) throw new Error('فشل تحميل البيانات');
+
+                const prescription = await response.json();
+
+                document.getElementById('prescription-id').textContent = prescription.id;
+                document.getElementById('patient-name').textContent = prescription.patient.user.fullName;
+                document.getElementById('doctor-name').textContent = prescription.doctor.user.fullName;
+                document.getElementById('created-at').textContent = new Date(prescription.issuedDate).toLocaleDateString('ar-EG');
+
+                selectedMedications = await Promise.all(prescription.prescriptionItems.map(async item => {
+                    if(!item.medicationId) {
+                    return {
+                        id: item.id,
+                        medicationId: item.medicationId,
+                        medicationName: item.customMedicationName,
+                        dosage: item.customDosageForm,
+                        frequency: item.frequency,
+                        duration: item.customStrength
+                    };
+                    }
+                    const res = await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
+                        headers: {
+                            'Authorization': 'Bearer ' + localStorage.getItem('token')
+                        },
+                    });
+                    const medication = await res.json();
+                    return {
+                        id: item.id,
+                        medicationId: item.medicationId,
+                        medicationName: medication.name,
+                        dosage: item.dosage,
+                        frequency: item.frequency,
+                        duration: item.duration
+                    };
+                }));
+                //updateMedicationList();
+
+
+            } catch (error) {
+                alert('حدث خطأ أثناء تحميل تفاصيل الوصفة');
+                console.error(error);
+            }
+        }
+           // دالة طباعة الوصفة
+async function printPrescription(prescriptionId) {
+    try {
+        alert(prescriptionId)
+ const response = await fetch(`https://localhost:7219/api/Prescription/${prescriptionId}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                });
+                if (!response.ok) throw new Error('فشل تحميل البيانات');
+
+                const prescription = await response.json();
+ const enrichedItems = await Promise.all(prescription.prescriptionItems.map(async item => {
+                    if(!item.medicationId) {
+                    return {
+                        id: item.id,
+                        medicationId: item.medicationId,
+                        medicationName: item.customMedicationName,
+                        dosage: item.customDosageForm,
+                        frequency: item.frequency,
+                        duration: item.customStrength
+                    };
+                    }
+                    const res = await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
+                        headers: {
+                            'Authorization': 'Bearer ' + localStorage.getItem('token')
+                        },
+                    });
+                    const medication = await res.json();
+                    return {
+                        id: item.id,
+                        medicationId: item.medicationId,
+                        medicationName: medication.name,
+                        dosage: item.dosage,
+                        frequency: item.frequency,
+                        duration: item.duration
+                    };
+                }));
+                
+        //const { prescription, enrichedItems } = data;
+        const patient = prescription.patient || {};
+        const doctor = prescription.doctor || {};
+        const medicalCenter = prescription.doctor.medicalCenter || {};
+        
+        // تنسيق التاريخ
+        const issuedDate = new Date(prescription.issuedDate);
+        const formattedDate = issuedDate.toLocaleDateString('ar-EG', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // إنشاء نافذة الطباعة
+        const printWindow = window.open('', '_blank');
+        
+        // بناء محتوى الطباعة
+        let itemsHtml = '';
+        if (enrichedItems && enrichedItems.length > 0) {
+            itemsHtml = enrichedItems.map(item => `
+                <div class="medication-item">
+                    <p><strong>${item.name || 'دواء غير معروف'}</strong></p>
+                    <p>الجرعة: ${item.dosage || '--'} | التكرار: ${item.frequency || '--'} | المدة: ${item.duration || '--'} يوم</p>
+                    ${item.notes ? `<p><small>ملاحظات: ${item.notes}</small></p>` : ''}
+                </div>
+            `).join('');
+        } else {
+            itemsHtml = '<div class="text-muted">لا توجد أدوية</div>';
+        }
+
+        // HTML كامل للطباعة
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html dir="rtl" lang="ar">
+            <head>
+                <title>وصفة طبية #${prescription.id || '--'}</title>
+                <style>
+                    body {
+                        font-family: 'Tajawal', Arial, sans-serif;
+                        line-height: 1.6;
+                        padding: 20px;
+                        color: #333;
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 20px;
+                        border-bottom: 2px solid #3498db;
+                        padding-bottom: 10px;
+                    }
+                    .info-section {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 20px;
+                    }
+                    .info-box {
+                        flex: 1;
+                        padding: 10px;
+                    }
+                    .medication-item {
+                        padding: 10px;
+                        border-bottom: 1px solid #eee;
+                        margin-bottom: 5px;
+                    }
+                    .signature-area {
+                        margin-top: 50px;
+                        display: flex;
+                        justify-content: space-between;
+                    }
+                    @media print {
+                        body {
+                            padding: 0 !important;
+                        }
+                        .no-print {
+                            display: none !important;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h2>وصفة طبية</h2>
+                    <p>${medicalCenter.name || 'مركز طبي'}</p>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-box">
+                        <h4>معلومات المريض</h4>
+                        <p><strong>الاسم:</strong> ${patient.user ? patient.user.fullName : '--'}</p>
+                        <p><strong>رقم الهوية:</strong> ${patient.id || '--'}</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>معلومات الوصفة</h4>
+                        <p><strong>رقم الوصفة:</strong> #${prescription.id || '--'}</p>
+                        <p><strong>التاريخ:</strong> ${formattedDate}</p>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-box">
+                        <h4>الطبيب المعالج</h4>
+                        <p><strong>الاسم:</strong> د. ${doctor.user ? doctor.user.fullName : '--'}</p>
+                        <p><strong>التخصص:</strong> ${doctor.specialization || '--'}</p>
+                    </div>
+                    <div class="info-box">
+                        <h4>المركز الطبي</h4>
+                        <p><strong>الاسم:</strong> ${medicalCenter.name || '--'}</p>
+                        <p><strong>العنوان:</strong> ${medicalCenter.address || '--'}</p>
+                    </div>
+
+                    
+                </div>
+                
+                <div>
+                    <h3>الأدوية الموصوفة</h3>
+                    ${itemsHtml}
+                </div>
+                
+                <div class="signature-area">
+                    <div>
+                        <p>توقيع الطبيب: ___________________</p>
+                        <p>الاسم: د. ${doctor.user ? doctor.user.fullName : '--'}</p>
+                    </div>
+                    <div>
+                        <p>توقيع الصيدلي: ___________________</p>
+                        <p>الاسم: ___________________</p>
+                    </div>
+                </div>
+                
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                            window.close();
+                        }, 200);
+                    }
+                </script>
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+    } catch (error) {
+        console.error('حدث خطأ أثناء الطباعة:', error);
+        alert('حدث خطأ أثناء محاولة الطباعة');
+    }
+
+}

@@ -85,6 +85,7 @@ function searchDoctors() {
     }
     const tableBody = document.getElementById('doctorsTableBody');
     tableBody.innerHTML = '';
+    currentPage = 1;
 
     const start = (currentPage - 1) * doctorsPerPage;
     const end = start + doctorsPerPage;

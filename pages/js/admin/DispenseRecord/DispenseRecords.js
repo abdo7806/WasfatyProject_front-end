@@ -40,7 +40,7 @@ function displayDispenseRecords(data) {
 <td>${record.prescription?.doctor?.user?.fullName || '—'}</td>
 <td>${record.prescription?.patientId || '—'}</td>
 <td>${record.prescription?.patient?.user?.fullName || '—'}</td>
-<td>${new Date(record.dispensedDate).toLocaleString()}</td>
+<td>${new Date(record.dispensedDate).toLocaleDateString()}</td>
 <td>
 
 

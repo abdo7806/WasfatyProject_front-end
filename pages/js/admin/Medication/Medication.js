@@ -38,7 +38,7 @@ function displayMedications(data) {
                     <td>${medication.prescriptionItems.length}</td>
                     <td>
                    
-                                        <a href="#" class="btn btn-info btn-action" title="عرض"><i class="fas fa-eye"></i></a>
+                <a href="./DetailsMedication.html?id=${medication.id}" class="btn btn-info btn-action" title="عرض"><i class="fas fa-eye"></i></a>
                 <button class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deleteMedication(${medication.id})" title="حذف"><i class="fas fa-trash"></i></button>
 								<a href="EditMedication.html?id=${medication.id}"  class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
 

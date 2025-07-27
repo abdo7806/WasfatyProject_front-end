@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل الدواء - نظام إدارة الوصفات الطبية</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .medication-info, .prescription-info {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .section-title {
+            color: #3498db;
+            margin-top: 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .info-label {
+            font-weight: bold;
+            width: 150px;
+            color: #555;
+        }
+        .info-value {
+            flex: 1;
+        }
+        .prescription-items {
+            margin-top: 20px;
+        }
+        .prescription-item {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .btn {
+            display: inline-block;
+            background: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        @media (max-width: 768px) {
+            .info-row {
+                flex-direction: column;
+            }
+            .info-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>تفاصيل الدواء</h1>
+        </div>
+
+        <div class="medication-info">
+            <h2 class="section-title">المعلومات الأساسية للدواء</h2>
+            <div class="info-row">
+                <div class="info-label">اسم الدواء:</div>
+                <div class="info-value" id="med-name">{{name}}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">وصف الدواء:</div>
+                <div class="info-value" id="med-description">{{description}}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">شكل الجرعة:</div>
+                <div class="info-value" id="med-dosage-form">{{dosageForm}}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">التركيز:</div>
+                <div class="info-value" id="med-strength">{{strength}}</div>
+            </div>
+						  <div class="info-row">
+                <div class="info-label">عدد مرات الصرف:</div>
+                <div class="info-value" id="med-prescriptionItems">{{strength}}</div>
+            </div>
+        </div>
+
+
+        <a href="./Medications.html" class="btn">العودة إلى قائمة الأدوية</a>
+    </div>
+
+    <script>
+        // يمكنك استخدام JavaScript لملء البيانات من API
+        document.addEventListener('DOMContentLoaded', function() {
+            // في الواقع الفعلي، ستقوم بجلب البيانات من API
+            // fetch('/api/medications/{id}')
+            //     .then(response => response.json())
+            //     .then(data => populateData(data));
+            
+            // مثال على ملء البيانات (في الواقع سيتم استبدالها بالبيانات الفعلية من API)
+            function populateData(medicationData) {
+                document.getElementById('med-name').textContent = medicationData.name;
+                document.getElementById('med-description').textContent = medicationData.description;
+                document.getElementById('med-dosage-form').textContent = medicationData.dosageForm;
+                document.getElementById('med-strength').textContent = medicationData.strength;
+                document.getElementById('med-prescriptionItems').textContent = medicationData.prescriptionItems.length;
+              
+               /* const prescriptionItemsContainer = document.getElementById('prescription-items');
+                prescriptionItemsContainer.innerHTML = '';
+                */
+              /*  medicationData.prescriptionItems.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'prescription-item';
+                    itemElement.innerHTML = `
+                        <div class="info-row">
+                            <div class="info-label">الجرعة:</div>
+                            <div class="info-value">${item.dosage}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">التكرار:</div>
+                            <div class="info-value">${item.frequency}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">المدة:</div>
+                            <div class="info-value">${item.duration}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">تاريخ الصرف:</div>
+                            <div class="info-value">${new Date(item.prescription.issuedDate).toLocaleDateString()}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">تم الصرف:</div>
+                            <div class="info-value">${item.prescription.isDispensed ? 'نعم' : 'لا'}</div>
+                        </div>
+                        
+                        <h3 style="margin-top: 15px;">معلومات الطبيب</h3>
+                        <div class="info-row">
+                            <div class="info-label">اسم الطبيب:</div>
+                            <div class="info-value">${item.prescription.doctor.user.fullName}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">التخصص:</div>
+                            <div class="info-value">${item.prescription.doctor.specialization}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">المركز الطبي:</div>
+                            <div class="info-value">${item.prescription.doctor.medicalCenter.name}</div>
+                        </div>
+                        
+                        <h3 style="margin-top: 15px;">معلومات المريض</h3>
+                        <div class="info-row">
+                            <div class="info-label">اسم المريض:</div>
+                            <div class="info-value">${item.prescription.patient.user.fullName}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">تاريخ الميلاد:</div>
+                            <div class="info-value">${item.prescription.patient.dateOfBirth}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">الجنس:</div>
+                            <div class="info-value">${item.prescription.patient.gender}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">فصيلة الدم:</div>
+                            <div class="info-value">${item.prescription.patient.bloodType}</div>
+                        </div>
+                    `;
+                    prescriptionItemsContainer.appendChild(itemElement);
+                });
+           */
+							}
+            
+            // في الواقع الفعلي، ستقوم باستدعاء populateData مع البيانات الفعلية من API
+
+
+						
+async function fetchMedications() {
+    try {
+			            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+
+      
+        const response = await fetch('https://localhost:7219/api/Medication/'+id, {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        });
+        medications = await response.json();
+        populateData(medications);
+      //  setupPagination(medications);
+    } catch (error) {
+        console.error('خطأ في جلب البيانات:', error);
+    }
+}
+				fetchMedications();
+
+        });
+
+    </script>
+</body>
+</html>
