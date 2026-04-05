@@ -65,33 +65,48 @@ Wasfaty-FrontEnd/
 ````
 
 -----
+---
 
 ## 📸 واجهات النظام (System Screenshots)
 
 ### 1️⃣ الواجهات العامة (General Screens)
-
-| واجهة تسجيل الدخول | إنشاء حساب مريض | رفض الوصول (صلاحيات) |
+| تسجيل الدخول | إنشاء حساب مريض | رفض الوصول (403) |
 | :---: | :---: | :---: |
-|  |  |  |
+| ![Login](images/screenshots/Login.png) | ![Register](images/screenshots/register.png) | ![Access Denied](images/screenshots/403-error.png) |
 
-### 2️⃣ لوحات التحكم (Dashboards)
-
-| لوحة تحكم المدير (Admin) | لوحة تحكم الطبيب | لوحة تحكم الصيدلي |
+### 2️⃣ واجهات المدير (Admin - مركز التحكم)
+| لوحة التحكم | إدارة المستخدمين | إضافة مستخدم جديد |
 | :---: | :---: | :---: |
-|  |  |  |
+| ![Admin Dash](images/screenshots/admin-dashboard.png) | ![Users List](images/screenshots/users-list.png) | ![Add User](images/screenshots/add-user.png) |
 
-### 3️⃣ العمليات الأساسية (Core Operations)
+| إدارة الأدوية | تفاصيل الصيدليات |
+| :---: | :---: |
+| ![Meds Manage](images/screenshots/medications-manage.png) | ![Pharmacy Details](images/screenshots/pharmacy-details.png) |
 
-| إدارة المستخدمين (Admin) | إنشاء وصفة طبية (Doctor) | تفاصيل الوصفة والصرف (Pharmacist) |
+### 3️⃣ واجهات الطبيب (Doctor - مرحلة الإنشاء)
+| لوحة تحكم الطبيب | قائمة المرضى | إنشاء وصفة طبية |
 | :---: | :---: | :---: |
-|  |  |  |
+| ![Doctor Dash](images/screenshots/doctor-dashboard.png) | ![Patients List](images/screenshots/patients-list.png) | ![Create Prescription](images/screenshots/create-prescription.png) |
 
-### 4️⃣ واجهات المريض (Patient Experience)
+| عرض الوصفة قبل الصرف |
+| :---: |
+| ![Prescription View](images/screenshots/prescription-view.png) |
 
-| قائمة الوصفات الشخصية | تحميل الوصفة PDF | تعديل الملف الشخصي |
+### 4️⃣ واجهات الصيدلي (Pharmacist - مرحلة الصرف)
+| الوصفات المعلقة | نافذة تأكيد الصرف | رسالة نجاح العملية |
 | :---: | :---: | :---: |
-|  |  |  |
+| ![Pending](images/screenshots/pending-prescriptions.png) | ![Confirm](images/screenshots/dispense-confirm.png) | ![Success](images/screenshots/dispense-success.png) |
 
+### 5️⃣ واجهات المريض (Patient - المستفيد)
+| لوحة تحكم المريض | سجل وصفاتي | تنزيل الوصفة PDF |
+| :---: | :---: | :---: |
+| ![Patient Dash](images/screenshots/patient-dashboard.png) | ![My Prescriptions](images/screenshots/my-prescriptions.png) | ![PDF Export](images/screenshots/prescription-pdf.png) |
+
+| تعديل الملف الشخصي |
+| :---: |
+| ![Edit Profile](images/screenshots/edit-profile.png) |
+
+---
 -----
 
 ## 🚀 كيفية التشغيل (Installation & Setup)
