@@ -78,7 +78,7 @@ Wasfaty-FrontEnd/
 
 | Login Screen | Register Screen | Access Denied (403) |
 | :---: | :---: | :---: |
-| ![Login](images/screenshots/login.png) | ![Register](images/screenshots/register.png) | ![403 Error](images/screenshots/403-error.png) |
+| ![Login](images/screenshots/Login.png) | ![Register](images/screenshots/Register.png) | ![403 Error](images/screenshots/AccessDenied.png) |
 | *Login interface with fields and responsive design* | *New patient registration form* | *Permission protection system* |
 | *واجهة تسجيل الدخول مع الحقول والتصميم المتجاوب* | *إنشاء حساب جديد للمريض* | *نظام حماية الصلاحيات* |
 
