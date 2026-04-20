@@ -1,46 +1,80 @@
+
+
+// ========== أضف هذه الدالة فقط ==========
+function getRoleFromPayload(payload) {
+    return payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || 
+           payload.role || 
+           '';
+}
+
+// ========== عدل دالة checkAccess فقط ==========
 function checkAccess(allowedRoles, url) {
-
-
     const token = localStorage.getItem('token');
     if (!token) {
         window.location.href = url;
         return;
     }
 
-
     const payload = parseJwt(token);
-
-    const role = payload.role;
+    const role = getRoleFromPayload(payload);  // هذا التعديل الوحيد
 
     if (!allowedRoles.includes(role)) {
         window.location.href = url;
     }
 }
 
+// ========== باقي الكود كما هو بدون أي تغيير ==========
+// (parseJwt, getUserName, getDoctorByUserId, getPatientByUserId, getPharmacistByUserId)
+// كلهم زي ما كانوا بالضبط
+
+
+// function checkAccess(allowedRoles, url) {
+
+
+//     const token = localStorage.getItem('token');
+//     if (!token) {
+//         window.location.href = url;
+//         return;
+//     }
+
+
+//     const payload = parseJwt(token);
+
+//     const role = payload.role;
+
+//     if (!allowedRoles.includes(role)) {
+//         window.location.href = url;
+//     }
+// }
+
+
+
+/**
+ * تحليل توكن JWT
+ * @param {string} token - توكن JWT
+ * @returns {object|null} بيانات التوكن المفكوكة
+ */
 function parseJwt(token) {
     try {
         if (!token) throw new Error('No token provided');
+        if (typeof token !== 'string') throw new Error('Token must be a string');
 
-        const base64Url = token.split('.')[1];
-        if (!base64Url) throw new Error('Invalid token format');
+        const parts = token.split('.');
+        if (parts.length !== 3) throw new Error('Invalid token format');
 
+        const base64Url = parts[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const decodedData = atob(base64);
-
-        const jsonPayload = decodeURIComponent(
-            decodedData.split('')
-            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-            .join('')
+        
+        const decodedData = new TextDecoder().decode(
+            Uint8Array.from(atob(base64), c => c.charCodeAt(0))
         );
-
-        return JSON.parse(jsonPayload);
+        
+        return JSON.parse(decodedData);
     } catch (error) {
         console.error('Failed to parse JWT:', error);
         return null;
     }
 }
-
-
 function getUserName() {
 
     const userData = JSON.parse(localStorage.getItem("userData"));
