@@ -10,7 +10,7 @@
                 showLoading(true);
 
                 console.log('جاري جلب الوصفات الطبية...');
-                const prescriptionsResponse = await fetch(`https://localhost:7219/api/Prescription/GetByPatientId/${id}`, {
+                const prescriptionsResponse = await fetch(`https://localhost:7219/api/Prescription/MyPrescriptions`, {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     }
@@ -356,7 +356,6 @@
            // دالة طباعة الوصفة
 async function printPrescription(prescriptionId) {
     try {
-        alert(prescriptionId)
  const response = await fetch(`https://localhost:7219/api/Prescription/${prescriptionId}`, {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')

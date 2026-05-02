@@ -81,7 +81,13 @@
                 const patientData = JSON.parse(localStorage.getItem("patientData"));
                 if (!patientData?.id) throw new Error("بيانات المريض غير صالحة");
 
-                const response = await fetch(`https://localhost:7219/api/Prescription/GetByPatientId/${patientData.id}`, {
+                // const response = await fetch(`https://localhost:7219/api/Prescription/GetByPatientId/${patientData.id}`, {
+                //     headers: {
+                //         'Authorization': `Bearer ${localStorage.getItem('token')}`
+                //     }
+                // });
+
+                const response = await fetch(`https://localhost:7219/api/Prescription/MyPrescriptions`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }

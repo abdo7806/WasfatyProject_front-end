@@ -419,27 +419,27 @@ async function addPatient(userId, dateOfBirth, gender, bloodType) {
 
             try {
                 // 1. تسجيل المستخدم
-                const userResponse = await fetch('https://localhost:7219/api/User', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
-                    body: JSON.stringify({
-                        fullName,
-                        email,
-                        password,
-                        role,
-                        phoneNumber
-                    })
-                });
+                // const userResponse = await fetch('https://localhost:7219/api/User', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //         'Authorization': 'Bearer ' + localStorage.getItem('token')
+                //     },
+                //     body: JSON.stringify({
+                //         fullName,
+                //         email,
+                //         password,
+                //         role,
+                //         phoneNumber
+                //     })
+                // });
 
-                if (!userResponse.ok) {
-                    const errorData = await userResponse.json();
-                    throw new Error(errorData.message || 'فشل في تسجيل المستخدم');
-                }
+                // if (!userResponse.ok) {
+                //     const errorData = await userResponse.json();
+                //     throw new Error(errorData.message || 'فشل في تسجيل المستخدم');
+                // }
 
-                const userData = await userResponse.json();
+                // const userData = await userResponse.json();
 
                 // 2. إضافة بيانات المريض
                 const patientResponse = await fetch('https://localhost:7219/api/PatientController', {
@@ -449,10 +449,14 @@ async function addPatient(userId, dateOfBirth, gender, bloodType) {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },
                     body: JSON.stringify({
-                        userId: userData.id,
+                        // userId: userData.id,
+                        fullName,
+                        email,
+                        password,
                         dateOfBirth,
                         gender,
-                        bloodType
+                        bloodType,
+                        phoneNumber
                     })
                 });
                 if (patientResponse.status != 201) {
@@ -551,7 +555,9 @@ async function updatePatient() {
             body: JSON.stringify({
                 dateOfBirth,
                 gender,
-                bloodType
+                bloodType,
+                fullName,
+                email
             })
         });
 
@@ -559,11 +565,7 @@ async function updatePatient() {
             const errorText = await response.text();
             throw new Error(errorText || "فشل تعديل بيانات المريض");
         }
-
-        const updatedPatient = await response.json();
-        const userUpdated = await updateUser(updatedPatient.userId, fullName, email, 3);
-
-        if (userUpdated) {
+     else{
             alert("تم تعديل البيانات بنجاح");
             window.location.href = './Patient.html';
         }

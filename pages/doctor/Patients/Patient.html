@@ -265,7 +265,12 @@
         if (!doctorId) {
             return console.error('Doctor ID not found in localStorage');
         }            try {
-                const response = await fetch('https://localhost:7219/api/Prescription/GetByDoctorId/'+doctorId, {
+                // const response = await fetch('https://localhost:7219/api/Prescription/GetByDoctorId/'+doctorId, {
+                //     headers: {
+                //         'Authorization': 'Bearer ' + localStorage.getItem('token')
+                //     },
+                // });
+                const response = await fetch('https://localhost:7219/api/Prescription/MyPrescriptions', {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },

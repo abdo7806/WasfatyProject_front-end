@@ -61,7 +61,7 @@ const prescriptionsPerPage = 5;
     hintText.innerHTML = `عرض <b>${paginatedprescriptions.length}</b> من <b>${prescriptions.length}</b> إدخالات`;
  }
 
- // وظيفة لحذف المستخدم
+ // وظيفة لحذف الوصفة
 async function deletePrescription(prescriptionId) {
     const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذا المستخدم؟");
     if (confirmDelete) {

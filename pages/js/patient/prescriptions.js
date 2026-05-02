@@ -14,7 +14,13 @@
                     let patientData = JSON.parse(localStorage.getItem("patientData"));
                     console.log(patientData)
                         
-                    const response = await fetch(`https://localhost:7219/api/Prescription/GetByPatientId/${patientData.id}`, {
+                    // const response = await fetch(`https://localhost:7219/api/Prescription/GetByPatientId/${patientData.id}`, {
+                    //     headers: {
+                    //         'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    //     }
+                    // });
+
+                    const response = await fetch(`https://localhost:7219/api/Prescription/MyPrescriptions`, {
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('token')}`
                         }

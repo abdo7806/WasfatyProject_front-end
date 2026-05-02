@@ -458,7 +458,7 @@ function resetMedicationFields() {
 
         async function GetPatientsById(patientId) {
             try {
-                const prescriptionsResponse = await fetch(`https://localhost:7219/api/Prescription/GetByPatientId/${patientId}`, {
+                const prescriptionsResponse = await fetch(`https://localhost:7219/api/Prescription/MyPrescriptions`, {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     }

@@ -35,12 +35,19 @@
 
 
             try {
-                // استبدل الرابط هنا برابط الـ API الخاص بك
-                const response = await fetch(`https://localhost:7219/api/Prescription/GetByDoctorId/${doctorId}`, {
+
+                // const response = await fetch(`https://localhost:7219/api/Prescription/GetByDoctorId/${doctorId}`, {
+                //     headers: {
+                //         'Authorization': 'Bearer ' + localStorage.getItem('token')
+                //     }
+                // });
+
+                const response = await fetch(`https://localhost:7219/api/Prescription/MyPrescriptions`, {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     }
                 });
+
                 prescriptions = await response.json(); // تخزين البيانات في المتغير
 
 
@@ -91,6 +98,33 @@
 
 
  
+async function deletePrescription(prescriptionId) {
+    const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذا المستخدم؟");
+    if (confirmDelete) {
+        try {
+            // حذف المستخدم من API
+            const response = await fetch(`https://localhost:7219/api/Prescription/${prescriptionId}`, {
+                method: 'DELETE',
+
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+
+            });
+
+
+
+            if (response.ok) {
+                // تحديث القائمة بعد الحذف
+                prescriptions = prescriptions.filter(prescription => prescription.id !== prescriptionId);
+                displayPrescriptions(prescriptions);
+                setupPagination();
+            }
+        } catch (error) {
+            console.error('خطأ في حذف المستخدم:', error);
+        }
+    }
+}
         // وظيفة لإعداد التقليب
 function setupPagination() {
     const pagination = document.getElementById('pagination');

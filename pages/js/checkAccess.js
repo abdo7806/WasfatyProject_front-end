@@ -90,7 +90,7 @@ function getUserName() {
 
 
 async function getDactorByUserId() {
-
+ alert("1");
     const userData = JSON.parse(localStorage.getItem("userData"));
 
     let userId = userData.userId;
@@ -130,6 +130,8 @@ async function getDactorByUserId() {
 
 async function getPatientByUserId() {
 
+ alert("2");
+
     const userData = JSON.parse(localStorage.getItem("userData"));
 
     let userId = userData.userId;
@@ -161,10 +163,11 @@ async function getPatientByUserId() {
 
 async function getPharmacistByUserId() {
 
-
+ alert("3");
     const userData = JSON.parse(localStorage.getItem("userData"));
 
     let userId = userData.userId;
+ alert(userId);
 
     const response = await fetch(`https://localhost:7219/api/Pharmacist/GetPharmacistByUserId/${userId}`, {
         method: 'GET',
