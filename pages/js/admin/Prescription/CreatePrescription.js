@@ -1,282 +1,274 @@
+let selectedMedications = [];
+let doctors = [];
+let patients = [];
+let medications = [];
+let doctorData = JSON.parse(localStorage.getItem("doctorData"));
 
- let selectedMedications = [];
- let doctors = [];
- let patients = [];
- let medications = [];
-
- // تبديل حالة حقول الدواء المخصص
-document.getElementById('custom-medication-toggle').addEventListener('change', function() {
+// تبديل حالة حقول الدواء المخصص
+document.getElementById('custom-medication-toggle')?.addEventListener('change', function() {
     const customFields = document.getElementById('custom-medication-fields');
     const medicationSelect = document.getElementById('medication');
     
     if (this.checked) {
-        customFields.style.display = 'block';
-        medicationSelect.disabled = true;
-        medicationSelect.value = '';
+        if (customFields) customFields.style.display = 'block';
+        if (medicationSelect) {
+            medicationSelect.disabled = true;
+            medicationSelect.value = '';
+        }
     } else {
-        customFields.style.display = 'none';
-        medicationSelect.disabled = false;
+        if (customFields) customFields.style.display = 'none';
+        if (medicationSelect) medicationSelect.disabled = false;
     }
 });
 
+// ✅ 1. تحميل الأطباء
+async function loadDoctors() {
+    showLoading(true);
+    try {
+        const response = await fetchWithAuth('https://localhost:7219/api/Doctor/All', {
+            method: 'GET'
+        });
+        
+        if (!response.ok) throw new Error('فشل في تحميل قائمة الأطباء');
+        
+        doctors = await response.json();
+        const doctorSelect = document.getElementById('doctor');
+        if (doctorSelect) {
+            doctorSelect.innerHTML = '<option value="">-- اختر الطبيب --</option>';
+            doctors.forEach(doctor => {
+                const option = document.createElement('option');
+                option.value = doctor.id;
+                option.textContent = doctor.user?.fullName || 'بدون اسم';
+                doctorSelect.appendChild(option);
+            });
+        }
+    } catch (error) {
+        showMessage(error.message, true);
+    } finally {
+        showLoading(false);
+    }
+}
 
- async function loadDoctors() {
-     showLoading(true);
-     const response = await fetch('https://localhost:7219/api/Doctor/All', {
-         headers: {
-             'Authorization': 'Bearer ' + localStorage.getItem('token')
-         }
-     });
-     doctors = await response.json();
-     const doctorSelect = document.getElementById('doctor');
-     doctors.forEach(doctor => {
-         const option = document.createElement('option');
-         option.value = doctor.id;
-         option.textContent = doctor.user.fullName;
-         doctorSelect.appendChild(option);
-     });
-     showLoading(false);
- }
+// ✅ 2. تحميل المرضى
+async function loadPatients() {
+    showLoading(true);
+    try {
+        const response = await fetchWithAuth('https://localhost:7219/api/PatientController/All', {
+            method: 'GET'
+        });
+        
+        if (!response.ok) throw new Error('فشل في تحميل قائمة المرضى');
+        
+        patients = await response.json();
+        populatePatientSelect(patients);
+    } catch (error) {
+        showMessage(error.message, true);
+    } finally {
+        showLoading(false);
+    }
+}
 
- async function loadPatients() {
-     showLoading(true);
-     const response = await fetch('https://localhost:7219/api/PatientController/All', {
-         headers: {
-             'Authorization': 'Bearer ' + localStorage.getItem('token')
-         }
-     });
-     patients = await response.json();
-     populatePatientSelect(patients);
-     showLoading(false);
- }
+// ✅ 3. تحميل الأدوية
+async function loadMedications() {
+    showLoading(true);
+    try {
+        const response = await fetchWithAuth('https://localhost:7219/api/Medication/All', {
+            method: 'GET'
+        });
+        
+        if (!response.ok) throw new Error('فشل في تحميل قائمة الأدوية');
+        
+        medications = await response.json();
+        populateMedicationSelect(medications);
+    } catch (error) {
+        showMessage(error.message, true);
+    } finally {
+        showLoading(false);
+    }
+}
 
- async function loadMedications() {
-     showLoading(true);
-     const response = await fetch('https://localhost:7219/api/Medication/All', {
-         headers: {
-             'Authorization': 'Bearer ' + localStorage.getItem('token')
-         }
-     });
-     medications = await response.json();
-     populateMedicationSelect(medications);
-     showLoading(false);
- }
+// عرض قائمة المرضى
+function populatePatientSelect(patientsList) {
+    const patientSelect = document.getElementById('patient');
+    if (!patientSelect) return;
+    
+    patientSelect.innerHTML = '<option value="">-- اختر المريض --</option>';
+    patientsList.forEach(patient => {
+        const option = document.createElement('option');
+        option.value = patient.id;
+        option.textContent = `${patient.user?.fullName || ''} - ${patient.user?.email || ''} - ${patient.id}`;
+        patientSelect.appendChild(option);
+    });
+}
 
- function populatePatientSelect(patientsList) {
-     const patientSelect = document.getElementById('patient');
-     patientSelect.innerHTML = '';
-     patientsList.forEach(patient => {
-         const option = document.createElement('option');
-         option.value = patient.id;
-         option.textContent = patient.user.fullName;
-         patientSelect.appendChild(option);
-     });
- }
+// عرض قائمة الأدوية
+function populateMedicationSelect(medicationsList) {
+    const medicationSelect = document.getElementById('medication');
+    if (!medicationSelect) return;
+    
+    medicationSelect.innerHTML = '<option value="">-- اختر الدواء --</option>';
+    medicationsList.forEach(medication => {
+        const option = document.createElement('option');
+        option.value = medication.id;
+        option.textContent = medication.name;
+        medicationSelect.appendChild(option);
+    });
+}
 
- function populateMedicationSelect(medicationsList) {
-     const medicationSelect = document.getElementById('medication');
-     medicationSelect.innerHTML = '';
-     medicationsList.forEach(medication => {
-         const option = document.createElement('option');
-         option.value = medication.id;
-         option.textContent = medication.name;
-         medicationSelect.appendChild(option);
-     });
- }
+// البحث في المرضى
+function searchPatients() {
+    const searchTerm = document.getElementById('patient-search')?.value.toLowerCase() || '';
+    const filteredPatients = patients.filter(patient =>
+        patient.user?.fullName?.toLowerCase().includes(searchTerm) ||
+        patient.user?.email?.toLowerCase().includes(searchTerm) ||
+        patient.id?.toString().includes(searchTerm)
+    );
+    populatePatientSelect(filteredPatients.length ? filteredPatients : patients);
+}
 
- function searchPatients() {
-     const searchTerm = document.getElementById('patient-search').value.toLowerCase();
-     const filteredPatients = patients.filter(patient => patient.user.fullName.toLowerCase().includes(searchTerm));
-     populatePatientSelect(filteredPatients);
- }
+// البحث في الأدوية
+function searchMedications() {
+    const searchTerm = document.getElementById('medication-search')?.value.toLowerCase() || '';
+    const filteredMedications = medications.filter(medication =>
+        medication.name.toLowerCase().includes(searchTerm)
+    );
+    populateMedicationSelect(filteredMedications.length ? filteredMedications : medications);
+}
 
- function searchMedications() {
-     const searchTerm = document.getElementById('medication-search').value.toLowerCase();
-     const filteredMedications = medications.filter(medication => medication.name.toLowerCase().includes(searchTerm));
-     populateMedicationSelect(filteredMedications);
- }
-
-
-
-
-
- 
-        /**
- * دالة التحقق من صحة بيانات الوصفة الطبية
- * @returns {boolean} true إذا كانت البيانات صحيحة، false إذا كان هناك أخطاء
- */
+// ✅ دالة التحقق من صحة الوصفة
 function validatePrescriptionForm() {
-    // مسح رسائل الخطأ السابقة
     document.querySelectorAll('.text-danger').forEach(el => el.textContent = '');
     document.getElementById('error-message').style.display = 'none';
     
-    // الحصول على قيم الحقول
-    const doctorId = document.getElementById('doctor').value;
-    const patientId = document.getElementById('patient').value;
-    const medications = document.querySelectorAll('#medication-list li');
+    const doctorId = document.getElementById('doctor')?.value;
+    const patientId = document.getElementById('patient')?.value;
+    const medicationsCount = selectedMedications.length;
     
-    // متغير لتتبع صحة البيانات
     let isValid = true;
     
-    // التحقق من اختيار الطبيب
     if (!doctorId) {
-        document.getElementById('doctorError').textContent = 'يجب اختيار الطبيب';
+        const errorEl = document.getElementById('doctorError');
+        if (errorEl) errorEl.textContent = 'يجب اختيار الطبيب';
         isValid = false;
     }
     
-    // التحقق من اختيار المريض
     if (!patientId) {
-        document.getElementById('patientError').textContent = 'يجب اختيار المريض';
+        const errorEl = document.getElementById('patientError');
+        if (errorEl) errorEl.textContent = 'يجب اختيار المريض';
         isValid = false;
     }
     
-    // التحقق من وجود أدوية مضافة
-    if (medications.length === 0) {
-        document.getElementById('medicationError').textContent = 'يجب إضافة دواء واحد على الأقل';
+    if (medicationsCount === 0) {
+        const errorEl = document.getElementById('medicationError');
+        if (errorEl) errorEl.textContent = 'يجب إضافة دواء واحد على الأقل';
         isValid = false;
     }
     
-    // إذا كانت هناك أخطاء، عرض رسالة عامة
     if (!isValid) {
-        showError('يوجد أخطاء في البيانات المدخلة. يرجى مراجعة الحقول المطلوبة');
+        showMessage('يوجد أخطاء في البيانات المدخلة. يرجى مراجعة الحقول المطلوبة', true);
     }
     
     return isValid;
 }
 
-/**
- * دالة التحقق من صحة بيانات الدواء قبل إضافته للقائمة
- * @returns {boolean} true إذا كانت البيانات صحيحة، false إذا كان هناك أخطاء
- */
+// ✅ دالة التحقق من صحة الدواء قبل الإضافة
 function validateMedicationBeforeAdd() {
-    // مسح رسائل الخطأ السابقة
-    document.getElementById('dosageError').textContent = '';
-    document.getElementById('frequencyError').textContent = '';
-    document.getElementById('durationError').textContent = '';
+    document.getElementById('dosageError')?.setAttribute?.('textContent', '');
+    document.getElementById('frequencyError')?.setAttribute?.('textContent', '');
+    document.getElementById('durationError')?.setAttribute?.('textContent', '');
     
-    // الحصول على قيم الحقول
-    const medicationId = document.getElementById('medication').value;
-    const dosage = document.getElementById('dosage').value.trim();
-    const frequency = document.getElementById('frequency').value.trim();
-    const duration = document.getElementById('duration').value.trim();
+    const isCustomMed = document.getElementById('custom-medication-toggle')?.checked || false;
+    const medicationSelect = document.getElementById('medication');
+    const medicationId = medicationSelect?.value;
+    const dosage = document.getElementById('dosage')?.value.trim();
+    const frequency = document.getElementById('frequency')?.value.trim();
+    const duration = document.getElementById('duration')?.value.trim();
     
-    // متغير لتتبع صحة البيانات
     let isValid = true;
     
-    // التحقق من اختيار الدواء
-   /* if (!medicationId) {
-        document.getElementById('medicationError').textContent = 'يجب اختيار الدواء';
-        isValid = false;
-    }
-    */
-    // التحقق من إدخال الجرعة
-    if (!dosage) {
-        document.getElementById('dosageError').textContent = 'حقل الجرعة مطلوب';
+    if (!isCustomMed && !medicationId) {
+        const errorEl = document.getElementById('medicationError');
+        if (errorEl) errorEl.textContent = 'يجب اختيار الدواء';
         isValid = false;
     }
     
-    // التحقق من إدخال عدد المرات
+    if (!dosage) {
+        const errorEl = document.getElementById('dosageError');
+        if (errorEl) errorEl.textContent = 'حقل الجرعة مطلوب';
+        isValid = false;
+    }
+    
     if (!frequency) {
-        document.getElementById('frequencyError').textContent = 'حقل عدد المرات مطلوب';
+        const errorEl = document.getElementById('frequencyError');
+        if (errorEl) errorEl.textContent = 'حقل عدد المرات مطلوب';
         isValid = false;
     } else if (isNaN(frequency) || parseInt(frequency) <= 0) {
-        document.getElementById('frequencyError').textContent = 'يجب إدخال رقم صحيح موجب';
+        const errorEl = document.getElementById('frequencyError');
+        if (errorEl) errorEl.textContent = 'يجب إدخال رقم صحيح موجب';
         isValid = false;
     }
     
-    // التحقق من إدخال المدة
     if (!duration) {
-        document.getElementById('durationError').textContent = 'حقل المدة مطلوب';
+        const errorEl = document.getElementById('durationError');
+        if (errorEl) errorEl.textContent = 'حقل المدة مطلوب';
         isValid = false;
     }
-
-        const isCustomMed = document.getElementById('custom-medication-toggle').checked;
     
-    if (!isCustomMed && !medicationId) {
-        document.getElementById('medicationError').textContent = 'يجب اختيار الدواء';
-        isValid = false;
-    }
-
-
-        if (isCustomMed) {
-        const customName = document.getElementById('custom-medication-name').value.trim();
-        const customDesc = document.getElementById('custom-medication-description').value.trim();
+    if (isCustomMed) {
+        const customName = document.getElementById('custom-medication-name')?.value.trim();
+        const customDesc = document.getElementById('custom-medication-description')?.value.trim();
         
         if (!customName) {
+            const errorEl = document.getElementById('customMedicationError');
+            if (errorEl) errorEl.textContent = 'اسم الدواء المخصص مطلوب';
             isValid = false;
-            // يمكنك إضافة رسالة خطأ هنا
         }
         
         if (!customDesc) {
+            const errorEl = document.getElementById('customMedicationError');
+            if (errorEl) errorEl.textContent = 'وصف الدواء المخصص مطلوب';
             isValid = false;
-            // يمكنك إضافة رسالة خطأ هنا
         }
     }
     
     return isValid;
 }
 
-// دالة لعرض رسالة الخطأ
-function showError(message) {
-    const errorElement = document.getElementById('error-message');
-    errorElement.style.display = 'block';
-    errorElement.textContent = message;
-    errorElement.classList.add('alert-danger');
-    errorElement.classList.remove('alert-success');
-    
-    // التمرير لأعلى لعرض الرسالة
-    errorElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// دالة لعرض رسالة النجاح
-function showSuccess(message) {
-    const successElement = document.getElementById('success-message');
-    successElement.style.display = 'block';
-    successElement.textContent = message;
-    successElement.classList.add('alert-success');
-    successElement.classList.remove('alert-danger');
-    
-    // إخفاء الرسالة بعد 5 ثواني
-    setTimeout(() => {
-        successElement.style.display = 'none';
-    }, 5000);
-}
-
-
-
-
-
-
-// استخدام الدوال في الأحداث
-
-document.getElementById('add-medication').addEventListener('click', () => {
+// ✅ إضافة دواء إلى القائمة
+document.getElementById('add-medication')?.addEventListener('click', () => {
     if (validateMedicationBeforeAdd()) {
-        const isCustomMed = document.getElementById('custom-medication-toggle').checked;
+        const isCustomMed = document.getElementById('custom-medication-toggle')?.checked || false;
         let medicationName, medicationId;
         
         if (isCustomMed) {
-            medicationName = document.getElementById('custom-medication-name').value;
-            medicationId = null; // أو يمكنك استخدام قيمة خاصة للتمييز
+            medicationName = document.getElementById('custom-medication-name')?.value;
+            medicationId = null;
         } else {
-            medicationId = document.getElementById('medication').value;
-            medicationName = document.getElementById('medication').options[document.getElementById('medication').selectedIndex].text;
+            medicationId = parseInt(document.getElementById('medication')?.value);
+            medicationName = document.getElementById('medication')?.options[document.getElementById('medication').selectedIndex]?.text;
         }
         
-        const dosage = document.getElementById('dosage').value;
-        const frequency = document.getElementById('frequency').value;
-        const duration = document.getElementById('duration').value;
+        const dosage = document.getElementById('dosage')?.value;
+        const frequency = document.getElementById('frequency')?.value;
+        const duration = document.getElementById('duration')?.value;
+        
+        // التحقق من عدم تكرار الدواء
+        if (!isCustomMed && selectedMedications.some(m => !m.isCustom && m.medicationId === medicationId)) {
+            showMessage('هذا الدواء مضاف مسبقاً إلى الوصفة', true);
+            return;
+        }
         
         const medication = {
-            medicationId,
-            medicationName,
+            medicationId: medicationId,
+            medicationName: medicationName,
             isCustom: isCustomMed,
-            customName: isCustomMed ? document.getElementById('custom-medication-name').value : null,
-            customDescription: isCustomMed ? document.getElementById('custom-medication-description').value : null,
-            customDosageForm: isCustomMed ? document.getElementById('custom-dosage-form').value : null,
-            customStrength: isCustomMed ? document.getElementById('custom-strength').value : null,
-            dosage,
-            frequency,
-            duration
+            customName: isCustomMed ? document.getElementById('custom-medication-name')?.value : null,
+            customDescription: isCustomMed ? document.getElementById('custom-medication-description')?.value : null,
+            customDosageForm: isCustomMed ? document.getElementById('custom-dosage-form')?.value : null,
+            customStrength: isCustomMed ? document.getElementById('custom-strength')?.value : null,
+            dosage: dosage,
+            frequency: frequency,
+            duration: duration
         };
         
         selectedMedications.push(medication);
@@ -285,131 +277,187 @@ document.getElementById('add-medication').addEventListener('click', () => {
     }
 });
 
+// ✅ تحديث قائمة الأدوية المختارة
 function updateMedicationList() {
     const list = document.getElementById('medication-list');
+    if (!list) return;
+    
     list.innerHTML = '';
     
     selectedMedications.forEach((med, index) => {
         const listItem = document.createElement('li');
-        listItem.className = 'medication-item';
+        listItem.className = 'd-flex justify-content-between align-items-center mb-2 p-2 border rounded';
         
-        const medInfo = document.createElement('div');
-        medInfo.innerHTML = `
-            <strong>${med.medicationName || med.customName}</strong>
-            <div>جرعة: ${med.dosage} - تكرار: ${med.frequency} - مدة: ${med.duration}</div>
-            ${med.isCustom ? '<small class="text-muted">(دواء مخصص)</small>' : ''}
-        `;
+        const medInfo = document.createElement('span');
+        if (med.isCustom) {
+            medInfo.textContent = `${med.customName} (مخصص) - جرعة: ${med.dosage}، ${med.frequency} مرات/يوم، لمدة ${med.duration}`;
+        } else {
+            medInfo.textContent = `${med.medicationName} - جرعة: ${med.dosage}، ${med.frequency} مرات/يوم، لمدة ${med.duration}`;
+        }
         
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'btn btn-danger btn-sm';
-        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-        deleteBtn.onclick = () => {
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'btn btn-danger btn-sm';
+        deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+        deleteButton.onclick = () => {
             selectedMedications.splice(index, 1);
             updateMedicationList();
         };
         
         listItem.appendChild(medInfo);
-        listItem.appendChild(deleteBtn);
+        listItem.appendChild(deleteButton);
         list.appendChild(listItem);
     });
 }
 
+// ✅ إعادة تعيين حقول الدواء
 function resetMedicationFields() {
-    document.getElementById('dosage').value = '';
-    document.getElementById('frequency').value = '';
-    document.getElementById('duration').value = '';
-    document.getElementById('custom-medication-name').value = '';
-    document.getElementById('custom-medication-description').value = '';
-    document.getElementById('custom-dosage-form').value = '';
-    document.getElementById('custom-strength').value = '';
-    document.getElementById('custom-medication-toggle').checked = false;
-    document.getElementById('custom-medication-fields').style.display = 'none';
-    document.getElementById('medication').disabled = false;
+    const medicationSelect = document.getElementById('medication');
+    const dosage = document.getElementById('dosage');
+    const frequency = document.getElementById('frequency');
+    const duration = document.getElementById('duration');
+    const customName = document.getElementById('custom-medication-name');
+    const customDesc = document.getElementById('custom-medication-description');
+    const customDosageForm = document.getElementById('custom-dosage-form');
+    const customStrength = document.getElementById('custom-strength');
+    const customToggle = document.getElementById('custom-medication-toggle');
+    const customFields = document.getElementById('custom-medication-fields');
+    const medicationSearch = document.getElementById('medication-search');
+    
+    if (medicationSelect) medicationSelect.value = '';
+    if (dosage) dosage.value = '';
+    if (frequency) frequency.value = '';
+    if (duration) duration.value = '';
+    if (customName) customName.value = '';
+    if (customDesc) customDesc.value = '';
+    if (customDosageForm) customDosageForm.value = '';
+    if (customStrength) customStrength.value = '';
+    if (customToggle) customToggle.checked = false;
+    if (customFields) customFields.style.display = 'none';
+    if (medicationSelect) medicationSelect.disabled = false;
+    if (medicationSearch) medicationSearch.value = '';
 }
- 
 
+// ✅ 5. إنشاء وصفة جديدة (بطلب واحد)
+document.getElementById('prescription-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
- document.getElementById('prescription-form').addEventListener('submit', async(event) => {
-     event.preventDefault();
-
-         if (validatePrescriptionForm()) {
-
-     const doctorId = document.getElementById('doctor').value;
-     const patientId = document.getElementById('patient').value;
-
-     if (!doctorId || !patientId) {
-         showMessage('يرجى اختيار الطبيب والمريض', true);
-         return;
-     }
-
-     const prescriptionData = {
-         doctorId,
-         patientId,
-         issuedDate: new Date().toISOString(),
-         isDispensed: false
-     };
-
- 
-        
-
-     const prescriptionResponse = await fetch('https://localhost:7219/api/Prescription/CreatePrescription', {
-         method: 'POST',
-         headers: {
-             'Content-Type': 'application/json',
-             'Authorization': 'Bearer ' + localStorage.getItem('token')
-         },
-         body: JSON.stringify(prescriptionData)
-     });
-
-     const prescription = await prescriptionResponse.json();
-
-     for (let medication of selectedMedications) {
-        /* const prescriptionItemData = {
-             prescriptionId: prescription.id,
-             medicationId: medication.medicationId,
-             dosage: medication.dosage,
-             frequency: medication.frequency,
-             duration: medication.duration
-         };*/
-
-            const prescriptionItemData = {
-                prescriptionId: prescription.id,
-                medicationId: medication.medicationId,
-                customMedicationName: medication.customName,
-                customMedicationDescription: medication.customDescription,
-                customDosageForm: medication.customDosageForm,
-                customStrength: medication.customStrength,
-                dosage: medication.dosage,
-                frequency: medication.frequency,
-                duration: medication.duration
-            };
-
-         await fetch('https://localhost:7219/api/PrescriptionItem/CreatePrescriptionItem', {
-             method: 'POST',
-             headers: {
-                 'Content-Type': 'application/json',
-                 'Authorization': 'Bearer ' + localStorage.getItem('token')
-
-             },
-             body: JSON.stringify(prescriptionItemData)
-         });
-     }
-
-     showMessage('تم إضافة الوصفة الطبية بنجاح!', false);
-     window.location.href = './Prescriptions.html';
+    if (!validatePrescriptionForm()) {
+        return;
     }
- });
 
- function showLoading(isLoading) {
-     const loading = document.getElementById('loading');
-     loading.style.display = isLoading ? 'block' : 'none';
- }
+    const doctorId = document.getElementById('doctor')?.value;
+    const patientId = document.getElementById('patient')?.value;
 
- function showMessage(message, isError) {
-     const messageBox = isError ? document.getElementById('error-message') : document.getElementById('success-message');
-     messageBox.textContent = message;
-     messageBox.style.display = 'block';
-     setTimeout(() => {
-         messageBox.style.display = 'none';
-     }, 3000);
- }
+    if (!doctorId || !patientId) {
+        showMessage('يرجى اختيار الطبيب والمريض', true);
+        return;
+    }
+
+    if (selectedMedications.length === 0) {
+        showMessage('يرجى إضافة أدوية إلى الوصفة', true);
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        // بناء البيانات بنفس هيكل CreatePrescriptionDto
+        const prescriptionData = {
+            doctorId: parseInt(doctorId),
+            patientId: parseInt(patientId),
+            issuedDate: new Date().toISOString(),
+            isDispensed: false,
+            prescriptionItems: selectedMedications.map(med => ({
+                medicationId: med.isCustom ? null : med.medicationId,
+                customMedicationName: med.isCustom ? med.customName : null,
+                customMedicationDescription: med.isCustom ? med.customDescription : null,
+                customDosageForm: med.isCustom ? med.customDosageForm : null,
+                customStrength: med.isCustom ? med.customStrength : null,
+                dosage: med.dosage,
+                frequency: med.frequency.toString(),
+                duration: med.duration.toString()
+            }))
+        };
+
+        console.log('Sending create data:', prescriptionData);
+
+        const response = await fetchWithAuth('https://localhost:7219/api/Prescription/CreatePrescription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(prescriptionData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'فشل في إنشاء الوصفة الطبية');
+        }
+
+        showMessage('تم إضافة الوصفة الطبية بنجاح!', false);
+        setTimeout(() => {
+            window.location.href = './Prescriptions.html';
+        }, 1500);
+
+    } catch (error) {
+        console.error('Error:', error);
+        showMessage(error.message, true);
+    } finally {
+        showLoading(false);
+    }
+});
+
+// دوال مساعدة
+function showLoading(isLoading) {
+    const loadingDiv = document.getElementById('loading');
+    const formDiv = document.getElementById('prescription-form');
+    
+    if (loadingDiv) loadingDiv.style.display = isLoading ? 'flex' : 'none';
+    if (formDiv) formDiv.style.display = isLoading ? 'none' : 'block';
+}
+
+function showMessage(message, isError) {
+    const messageBox = isError ?
+        document.getElementById('error-message') :
+        document.getElementById('success-message');
+
+    if (messageBox) {
+        messageBox.textContent = message;
+        messageBox.style.display = 'block';
+        
+        setTimeout(() => {
+            messageBox.style.display = 'none';
+        }, 5000);
+    } else {
+        alert(message);
+    }
+}
+
+// ✅ بدء التحميل عند فتح الصفحة
+window.onload = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const patientId = urlParams.get('patientId');
+    
+    const doctorIdField = document.getElementById('doctorId');
+    if (doctorIdField && doctorData) {
+        doctorIdField.value = doctorData.id;
+    }
+    
+    const patientSearch = document.getElementById('patient-search');
+    const lblPatient = document.getElementById('lblPatient');
+    const lblPatientList = document.getElementById('lblPatient-list');
+    
+    if (patientId) {
+        if (patientSearch) {
+            patientSearch.value = patientId;
+            const a = document.createAttribute("readonly");
+            patientSearch.setAttributeNode(a);
+        }
+        if (lblPatient) lblPatient.textContent = "رقم المريض";
+        searchPatients();
+        GetPatientsById(patientId);
+        if (lblPatientList) lblPatientList.textContent = "بيانات المريض";
+    }
+    
+    loadDoctors();
+    loadPatients();
+    loadMedications();
+};

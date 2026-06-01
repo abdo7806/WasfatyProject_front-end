@@ -5,11 +5,8 @@ const prescriptionsPerPage = 5;
 
  async function loadPrescriptions() {
      try {
-         // استبدل الرابط هنا برابط الـ API الخاص بك
-         const response = await fetch('https://localhost:7219/api/Prescription/All', {
-             headers: {
-                 'Authorization': 'Bearer ' + localStorage.getItem('token')
-             }
+         const response = await fetchWithAuth('https://localhost:7219/api/Prescription/All', {
+            method: 'GET'
          });
          prescriptions = await response.json(); // تخزين البيانات في المتغير
 
@@ -67,13 +64,8 @@ async function deletePrescription(prescriptionId) {
     if (confirmDelete) {
         try {
             // حذف المستخدم من API
-            const response = await fetch(`https://localhost:7219/api/Prescription/${prescriptionId}`, {
+            const response = await fetchWithAuth(`https://localhost:7219/api/Prescription/${prescriptionId}`, {
                 method: 'DELETE',
-
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                }
-
             });
 
 

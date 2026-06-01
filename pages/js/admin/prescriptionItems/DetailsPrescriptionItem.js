@@ -11,15 +11,13 @@
 
         async function loadPrescriptionItemData() {
             try {
-                const response = await fetch(`https://localhost:7219/api/PrescriptionItem/${prescriptionItemId}`, {
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token') // أضف التوكن إلى الهيدر
-                    },
+                const response = await fetchWithAuth(`https://localhost:7219/api/PrescriptionItem/${prescriptionItemId}`, {
+                    method: 'GET'
                 });
+
                 if (!response.ok) throw new Error('فشل تحميل البيانات');
 
                 const prescriptionItem = await response.json();
-					
                 // عرض بيانات عنصر الوصفة
                 document.getElementById('prescription-id').textContent = prescriptionItem.prescriptionId;
                 document.getElementById('medication-name').textContent = prescriptionItem.medicationId == null ? prescriptionItem.customMedicationName : prescriptionItem.medicationName; // يمكنك تعديل هذا بناءً على كيفية إرسال البيانات
@@ -28,10 +26,8 @@
                 document.getElementById('duration').textContent = prescriptionItem.duration == null ? prescriptionItem.customStrength : prescriptionItem.duration;
 
                 // تحميل بيانات الوصفة المرتبطة
-                const prescriptionResponse = await fetch(`https://localhost:7219/api/Prescription/${prescriptionItem.prescriptionId}`, {
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token') // أضف التوكن إلى الهيدر
-                    },
+                const prescriptionResponse = await fetchWithAuth(`https://localhost:7219/api/Prescription/${prescriptionItem.prescriptionId}`, {
+                    method: 'GET'
                 });
                 if (!prescriptionResponse.ok) throw new Error('فشل تحميل الوصفة');
 

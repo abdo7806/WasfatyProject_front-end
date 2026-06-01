@@ -6,10 +6,8 @@ const itemsPerPage = 5;
 async function fetchPrescriptionItems() {
 
     try {
-        const response = await fetch('https://localhost:7219/api/PrescriptionItem/All', {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
+        const response = await fetchWithAuth('https://localhost:7219/api/PrescriptionItem/All', {
+                method: 'GET'
         });
         prescriptionItems = await response.json();
 
@@ -84,11 +82,8 @@ async function deletePrescriptionItem(id) {
     const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذا السجل؟");
     if (confirmDelete) {
         try {
-            const response = await fetch(`https://localhost:7219/api/PrescriptionItem/${id}`, {
+            const response = await fetchWithAuth(`https://localhost:7219/api/PrescriptionItem/${id}`, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                }
             });
             if (response.ok) {
                 prescriptionItems = prescriptionItems.filter(r => r.id !== id);

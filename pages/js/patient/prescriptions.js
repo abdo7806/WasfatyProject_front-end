@@ -13,17 +13,10 @@
                 try {
                     let patientData = JSON.parse(localStorage.getItem("patientData"));
                     console.log(patientData)
-                        
-                    // const response = await fetch(`https://localhost:7219/api/Prescription/GetByPatientId/${patientData.id}`, {
-                    //     headers: {
-                    //         'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    //     }
-                    // });
+                    
 
-                    const response = await fetch(`https://localhost:7219/api/Prescription/MyPrescriptions`, {
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        }
+                    const response = await fetchWithAuth(`https://localhost:7219/api/Prescription/MyPrescriptions`, {
+                                method: 'GET'
                     });
                     if(response.status == 404){
                 prescriptionsContainer.innerHTML = `
@@ -364,10 +357,9 @@ async function enrichPrescriptionItems(items) {
         } else {
             try {
                 // جلب بيانات الدواء من API
-                const res = await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
+                const res = await fetchWithAuth(`https://localhost:7219/api/Medication/${item.medicationId}`, {
+               method: 'GET'
+
                 });
                 
                 if (!res.ok) throw new Error('فشل في جلب بيانات الدواء');
@@ -428,10 +420,7 @@ async function enrichPrescriptionItems(items) {
             statusFilter.addEventListener('change', filterPrescriptions);
             dateFilter.addEventListener('change', filterPrescriptions);
 
-            // مستمع لزر تسجيل الخروج
-           //  document.getElementById('logout-btn').addEventListener('click', logout2);
-
-       
+  
             // جلب البيانات عند تحميل الصفحة
             fetchPrescriptions();
         });

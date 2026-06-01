@@ -34,10 +34,9 @@
                 const patient = JSON.parse(localStorage.getItem("patientData"));
                 if (!patient?.id) throw new Error("بيانات المريض غير صالحة");
 
-                const response = await fetch(`https://localhost:7219/api/PatientController/${patient.id}`, {
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    }
+                const response = await fetchWithAuth(`https://localhost:7219/api/PatientController/${patient.id}`, {
+               method: 'GET'
+
                 });
                 
                 if (!response.ok) throw new Error("فشل تحميل بيانات المريض");
@@ -81,16 +80,10 @@
                 const patientData = JSON.parse(localStorage.getItem("patientData"));
                 if (!patientData?.id) throw new Error("بيانات المريض غير صالحة");
 
-                // const response = await fetch(`https://localhost:7219/api/Prescription/GetByPatientId/${patientData.id}`, {
-                //     headers: {
-                //         'Authorization': `Bearer ${localStorage.getItem('token')}`
-                //     }
-                // });
+         
+                const response = await fetchWithAuth(`https://localhost:7219/api/Prescription/MyPrescriptions`, {
+               method: 'GET'
 
-                const response = await fetch(`https://localhost:7219/api/Prescription/MyPrescriptions`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
                 });
 
                 if (!response.ok) throw new Error('فشل في جلب الوصفات الطبية');
@@ -163,10 +156,9 @@
         async function viewPrescription(prescriptionId) {
             try {
                 showLoading(true);
-                const response = await fetch(`https://localhost:7219/api/Prescription/${prescriptionId}`, {
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
+                const response = await fetchWithAuth(`https://localhost:7219/api/Prescription/${prescriptionId}`, {
+               method: 'GET'
+
                 });
                 
                 if (!response.ok) throw new Error('فشل تحميل بيانات الوصفة');
@@ -339,41 +331,23 @@
                 showLoading(true);
 
                 // تحديث بيانات المريض
-                const patientResponse = await fetch(`https://localhost:7219/api/PatientController/${patient.id}`, {
+                const patientResponse = await fetchWithAuth(`https://localhost:7219/api/PatientController/${patient.id}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        dateOfBirth,
-                        gender,
-                        bloodType
-                    })
+                dateOfBirth,
+                gender,
+                bloodType,
+                fullName,
+                email            
+              })
                 });
+
+
 
                 if (!patientResponse.ok) {
                     const errorText = await patientResponse.text();
                     throw new Error(errorText || "فشل تعديل بيانات المريض");
-                }
-
-                // تحديث بيانات المستخدم
-                const userResponse = await fetch(`https://localhost:7219/api/User/${patient.userId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
-                    body: JSON.stringify({
-                        fullName,
-                        email,
-                        role: 3 // دور المريض
-                    })
-                });
-
-                if (!userResponse.ok) {
-                    const errorText = await userResponse.text();
-                    throw new Error(errorText || 'فشل تحديث المستخدم');
                 }
 
                 showAlert('تم تحديث المعلومات الشخصية بنجاح', 'success');
@@ -399,12 +373,9 @@
                 showLoading(true);
 
                 // هنا سيتم إرسال البيانات إلى API لتحديث المعلومات الطبية
-                const response = await fetch(`https://localhost:7219/api/PatientController/UpdateMedicalInfo/${patient.id}`, {
+                const response = await fetchWithAuth(`https://localhost:7219/api/PatientController/UpdateMedicalInfo/${patient.id}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         allergies,
                         chronicDiseases,
@@ -457,12 +428,9 @@
                     newPassword: newPassword
                 };
 
-                const response = await fetch(`https://localhost:7219/api/Auth/change-password`, {
+                const response = await fetchWithAuth(`https://localhost:7219/api/Auth/change-password`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(changePasswordData)
                 });
 

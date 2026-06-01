@@ -16,7 +16,7 @@
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
                 <h1 class="h4 mb-0"><i class="fas fa-prescription-bottle-alt"></i> الوصفات الطبية</h1>
-                <button id="logout-btn" class="btn btn-danger" onclick="logoutMassge('patient', '../auth/login.html')">
+                <button id="logout-btn" class="btn btn-danger" onclick="logoutMassge('../auth/login.html')">
                     <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
                 </button>
             </div>
@@ -147,13 +147,6 @@
     <script src="../js/patient/prescriptions.js"></script>
     <script>
             checkAccess(['Patient'], '../../shared/unauthorized.html');
-        // تسجيل الخروج
-function logout2() {
-       // localStorage.removeItem('patientData');
-      // logout('../../auth/login.html');
-         localStorage.clear();
-    window.location.href = '../auth/login.html';
-}
 
        
     </script>

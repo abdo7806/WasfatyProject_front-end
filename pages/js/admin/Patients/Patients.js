@@ -3,27 +3,32 @@ let currentPage = 1;
 const patientsPerPage = 5;
 let searchColumn = 'fullName'; // العمود الافتراضي للبحث
 
-
-// وظيفة لجلب بيانات المرضى من API
+//  1. وظيفة لجلب بيانات المرضى من API (معدلة)
 async function fetchPatients() {
     try {
-        const response = await fetch('https://localhost:7219/api/PatientController/All', {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
+        const response = await fetchWithAuth('https://localhost:7219/api/PatientController/All', {
+            method: 'GET'
         });
+        
+        if (!response.ok) {
+            throw new Error('فشل في جلب البيانات');
+        }
+        
         patients = await response.json();
         displayPatients();
         setupPagination();
     } catch (error) {
         console.error('خطأ في جلب البيانات:', error);
+        showError('حدث خطأ أثناء جلب بيانات المرضى');
     }
 }
 
 // وظيفة لعرض بيانات المرضى في الجدول
 function displayPatients() {
     const patientsTableBody = document.getElementById('patientsTableBody');
-    patientsTableBody.innerHTML = ''; // مسح المحتوى السابق
+    if (!patientsTableBody) return;
+    
+    patientsTableBody.innerHTML = '';
 
     const start = (currentPage - 1) * patientsPerPage;
     const end = start + patientsPerPage;
@@ -32,40 +37,45 @@ function displayPatients() {
     paginatedPatients.forEach(patient => {
         const row = document.createElement('tr');
         row.innerHTML = `
-						<td>${patient.id}</td>
-						<td>${patient.userId}</td>
-						<td>${patient.user.fullName}</td>
-						<td>${patient.user.email}</td>
-						<td>${patient.gender}</td>
-						<td>${patient.bloodType}</td>
-						<td>${new Date(patient.user.createdAt).toLocaleDateString('ar-EG')}</td>
-						<td>
-
-                <button class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deletePatient(${patient.id})" title="حذف"><i class="fas fa-trash"></i></button>
-								<a href="EditePatient.html?id=${patient.id}"  class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
-
-                
-						</td>
-				`;
+            <td>${patient.id}</td>
+            <td>${patient.userId}</td>
+            <td>${patient.user?.fullName || ''}</td>
+            <td>${patient.user?.email || ''}</td>
+            <td>${patient.gender || ''}</td>
+            <td>${patient.bloodType || ''}</td>
+            <td>${patient.user?.createdAt ? new Date(patient.user.createdAt).toLocaleDateString('ar-EG') : ''}</td>
+            <td>
+                <button class="btn btn-danger btn-action" onclick="deletePatient(${patient.id})" title="حذف">
+                    <i class="fas fa-trash"></i>
+                </button>
+                <a href="EditePatient.html?id=${patient.id}" class="btn btn-primary btn-action" title="تعديل">
+                    <i class="fas fa-edit"></i>
+                </a>
+            </td>
+        `;
         patientsTableBody.appendChild(row);
     });
 
-    // عرض عدد المرضى
     const hintText = document.getElementById('hintText');
-    hintText.innerHTML = `عرض <b>${paginatedPatients.length}</b> من <b>${patients.length}</b> إدخالات`;
+    if (hintText) {
+        hintText.innerHTML = `عرض <b>${paginatedPatients.length}</b> من <b>${patients.length}</b> إدخالات`;
+    }
 }
 
 // وظيفة لإعداد التقليب
-function setupPagination() {
+function setupPagination(totalCount = null) {
     const pagination = document.getElementById('pagination');
-    pagination.innerHTML = ''; // مسح المحتوى السابق
+    if (!pagination) return;
+    
+    pagination.innerHTML = '';
 
-    const totalPages = Math.ceil(patients.length / patientsPerPage);
+    const total = totalCount || patients.length;
+    const totalPages = Math.ceil(total / patientsPerPage);
 
     for (let i = 1; i <= totalPages; i++) {
         const pageItem = document.createElement('li');
         pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
-        pageItem.innerHTML = `<button  class="page-link" onclick="changePage(${i})">${i}</button>`;
+        pageItem.innerHTML = `<button class="page-link" onclick="changePage(${i})">${i}</button>`;
         pagination.appendChild(pageItem);
     }
 }
@@ -79,24 +89,28 @@ function changePage(page) {
 
 // وظيفة للبحث عن المرضى حسب العمود المحدد
 function searchPatients() {
-    const searchInput = document.getElementById('searchInput').value.toLowerCase();
-   let filteredPatients = [];
-    if(searchColumn === "gender" || searchColumn === "bloodType"){
- filteredPatients = patients.filter(patient => {
-        return patient[searchColumn].toLowerCase().includes(searchInput);
-    });    }
-    else{
-     filteredPatients = patients.filter(patient => {
-        return patient.user[searchColumn].toLowerCase().includes(searchInput);
-    });
-    }    
-    /*const filteredPatients = patients.filter(patient => {
-        return patient.user[searchColumn].toLowerCase().includes(searchInput);
-    });*/
-
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+    
+    const searchValue = searchInput.value.toLowerCase();
+    let filteredPatients = [];
+    
+    if (searchColumn === "gender" || searchColumn === "bloodType") {
+        filteredPatients = patients.filter(patient => {
+            return (patient[searchColumn] || '').toLowerCase().includes(searchValue);
+        });
+    } else {
+        filteredPatients = patients.filter(patient => {
+            return (patient.user?.[searchColumn] || '').toLowerCase().includes(searchValue);
+        });
+    }
+    
     const patientsTableBody = document.getElementById('patientsTableBody');
+    if (!patientsTableBody) return;
+    
     patientsTableBody.innerHTML = '';
     currentPage = 1;
+    
     const start = (currentPage - 1) * patientsPerPage;
     const end = start + patientsPerPage;
     const paginatedPatients = filteredPatients.slice(start, end);
@@ -104,460 +118,129 @@ function searchPatients() {
     paginatedPatients.forEach(patient => {
         const row = document.createElement('tr');
         row.innerHTML = `
-								<td>${patient.id}</td>
-						<td>${patient.userId}</td>
-						<td>${patient.user.fullName}</td>
-						<td>${patient.user.email}</td>
-						<td>${patient.gender}</td>
-						<td>${patient.bloodType}</td>
-						<td>${new Date(patient.user.createdAt).toLocaleDateString('ar-EG')}</td>
-						<td>
-                        
-                <button class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deletePatient(${patient.id})" title="حذف"><i class="fas fa-trash"></i></button>
-				<a href="EditePatient.html?id=${patient.id}"  class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
-
-						</td>
-				`;
+            <td>${patient.id}</td>
+            <td>${patient.userId}</td>
+            <td>${patient.user?.fullName || ''}</td>
+            <td>${patient.user?.email || ''}</td>
+            <td>${patient.gender || ''}</td>
+            <td>${patient.bloodType || ''}</td>
+            <td>${patient.user?.createdAt ? new Date(patient.user.createdAt).toLocaleDateString('ar-EG') : ''}</td>
+            <td>
+                <button class="btn btn-danger btn-action" onclick="deletePatient(${patient.id})" title="حذف">
+                    <i class="fas fa-trash"></i>
+                </button>
+                <a href="EditePatient.html?id=${patient.id}" class="btn btn-primary btn-action" title="تعديل">
+                    <i class="fas fa-edit"></i>
+                </a>
+            </td>
+        `;
         patientsTableBody.appendChild(row);
     });
 
-    // عرض عدد المرضى المتطابقين
     const hintText = document.getElementById('hintText');
-    hintText.innerHTML = `عرض <b>${paginatedPatients.length}</b> من <b>${filteredPatients.length}</b> إدخالات`;
-
-    // إعداد التقليب الجديد
+    if (hintText) {
+        hintText.innerHTML = `عرض <b>${paginatedPatients.length}</b> من <b>${filteredPatients.length}</b> إدخالات`;
+    }
+    
     setupPagination(filteredPatients.length);
 }
 
 // وظيفة لتحديد العمود الذي سيتم البحث فيه
 function changeSearchColumn() {
     const columnSelect = document.getElementById('columnSelect');
-    searchColumn = columnSelect.value;
-    searchPatients(); // إعادة البحث عند تغيير العمود
+    if (columnSelect) {
+        searchColumn = columnSelect.value;
+        searchPatients();
+    }
 }
 
-// وظيفة لحذف المريض
+//  2. وظيفة لحذف المريض (معدلة)
 async function deletePatient(patientId) {
     const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذا المريض؟");
-    if (confirmDelete) {
-        try {
-            // حذف المريض من API
-            const response = await fetch(`https://localhost:7219/api/PatientController/${patientId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                },
-            });
-
-            if (response.ok) {
-                // تحديث القائمة بعد الحذف
-                patients = patients.filter(patient => patient.id !== patientId);
-                displayPatients();
-                setupPagination();
-            }
-        } catch (error) {
-            console.error('خطأ في حذف المريض:', error);
-            // console.log('خطأ في حذف المريض:');
-        }
-    }
-}
-
-
-
-
-//----------------------------------------
-/*
-function validateForm() {
-    const fullName = document.getElementById('fullName').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    const dateOfBirth = document.getElementById('DateOfBirth').value;
-    const gender = document.getElementById('gender').value;
-    const bloodType = document.getElementById('bloodType').value;
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    // إعادة تعيين رسائل الخطأ
-    document.getElementById('fullNameError').textContent = '';
-    document.getElementById('emailError').textContent = '';
-    document.getElementById('passwordError').textContent = '';
-    document.getElementById('confirmPasswordError').textContent = '';
-    document.getElementById('DateOfBirthError').textContent = '';
-    document.getElementById('error-message').style.display = "none";
-
-    let isValid = true;
-
-    if (!fullName) {
-        document.getElementById('fullNameError').textContent = 'الاسم الكامل مطلوب!';
-        isValid = false;
-    }
-
-    if (!email) {
-        document.getElementById('emailError').textContent = 'البريد الإلكتروني مطلوب!';
-        isValid = false;
-    } else if (!emailPattern.test(email)) {
-        document.getElementById('emailError').textContent = 'يرجى إدخال بريد إلكتروني صحيح.';
-        isValid = false;
-    }
-
-    if (!password) {
-        document.getElementById('passwordError').textContent = 'كلمة المرور مطلوبة!';
-        isValid = false;
-    }
-
-    if (password !== confirmPassword) {
-        document.getElementById('confirmPasswordError').textContent = 'كلمات المرور غير متطابقة!';
-        isValid = false;
-    }
-
-    if (!dateOfBirth) {
-        document.getElementById('DateOfBirthError').textContent = 'تاريخ الميلاد مطلوب!';
-        isValid = false;
-    }
-
-    if (!gender) {
-        document.getElementById('error-message').style.display = "block";
-        document.getElementById('error-message').textContent = 'يرجى اختيار الجنس.';
-        isValid = false;
-    }
-
-    if (!bloodType) {
-        document.getElementById('error-message').style.display = "block";
-        document.getElementById('error-message').textContent = 'يرجى اختيار فصيلة الدم.';
-        isValid = false;
-    }
-
-    return isValid;
-}
-
-async function addUser() {
-    const fullName = document.getElementById('fullName').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const dateOfBirth = document.getElementById('DateOfBirth').value;
-    const gender = document.getElementById('gender').value;
-    const bloodType = document.getElementById('bloodType').value;
-    const role = 3;
-
-
+    if (!confirmDelete) return;
     try {
-        const response = await fetch('https://localhost:7219/api/Auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
-            body: JSON.stringify({
-                fullName,
-                email,
-                password,
-                role: role
-            })
+        const response = await fetchWithAuth(`https://localhost:7219/api/PatientController/${patientId}`, {
+            method: 'DELETE'
         });
 
-        if (!response.ok) {
-            throw new Error('فشل التسجيل');
+        if (response.ok) {
+            patients = patients.filter(patient => patient.id !== patientId);
+            displayPatients();
+            setupPagination();
+            showSuccess('تم حذف المريض بنجاح');
+        } else {
+            throw new Error('فشل في حذف المريض');
         }
-
-        const createdUser = await response.json();
-        await addPatient(createdUser.id, dateOfBirth, gender, bloodType);
-        window.location.href = './Patient.html';
     } catch (error) {
-        document.getElementById('error-message').style.display = "block";
-        document.getElementById('error-message').textContent = error.message;
+        console.error('خطأ في حذف المريض:', error);
+        showError('حدث خطأ أثناء حذف المريض');
     }
 }
 
-async function addPatient(userId, dateOfBirth, gender, bloodType) {
-    try {
-        const response = await fetch('https://localhost:7219/api/PatientController', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
-            body: JSON.stringify({
-                userId,
-                dateOfBirth,
-                gender,
-                bloodType
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('فشل إضافة المريض');
-        }
-
-        await response.json();
-    } catch (error) {
-        document.getElementById('error-message').style.display = "block";
-        document.getElementById('error-message').textContent = error.message;
-    }
-}
-*/
-
-
-
-
-
-
-        function showLoading(isLoading) {
-            document.getElementById('loading').style.display = isLoading ? 'flex' : 'none';
-            document.getElementById('submitBtn').disabled = isLoading;
-        }
-
-        function showMessage(message, isError = true) {
-            const messageBox = isError ?
-                document.getElementById('error-message') :
-                document.getElementById('success-message');
-
-            messageBox.textContent = message;
-            messageBox.style.display = 'block';
-
-            if (!isError) {
-                setTimeout(() => {
-                    messageBox.style.display = 'none';
-                }, 3000);
-            }
-        }
-
-        function resetErrors() {
-            document.querySelectorAll('.text-danger').forEach(el => {
-                el.textContent = '';
-            });
-            document.querySelectorAll('.error-message').forEach(el => {
-                el.style.display = 'none';
-            });
-        }
-
-        function validateForm() {
-            resetErrors();
-
-            const fullName = document.getElementById('fullName').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const dateOfBirth = document.getElementById('DateOfBirth').value;
-            const gender = document.getElementById('gender').value;
-            const bloodType = document.getElementById('bloodType').value;
-            const phoneNumber = document.getElementById('phoneNumber').value.trim();
-
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const phonePattern = /^\d{9}$/;
-
-            let isValid = true;
-
-            if (!fullName) {
-                document.getElementById('fullNameError').textContent = 'الاسم الكامل مطلوب';
-                isValid = false;
-            }
-
-            if (!email) {
-                document.getElementById('emailError').textContent = 'البريد الإلكتروني مطلوب';
-                isValid = false;
-            } else if (!emailPattern.test(email)) {
-                document.getElementById('emailError').textContent = 'بريد إلكتروني غير صالح';
-                isValid = false;
-            }
-
-            if (!password) {
-                document.getElementById('passwordError').textContent = 'كلمة المرور مطلوبة';
-                isValid = false;
-            } else if (password.length < 6) {
-                document.getElementById('passwordError').textContent = 'يجب أن تكون كلمة المرور 6 أحرف على الأقل';
-                isValid = false;
-            }
-
-            if (password !== confirmPassword) {
-                document.getElementById('confirmPasswordError').textContent = 'كلمة المرور غير متطابقة';
-                isValid = false;
-            }
-
-            if (!dateOfBirth) {
-                document.getElementById('DateOfBirthError').textContent = 'تاريخ الميلاد مطلوب';
-                isValid = false;
-            } else {
-                const birthDate = new Date(dateOfBirth);
-                const today = new Date();
-                if (birthDate >= today) {
-                    document.getElementById('DateOfBirthError').textContent = 'تاريخ الميلاد يجب أن يكون في الماضي';
-                    isValid = false;
-                }
-            }
-
-            if (!gender) {
-                document.getElementById('genderError').textContent = 'الجنس مطلوب';
-                isValid = false;
-            }
-
-            if (!bloodType) {
-                document.getElementById('bloodTypeError').textContent = 'فصيلة الدم مطلوبة';
-                isValid = false;
-            }
-
-            if (phoneNumber && !phonePattern.test(phoneNumber)) {
-                document.getElementById('phoneError').textContent = 'رقم الهاتف يجب أن يبدأ بـ  ويتكون من 9 أرقام';
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
-        async function addUser() {
-            if (!validateForm()) return;
-
-            showLoading(true);
-
-            const fullName = document.getElementById('fullName').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const dateOfBirth = document.getElementById('DateOfBirth').value;
-            const gender = document.getElementById('gender').value;
-            const bloodType = document.getElementById('bloodType').value;
-            const phoneNumber = document.getElementById('phoneNumber').value.trim();
-            const role = 3; // Patient Role
-
-            try {
-                // 1. تسجيل المستخدم
-                // const userResponse = await fetch('https://localhost:7219/api/User', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //         'Authorization': 'Bearer ' + localStorage.getItem('token')
-                //     },
-                //     body: JSON.stringify({
-                //         fullName,
-                //         email,
-                //         password,
-                //         role,
-                //         phoneNumber
-                //     })
-                // });
-
-                // if (!userResponse.ok) {
-                //     const errorData = await userResponse.json();
-                //     throw new Error(errorData.message || 'فشل في تسجيل المستخدم');
-                // }
-
-                // const userData = await userResponse.json();
-
-                // 2. إضافة بيانات المريض
-                const patientResponse = await fetch('https://localhost:7219/api/PatientController', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
-                    body: JSON.stringify({
-                        // userId: userData.id,
-                        fullName,
-                        email,
-                        password,
-                        dateOfBirth,
-                        gender,
-                        bloodType,
-                        phoneNumber
-                    })
-                });
-                if (patientResponse.status != 201) {
-                    throw new Error('فشل في إضافة بيانات المريض');
-                }
-
-                showMessage('تم إضافة المريض بنجاح', false);
-                setTimeout(() => {
-                    window.location.href = './Patient.html';
-                }, 1500);
-
-            } catch (error) {
-                showMessage(error.message);
-                console.error('Error:', error);
-            } finally {
-                showLoading(false);
-            }
-        }
-    
-
-
-
-//----------------------------------------
-
-
-
+//  3. دالة تحميل بيانات المريض للتعديل (معدلة)
 async function loadUserData(patientId) {
     try {
-        const response = await fetch(`https://localhost:7219/api/PatientController/${patientId}`, {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
+        const response = await fetchWithAuth(`https://localhost:7219/api/PatientController/${patientId}`, {
+            method: 'GET'
         });
-        if (!response.ok) throw new Error("فشل تحميل البيانات");
+        
+        if (!response.ok) {
+            throw new Error("فشل تحميل البيانات");
+        }
 
         const data = await response.json();
         if (!data.user) throw new Error("بيانات المستخدم غير موجودة");
 
-        document.getElementById("fullName").value = data.user.fullName;
-        document.getElementById("email").value = data.user.email;
-        document.getElementById("DateOfBirth").value = data.dateOfBirth.split("T")[0];
-        document.getElementById("gender").value = data.gender;
-        document.getElementById("bloodType").value = data.bloodType;
+        const fullNameField = document.getElementById("fullName");
+        const emailField = document.getElementById("email");
+        const dateOfBirthField = document.getElementById("DateOfBirth");
+        const genderField = document.getElementById("gender");
+        const bloodTypeField = document.getElementById("bloodType");
+        const phoneNumberField = document.getElementById("phoneNumber");
+        
+        if (fullNameField) fullNameField.value = data.user.fullName || '';
+        if (emailField) emailField.value = data.user.email || '';
+        if (dateOfBirthField && data.dateOfBirth) dateOfBirthField.value = data.dateOfBirth.split("T")[0];
+        if (genderField) genderField.value = data.gender || '';
+        if (bloodTypeField) bloodTypeField.value = data.bloodType || '';
+        if (phoneNumberField) phoneNumberField.value = data.user.phoneNumber || '';
+        
     } catch (error) {
+        console.error('Error:', error);
         showError(error.message);
     }
 }
 
-async function updateUser(userId, fullName, email, role = 3) {
-    const userData = {
-        fullName,
-        email,
-        role: parseInt(role)
-    };
 
-    try {
-        const response = await fetch(`https://localhost:7219/api/User/${userId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
-            body: JSON.stringify(userData)
-        });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || 'فشل تحديث المستخدم');
-        }
-
-        return true;
-    } catch (error) {
-        showError(error.message);
-        return false;
-    }
-}
-
+//  5. دالة تحديث المريض (معدلة)
 async function updatePatient() {
     const urlParams = new URLSearchParams(window.location.search);
     const patientId = urlParams.get('id');
-    const fullName = document.getElementById('fullName').value;
-    const email = document.getElementById('email').value;
-    const dateOfBirth = document.getElementById('DateOfBirth').value;
-    const gender = document.getElementById('gender').value;
-    const bloodType = document.getElementById('bloodType').value;
-
-
+    
+    if (!patientId) {
+        showError('معرف المريض غير موجود');
+        return;
+    }
+    
+    const fullName = document.getElementById('fullName')?.value;
+    const email = document.getElementById('email')?.value;
+    const dateOfBirth = document.getElementById('DateOfBirth')?.value;
+    const gender = document.getElementById('gender')?.value;
+    const bloodType = document.getElementById('bloodType')?.value;
+    const phoneNumber = document.getElementById('phoneNumber')?.value;
 
     try {
-        const response = await fetch(`https://localhost:7219/api/PatientController/${patientId}`, {
+        const response = await fetchWithAuth(`https://localhost:7219/api/PatientController/${patientId}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 dateOfBirth,
                 gender,
                 bloodType,
                 fullName,
-                email
+                email,
+                phoneNumber
             })
         });
 
@@ -565,12 +248,196 @@ async function updatePatient() {
             const errorText = await response.text();
             throw new Error(errorText || "فشل تعديل بيانات المريض");
         }
-     else{
-            alert("تم تعديل البيانات بنجاح");
+        
+        showSuccess("تم تعديل البيانات بنجاح");
+        setTimeout(() => {
             window.location.href = './Patient.html';
-        }
+        }, 1500);
 
     } catch (error) {
+        console.error('Error:', error);
         showError(error.message);
     }
+}
+
+async function addUser() {
+    if (!validateForm()) return;
+
+    showLoading(true);
+
+    const fullName = document.getElementById('fullName')?.value.trim();
+    const email = document.getElementById('email')?.value.trim();
+    const password = document.getElementById('password')?.value;
+    const dateOfBirth = document.getElementById('DateOfBirth')?.value;
+    const gender = document.getElementById('gender')?.value;
+    const bloodType = document.getElementById('bloodType')?.value;
+    const phoneNumber = document.getElementById('phoneNumber')?.value.trim();
+    const role = 3; // Patient Role
+
+    try {
+        const patientResponse = await fetchWithAuth('https://localhost:7219/api/PatientController', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                fullName,
+                email,
+                password,
+                dateOfBirth,
+                gender,
+                bloodType,
+                phoneNumber
+            })
+        });
+        
+        if (patientResponse.status !== 201 && !patientResponse.ok) {
+            throw new Error('فشل في إضافة بيانات المريض');
+        }
+
+        showMessage('تم إضافة المريض بنجاح', false);
+        setTimeout(() => {
+            window.location.href = './Patient.html';
+        }, 1500);
+
+    } catch (error) {
+        showMessage(error.message);
+        console.error('Error:', error);
+    } finally {
+        showLoading(false);
+    }
+}
+
+//  7. دوال مساعدة
+function showError(message) {
+    const errorDiv = document.getElementById('error-message');
+    if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000);
+    } else {
+        alert(message);
+    }
+}
+
+function showSuccess(message) {
+    const successDiv = document.getElementById('success-message');
+    if (successDiv) {
+        successDiv.textContent = message;
+        successDiv.style.display = 'block';
+        setTimeout(() => {
+            successDiv.style.display = 'none';
+        }, 3000);
+    } else {
+        alert(message);
+    }
+}
+
+function showMessage(message, isError = true) {
+    if (isError) {
+        showError(message);
+    } else {
+        showSuccess(message);
+    }
+}
+
+function showLoading(isLoading) {
+    const loadingDiv = document.getElementById('loading');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (loadingDiv) loadingDiv.style.display = isLoading ? 'flex' : 'none';
+    if (submitBtn) submitBtn.disabled = isLoading;
+}
+
+function resetErrors() {
+    document.querySelectorAll('.text-danger').forEach(el => {
+        el.textContent = '';
+    });
+    document.querySelectorAll('.error-message').forEach(el => {
+        el.style.display = 'none';
+    });
+}
+
+function validateForm() {
+    resetErrors();
+
+    const fullName = document.getElementById('fullName')?.value.trim() || '';
+    const email = document.getElementById('email')?.value.trim() || '';
+    const password = document.getElementById('password')?.value || '';
+    const confirmPassword = document.getElementById('confirmPassword')?.value || '';
+    const dateOfBirth = document.getElementById('DateOfBirth')?.value || '';
+    const gender = document.getElementById('gender')?.value || '';
+    const bloodType = document.getElementById('bloodType')?.value || '';
+    const phoneNumber = document.getElementById('phoneNumber')?.value.trim() || '';
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phonePattern = /^\d{9}$/;
+
+    let isValid = true;
+
+    if (!fullName) {
+        const errorEl = document.getElementById('fullNameError');
+        if (errorEl) errorEl.textContent = 'الاسم الكامل مطلوب';
+        isValid = false;
+    }
+
+    if (!email) {
+        const errorEl = document.getElementById('emailError');
+        if (errorEl) errorEl.textContent = 'البريد الإلكتروني مطلوب';
+        isValid = false;
+    } else if (!emailPattern.test(email)) {
+        const errorEl = document.getElementById('emailError');
+        if (errorEl) errorEl.textContent = 'بريد إلكتروني غير صالح';
+        isValid = false;
+    }
+
+    if (!password) {
+        const errorEl = document.getElementById('passwordError');
+        if (errorEl) errorEl.textContent = 'كلمة المرور مطلوبة';
+        isValid = false;
+    } else if (password.length < 6) {
+        const errorEl = document.getElementById('passwordError');
+        if (errorEl) errorEl.textContent = 'يجب أن تكون كلمة المرور 6 أحرف على الأقل';
+        isValid = false;
+    }
+
+    if (password !== confirmPassword) {
+        const errorEl = document.getElementById('confirmPasswordError');
+        if (errorEl) errorEl.textContent = 'كلمة المرور غير متطابقة';
+        isValid = false;
+    }
+
+    if (!dateOfBirth) {
+        const errorEl = document.getElementById('DateOfBirthError');
+        if (errorEl) errorEl.textContent = 'تاريخ الميلاد مطلوب';
+        isValid = false;
+    } else {
+        const birthDate = new Date(dateOfBirth);
+        const today = new Date();
+        if (birthDate >= today) {
+            const errorEl = document.getElementById('DateOfBirthError');
+            if (errorEl) errorEl.textContent = 'تاريخ الميلاد يجب أن يكون في الماضي';
+            isValid = false;
+        }
+    }
+
+    if (!gender) {
+        const errorEl = document.getElementById('genderError');
+        if (errorEl) errorEl.textContent = 'الجنس مطلوب';
+        isValid = false;
+    }
+
+    if (!bloodType) {
+        const errorEl = document.getElementById('bloodTypeError');
+        if (errorEl) errorEl.textContent = 'فصيلة الدم مطلوبة';
+        isValid = false;
+    }
+
+    if (phoneNumber && !phonePattern.test(phoneNumber)) {
+        const errorEl = document.getElementById('phoneError');
+        if (errorEl) errorEl.textContent = 'رقم الهاتف يجب أن يتكون من 9 أرقام';
+        isValid = false;
+    }
+
+    return isValid;
 }

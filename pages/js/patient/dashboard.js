@@ -19,10 +19,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // جلب بيانات لوحة التحكم مع إدارة الوقت الزمني
         const response = await Promise.race([
-            fetch(`https://localhost:7219/api/PatientController/dashboard/${patientData.id}`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
+            fetchWithAuth(`https://localhost:7219/api/PatientController/dashboard/${patientData.id}`, {
+                  method: 'GET'
+
             }),
            /* new Promise((_, reject) => 
                 setTimeout(() => reject(new Error('تجاوز وقت الانتظار')), 20000)
@@ -109,10 +108,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        const response = await fetch(`https://localhost:7219/api/Prescription/${prescriptionId}`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
+        const response = await fetchWithAuth(`https://localhost:7219/api/Prescription/${prescriptionId}`, {
+               method: 'GET'
+
         });
         
         if (!response.ok) {
@@ -176,10 +174,8 @@ let medications = [];
                     };
                     }
                 try {
-                    const res = await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
-                        headers: {
-                            'Authorization': 'Bearer ' + localStorage.getItem('token')
-                        }
+                    const res = await fetchWithAuth(`https://localhost:7219/api/Medication/${item.medicationId}`, {
+                     method: 'GET'
                     });
                     return res.ok ? await res.json() : null;
                 } catch {

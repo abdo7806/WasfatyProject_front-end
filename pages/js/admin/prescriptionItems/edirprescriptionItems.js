@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    checkAccess(['Admin'], '../../../shared/unauthorized.html');
+    checkAccess(['Admin', 'Doctor'], '../../../shared/unauthorized.html');
     
     const urlParams = new URLSearchParams(window.location.search);
     itemId = urlParams.get('id');
@@ -27,68 +27,71 @@ $(document).ready(function() {
     });
 });
 
-function fetchPrescriptionItem(id) {
-    // تحميل الأدوية أولاً
-    $.ajax({
-        url: 'https://localhost:7219/api/Medication/All',
-        type: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token')
-        },
-        success: function(medications) {
-            const medicationData = medications.map(m => ({
-                id: m.id,
-                text: m.name
-            }));
-            
-            $('#medicationId').select2({
-                data: medicationData,
-                placeholder: 'اختر الدواء',
-                allowClear: true
-            });
-
-            // الآن جلب بيانات عنصر الوصفة
-            $.ajax({
-                url: `https://localhost:7219/api/PrescriptionItem/${id}`,
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                },
-                success: function(item) {
-                    $('#prescriptionId').val(item.prescriptionId);
-                    $('#dosage').val(item.dosage);
-                    $('#frequency').val(item.frequency);
-                    $('#duration').val(item.duration);
-
-                    if (item.medicationId) {
-                        // إذا كان دواءً موجوداً
-                        $('#isCustomToggle').prop('checked', false);
-                        $('#medicationId').val(item.medicationId).trigger('change');
-                        $('#existingMedFields').show();
-                        $('#customMedFields').hide();
-                    } else {
-                        // إذا كان دواءً مخصصاً
-                        $('#isCustomToggle').prop('checked', true);
-                        $('#existingMedFields').hide();
-                        $('#customMedFields').show();
-                        $('#customName').val(item.customMedicationName);
-                        $('#customDescription').val(item.customMedicationDescription);
-                        $('#customDosageForm').val(item.customDosageForm);
-                        $('#customStrength').val(item.customStrength);
-                    }
-                },
-                error: function() {
-                    showMessage('فشل في تحميل بيانات عنصر الوصفة', 'danger');
-                }
-            });
-        },
-        error: function() {
-            showMessage('فشل في تحميل قائمة الأدوية', 'danger');
+// ✅ 1. جلب بيانات عنصر الوصفة (معدل)
+async function fetchPrescriptionItem(id) {
+    try {
+        // تحميل الأدوية أولاً باستخدام fetchWithAuth
+        const medicationsResponse = await fetchWithAuth('https://localhost:7219/api/Medication/All', {
+            method: 'GET'
+        });
+        
+        if (!medicationsResponse.ok) {
+            throw new Error('فشل في تحميل قائمة الأدوية');
         }
-    });
+        
+        const medications = await medicationsResponse.json();
+        const medicationData = medications.map(m => ({
+            id: m.id,
+            text: m.name
+        }));
+        
+        $('#medicationId').select2({
+            data: medicationData,
+            placeholder: 'اختر الدواء',
+            allowClear: true
+        });
+
+        // جلب بيانات عنصر الوصفة
+        const itemResponse = await fetchWithAuth(`https://localhost:7219/api/PrescriptionItem/${id}`, {
+            method: 'GET'
+        });
+        
+        if (!itemResponse.ok) {
+            throw new Error('فشل في تحميل بيانات عنصر الوصفة');
+        }
+        
+        const item = await itemResponse.json();
+        
+        $('#prescriptionId').val(item.prescriptionId);
+        $('#dosage').val(item.dosage);
+        $('#frequency').val(item.frequency);
+        $('#duration').val(item.duration);
+
+        if (item.medicationId) {
+            // إذا كان دواءً موجوداً
+            $('#isCustomToggle').prop('checked', false);
+            $('#medicationId').val(item.medicationId).trigger('change');
+            $('#existingMedFields').show();
+            $('#customMedFields').hide();
+        } else {
+            // إذا كان دواءً مخصصاً
+            $('#isCustomToggle').prop('checked', true);
+            $('#existingMedFields').hide();
+            $('#customMedFields').show();
+            $('#customName').val(item.customMedicationName || '');
+            $('#customDescription').val(item.customMedicationDescription || '');
+            $('#customDosageForm').val(item.customDosageForm || '');
+            $('#customStrength').val(item.customStrength || '');
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        showMessage(error.message || 'فشل في تحميل البيانات', 'danger');
+    }
 }
 
-function updatePrescriptionItem() {
+// ✅ 2. تحديث عنصر الوصفة (معدل)
+async function updatePrescriptionItem() {
     const isCustom = $('#isCustomToggle').is(':checked');
     const dosage = $('#dosage').val().trim();
     const frequency = $('#frequency').val().trim();
@@ -145,27 +148,33 @@ function updatePrescriptionItem() {
         updatedItem.customStrength = null;
     }
 
-    $.ajax({
-        url: `https://localhost:7219/api/PrescriptionItem/${itemId}`,
-        method: 'PUT',
-        headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token'),
-            'Content-Type': 'application/json'
-        },
-        data: JSON.stringify(updatedItem),
-        success: function() {
-            showMessage('تم تحديث العنصر بنجاح', 'success');
-            setTimeout(() => {
-                window.location.href = 'PrescriptionItems.html';
-            }, 1500);
-        },
-        error: function(xhr) {
-            console.error('Error:', xhr.responseText);
-            showMessage('فشل في تحديث العنصر: ' + (xhr.responseJSON?.message || xhr.statusText), 'danger');
+    try {
+        const response = await fetchWithAuth(`https://localhost:7219/api/PrescriptionItem/${itemId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedItem)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'فشل في تحديث العنصر');
         }
-    });
+
+        showMessage('تم تحديث العنصر بنجاح', 'success');
+        setTimeout(() => {
+            window.location.href = 'PrescriptionItems.html';
+        }, 1500);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        showMessage(error.message, 'danger');
+    }
 }
 
+// عرض رسالة (نفسها)
 function showMessage(message, type) {
     $('#message').html(`<div class="alert alert-${type}">${message}</div>`);
+    setTimeout(() => {
+        $('#message').html('');
+    }, 3000);
 }

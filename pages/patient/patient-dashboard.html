@@ -14,7 +14,7 @@
         <h1><i class="fas fa-user-injured"></i> لوحة تحكم المريض</h1>
 
         
-        <button id="logout-btn" onclick="logoutMassge('patient', '../auth/login.html')">
+        <button id="logout-btn" onclick="logoutMassge('../auth/login.html')">
             <i class="fas fa-sign-out-alt" ></i> تسجيل الخروج
         </button>
     </header>
@@ -163,15 +163,6 @@
             checkAccess(['Patient'], '../../shared/unauthorized.html');
 
           //  location.reload();
-
-        // تسجيل الخروج
-function logout2() {
-       // localStorage.removeItem('patientData');
-      // logout('../../auth/login.html');
-         localStorage.clear();
-    window.location.href = '../auth/login.html';
-}
-
 
 
         

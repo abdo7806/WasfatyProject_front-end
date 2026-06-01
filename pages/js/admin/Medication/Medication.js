@@ -6,10 +6,8 @@ const itemsPerPage = 5;
 
 async function fetchMedications() {
     try {
-        const response = await fetch('https://localhost:7219/api/Medication/All', {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
+        const response = await fetchWithAuth('https://localhost:7219/api/Medication/All', {
+               method: 'GET'
         });
         medications = await response.json();
         displayMedications(medications);
@@ -77,11 +75,8 @@ async function deleteMedication(medicationId) {
     const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذا الدواء؟");
     if (confirmDelete) {
         try {
-            const response = await fetch(`https://localhost:7219/api/Medication/${medicationId}`, {
+            const response = await fetchWithAuth(`https://localhost:7219/api/Medication/${medicationId}`, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                }
             });
             if (response.ok) {
                 medications = medications.filter(med => med.id !== medicationId);
@@ -153,12 +148,9 @@ async function addMedication() {
     }
 
     try {
-        const response = await fetch('https://localhost:7219/api/Medication/CreateMedication', {
+        const response = await fetchWithAuth('https://localhost:7219/api/Medication/CreateMedication', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 name,
                 description,
@@ -193,12 +185,9 @@ async function updateMedication() {
     }
 
     try {
-        const response = await fetch(`https://localhost:7219/api/Medication/${medicationId}`, {
+        const response = await fetchWithAuth(`https://localhost:7219/api/Medication/${medicationId}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 id: medicationId,
                 name,

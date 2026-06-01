@@ -12,10 +12,8 @@
 
         async function loadPrescriptionData() {
             try {
-                const response = await fetch(`https://localhost:7219/api/Prescription/${prescriptionId}`, {
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
+                const response = await fetchWithAuth(`https://localhost:7219/api/Prescription/${prescriptionId}`, {
+                    method: 'GET'
                 });
                 if (!response.ok) throw new Error('فشل تحميل البيانات');
 
@@ -37,10 +35,8 @@
                         duration: item.customStrength
                     };
                     }
-                    const res = await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
-                        headers: {
-                            'Authorization': 'Bearer ' + localStorage.getItem('token')
-                        },
+                    const res = await fetchWithAuth(`https://localhost:7219/api/Medication/${item.medicationId}`, {
+                        method: 'GET'
                     });
                     const medication = await res.json();
                     return {

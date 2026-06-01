@@ -6,26 +6,7 @@
             SESSION_TIMEOUT: 30 // دقائق
         };
 
-   
-               function logout() {
-            Swal.fire({
-                title: 'تأكيد تسجيل الخروج',
-                text: 'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'نعم، سجل خروج',
-                cancelButtonText: 'إلغاء',
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6'
-            }).then((result) => {
-                if (result.isConfirmed) {
-			localStorage.removeItem('token');
-            localStorage.removeItem('userData');
-            localStorage.removeItem('PharmacistData');
-            window.location.href = '../../auth/login.html';
-                }
-            });
-        }
+
    
 
         // حساب العمر بدقة
@@ -71,7 +52,7 @@
             checkAccess(['Pharmacist'], '../../../shared/unauthorized.html');
             
             // إعداد مهلة الجلسة
-            setupSessionTimeout();
+            // setupSessionTimeout();
             
             // العناصر الرئيسية
             const elements = {
@@ -123,13 +104,15 @@
                 try {
                     showLoading();
                     
-                    const response = await axios.get(`${APP_CONFIG.API_BASE_URL}/Prescription/Pending`, {
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        }
-                    });
-                    
-                    state.prescriptions = response.data;
+                         const response = await fetchWithAuth(`${APP_CONFIG.API_BASE_URL}/Prescription/Pending`, {
+                method: 'GET'
+            });
+            
+            if (!response.ok) {
+                throw new Error('فشل في جلب البيانات');
+            }
+            
+            state.prescriptions = await response.json();
                     state.lastPrescriptionId = state.prescriptions.length > 0 ? 
                         Math.max(...state.prescriptions.map(p => p.id)) : 0;
                     
@@ -180,15 +163,16 @@
             // التحقق من وصفات جديدة
             async function checkForNewPrescriptions() {
                 try {
-                    const response = await axios.get(
-                        `${APP_CONFIG.API_BASE_URL}/Prescription/New/${state.lastPrescriptionId}`, {
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        }
-                    });
-                    
-                    if (response.data.length > 0) {
-                        state.newPrescriptionsCount = response.data.length;
+                      const response = await fetchWithAuth(`${APP_CONFIG.API_BASE_URL}/Prescription/New/${state.lastPrescriptionId}`, {
+                method: 'GET'
+            });
+            
+            if (!response.ok) return;
+            
+            const data = await response.json();
+
+                      if (data && data.length > 0) {
+                state.newPrescriptionsCount = data.length;
                         elements.newPrescriptionsBadge.classList.remove('d-none');
                         elements.newPrescriptionsBadge.textContent = 
                             ` ${state.newPrescriptionsCount} وصفات جديدة`;
@@ -340,14 +324,13 @@
                     showLoading();
 									
                     
-                    const response = await axios.get(`${APP_CONFIG.API_BASE_URL}/Prescription/${prescriptionId}`, {
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        }
-                    });
-								
-                    
-                    const prescription = response.data;
+            const response = await fetchWithAuth(`${APP_CONFIG.API_BASE_URL}/Prescription/${prescriptionId}`, {
+                method: 'GET'
+            });
+            
+            if (!response.ok) throw new Error('فشل في جلب التفاصيل');
+            
+            const prescription = await response.json();
                     const modal = new bootstrap.Modal(document.getElementById('prescriptionDetailsModal'));
 								
                     // تعبئة بيانات المريض
@@ -398,10 +381,8 @@
                     else{
 
                     console.log("iteme", item)
-				const res =  await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
-                        headers: {
-                            'Authorization': 'Bearer ' + localStorage.getItem('token')
-                        },
+				const res =  await fetchWithAuth(`https://localhost:7219/api/Medication/${item.medicationId}`, {
+                        method: 'GET'
                     });
                     const medication = await res.json();
                         const medItem = document.createElement('div');
@@ -479,12 +460,10 @@ async function dispensePrescription(prescriptionId) {
 
 				console.log(dispenseData)
         // 5. إنشاء سجل الصرف
-        const dispenseResponse = await fetch('https://localhost:7219/api/DispenseRecord/CreateDispenseRecord', {
+        const dispenseResponse = await fetchWithAuth('https://localhost:7219/api/DispenseRecord/CreateDispenseRecord', {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
-            },
+                    headers: { 'Content-Type': 'application/json' },
+
             body: JSON.stringify(dispenseData)
         });
 

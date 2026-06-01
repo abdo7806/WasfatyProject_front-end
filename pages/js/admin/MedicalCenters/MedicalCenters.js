@@ -8,10 +8,8 @@ let searchColumn = 'name';
 
 async function fetchMedicalCenters() {
     try {
-        const response = await fetch('https://localhost:7219/api/MedicalCenter/All', {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
+        const response = await fetchWithAuth('https://localhost:7219/api/MedicalCenter/All', {
+            method: 'GET'
         });
         medicalCenters = await response.json();
         displayMedicalCenters();
@@ -118,11 +116,8 @@ async function deleteMedicalCenter(id) {
     const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذا المركز الطبي؟");
     if (confirmDelete) {
         try {
-            const response = await fetch(`https://localhost:7219/api/MedicalCenter/${id}`, {
+            const response = await fetchWithAuth(`https://localhost:7219/api/MedicalCenter/${id}`, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                }
             });
             if (response.ok) {
                 medicalCenters = medicalCenters.filter(c => c.id !== id);
@@ -148,12 +143,9 @@ async function addMedicalCenter() {
     const medicalCenter = buildMedicalCenterModel();
 
     try {
-        const response = await fetch('https://localhost:7219/api/MedicalCenter/CreateMedicalCenter', {
+        const response = await fetchWithAuth('https://localhost:7219/api/MedicalCenter/CreateMedicalCenter', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(medicalCenter)
         });
 
@@ -179,12 +171,10 @@ async function updateMedicalCenter() {
 
     const medicalCenter = buildMedicalCenterModel();
     try {
-        const response = await fetch(`https://localhost:7219/api/MedicalCenter/${centerId}`, {
+        const response = await fetchWithAuth(`https://localhost:7219/api/MedicalCenter/${centerId}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
+            headers: { 'Content-Type': 'application/json' },
+
             body: JSON.stringify(medicalCenter)
         });
 

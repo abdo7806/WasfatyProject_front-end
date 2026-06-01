@@ -12,7 +12,6 @@
             searchBtn: document.getElementById('search-btn'),
             exportBtn: document.getElementById('export-btn'),
             tryAgainBtn: document.getElementById('try-again-btn'),
-            logoutBtn: document.getElementById('logout-btn'),
             dateFilter: document.getElementById('date-filter'),
             patientFilter: document.getElementById('patient-filter'),
             doctorFilter: document.getElementById('doctor-filter'),
@@ -52,15 +51,21 @@
         async function fetchDispensedPrescriptions() {
             try {
                 showLoading();
-                        const pharmacistData = JSON.parse(localStorage.getItem("PharmacistData"));
+
+        const pharmacistData = JSON.parse(localStorage.getItem("PharmacistData"));
                 
-                const response = await axios.get(`https://localhost:7219/api/DispenseRecord/GetAllDispenseRecor/${pharmacistData.pharmacyId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-                
-                state.dispenseRecord = response.data;
+        if (!pharmacistData?.pharmacyId) {
+            throw new Error('بيانات الصيدلي غير مكتملة');
+        }
+     const response = await fetchWithAuth(`https://localhost:7219/api/DispenseRecord/GetAllDispenseRecor/${pharmacistData.pharmacyId}`, {
+            method: 'GET'
+        });
+        
+        if (!response.ok) {
+            throw new Error('فشل في جلب البيانات');
+        }
+        
+        state.dispenseRecord = await response.json();
 								console.log("D=", state.dispenseRecord)
                 state.filtereddispenseRecord = [...state.dispenseRecord];
 								console.log(state.filtereddispenseRecord)
@@ -521,10 +526,8 @@ async function enrichPrescriptionItems(items) {
         } else {
             try {
                 // جلب بيانات الدواء من API
-                const res = await fetch(`https://localhost:7219/api/Medication/${item.medicationId}`, {
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    },
+                const res = await fetchWithAuth(`https://localhost:7219/api/Medication/${item.medicationId}`, {
+                            method: 'GET'
                 });
                 
                 if (!res.ok) throw new Error('فشل في جلب بيانات الدواء');
@@ -705,9 +708,7 @@ async function enrichPrescriptionItems(items) {
             // Try again
             elements.tryAgainBtn.addEventListener('click', fetchDispensedPrescriptions);
             
-            // Logout
-            elements.logoutBtn.addEventListener('click', logout);
-            
+          
             // Filters
             elements.dateFilter.addEventListener('change', (e) => {
                 state.filters.date = e.target.value;
@@ -784,24 +785,4 @@ const data = state.filtereddispenseRecord.map(p => ({
                     'success'
                 );
             }, 2000);
-        }
-        
-        function logout() {
-            Swal.fire({
-                title: 'تأكيد تسجيل الخروج',
-                text: 'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'نعم، سجل خروج',
-                cancelButtonText: 'إلغاء',
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6'
-            }).then((result) => {
-                if (result.isConfirmed) {
-									           localStorage.removeItem('token');
-            localStorage.removeItem('userData');
-            localStorage.removeItem('PharmacistData');
-            window.location.href = '../../auth/login.html';
-                }
-            });
         }

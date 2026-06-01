@@ -127,19 +127,22 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Custom Scripts -->
-    <script src="../../js/admin/Doctor/doctor.js"></script>
-    <script src="../../js/checkAccess.js"></script>
-    
-    <script>
-        checkAccess(['Admin'], '../../../shared/unauthorized.html');
 
-        // Global variables
-        let doctorId;
+<!-- Custom Scripts - الترتيب مهم جداً -->
+<script src="../../js/auth.js"></script>
+<script src="../../js/admin/Doctor/doctors.js"></script>
+<script src="../../js/checkAccess.js"></script>
 
-        // Function to show loading state
-        function setLoading(isLoading) {
-            const btn = document.getElementById('submitBtn');
+<script>
+    checkAccess(['Admin'], '../../../shared/unauthorized.html');
+
+    // Global variables
+    let doctorId;
+
+    // Function to show loading state
+    function setLoading(isLoading) {
+        const btn = document.getElementById('submitBtn');
+        if (btn) {
             if (isLoading) {
                 btn.disabled = true;
                 btn.innerHTML = '<div class="loading-spinner"></div> جاري التحديث...';
@@ -148,10 +151,12 @@
                 btn.innerHTML = '<i class="fas fa-save me-2"></i>حفظ التعديلات';
             }
         }
+    }
 
-        // Function to show error message
-        function showError(message) {
-            const errorDiv = document.getElementById('error-message');
+    // Function to show error message
+    function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        if (errorDiv) {
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
             
@@ -159,102 +164,115 @@
                 errorDiv.style.display = 'none';
             }, 5000);
         }
+    }
 
-        // Fetch doctor details
-        async function fetchDoctorDetails(id) {
-            try {
-                setLoading(true);
-                const response = await fetch(`https://localhost:7219/api/Doctor/${id}`, {
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error("فشل في جلب بيانات الطبيب");
+    // ✅ Fetch doctor details (معدل لاستخدام fetchWithAuth)
+    async function fetchDoctorDetails(id) {
+        try {
+            setLoading(true);
+            
+            const response = await fetchWithAuth(`https://localhost:7219/api/Doctor/${id}`, {
+                method: 'GET'
+            });
+            
+            if (!response.ok) {
+                throw new Error("فشل في جلب بيانات الطبيب");
+            }
+            
+            const doctor = await response.json();
+            
+            const doctorIdField = document.getElementById('doctorId');
+            const fullNameField = document.getElementById('fullName');
+            const emailField = document.getElementById('email');
+            const licenseNumberField = document.getElementById('licenseNumber');
+            const specializationField = document.getElementById('specialization');
+            
+            if (doctorIdField) doctorIdField.value = id;
+            if (fullNameField) fullNameField.value = doctor.user?.fullName || '';
+            if (emailField) emailField.value = doctor.user?.email || '';
+            if (licenseNumberField) licenseNumberField.value = doctor.licenseNumber || '';
+            if (specializationField) specializationField.value = doctor.specialization || '';
+            
+            // Set medical center after options are loaded
+            setTimeout(() => {
+                if (doctor.medicalCenterId) {
+                    const centerSelect = document.getElementById('MedicalCenter');
+                    if (centerSelect) centerSelect.value = doctor.medicalCenterId;
                 }
-                
-                const doctor = await response.json();
-                document.getElementById('doctorId').value = id;
-                document.getElementById('fullName').value = doctor.user.fullName || '';
-                document.getElementById('email').value = doctor.user.email || '';
-                document.getElementById('licenseNumber').value = doctor.licenseNumber || '';
-                document.getElementById('specialization').value = doctor.specialization || '';
-                
-                // Set medical center after options are loaded
-                setTimeout(() => {
-                    if (doctor.medicalCenterId) {
-                        document.getElementById('MedicalCenter').value = doctor.medicalCenterId;
-                    }
-                }, 300);
-                
-            } catch (error) {
-                console.error('Error:', error);
-                showError(error.message);
-            } finally {
-                setLoading(false);
-            }
+            }, 300);
+            
+        } catch (error) {
+            console.error('Error:', error);
+            showError(error.message);
+        } finally {
+            setLoading(false);
         }
+    }
 
-  
-        // Form validation
-        function validateForm() {
-            // Reset error messages
-            document.querySelectorAll('.text-danger').forEach(el => el.textContent = '');
-            document.getElementById('error-message').style.display = 'none';
-            
-            const fullName = document.getElementById('fullName').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const medicalCenterId = document.getElementById('MedicalCenter').value;
-            const licenseNumber = document.getElementById('licenseNumber').value.trim();
-            const specialization = document.getElementById('specialization').value.trim();
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            
-            let isValid = true;
-            
-            // Validation checks
-            if (!fullName) {
-                document.getElementById('fullNameError').textContent = 'حقل الاسم الكامل مطلوب';
-                isValid = false;
-            }
-            
-            if (!email) {
-                document.getElementById('emailError').textContent = 'حقل البريد الإلكتروني مطلوب';
-                isValid = false;
-            } else if (!emailPattern.test(email)) {
-                document.getElementById('emailError').textContent = 'صيغة البريد الإلكتروني غير صالحة';
-                isValid = false;
-            }
-            
-            if (!medicalCenterId) {
-                document.getElementById('MedicalCenterError').textContent = 'يجب اختيار المركز الطبي';
-                isValid = false;
-            }
-            
-            if (!licenseNumber) {
-                document.getElementById('licenseNumberError').textContent = 'حقل رقم الترخيص مطلوب';
-                isValid = false;
-            }
-            
-            if (!specialization) {
-                document.getElementById('specializationError').textContent = 'حقل التخصص مطلوب';
-                isValid = false;
-            }
-            
-            return isValid;
+    // Form validation
+    function validateForm() {
+        // Reset error messages
+        document.querySelectorAll('.text-danger').forEach(el => el.textContent = '');
+        const errorDiv = document.getElementById('error-message');
+        if (errorDiv) errorDiv.style.display = 'none';
+        
+        const fullName = document.getElementById('fullName')?.value.trim() || '';
+        const email = document.getElementById('email')?.value.trim() || '';
+        const medicalCenterId = document.getElementById('MedicalCenter')?.value;
+        const licenseNumber = document.getElementById('licenseNumber')?.value.trim() || '';
+        const specialization = document.getElementById('specialization')?.value.trim() || '';
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        let isValid = true;
+        
+        if (!fullName) {
+            const errorEl = document.getElementById('fullNameError');
+            if (errorEl) errorEl.textContent = 'حقل الاسم الكامل مطلوب';
+            isValid = false;
         }
+        
+        if (!email) {
+            const errorEl = document.getElementById('emailError');
+            if (errorEl) errorEl.textContent = 'حقل البريد الإلكتروني مطلوب';
+            isValid = false;
+        } else if (!emailPattern.test(email)) {
+            const errorEl = document.getElementById('emailError');
+            if (errorEl) errorEl.textContent = 'صيغة البريد الإلكتروني غير صالحة';
+            isValid = false;
+        }
+        
+        if (!medicalCenterId) {
+            const errorEl = document.getElementById('MedicalCenterError');
+            if (errorEl) errorEl.textContent = 'يجب اختيار المركز الطبي';
+            isValid = false;
+        }
+        
+        if (!licenseNumber) {
+            const errorEl = document.getElementById('licenseNumberError');
+            if (errorEl) errorEl.textContent = 'حقل رقم الترخيص مطلوب';
+            isValid = false;
+        }
+        
+        if (!specialization) {
+            const errorEl = document.getElementById('specializationError');
+            if (errorEl) errorEl.textContent = 'حقل التخصص مطلوب';
+            isValid = false;
+        }
+        
+        return isValid;
+    }
 
-        // On page load
-        $(document).ready(function() {
-            doctorId = new URLSearchParams(window.location.search).get('id');
-            if (!doctorId) {
-                showError('معرف الطبيب غير موجود في عنوان URL');
-                return;
-            }
-            
-            fetchMedicalCenters();
-            fetchDoctorDetails(doctorId);
-        });
-    </script>
+    // On page load
+    $(document).ready(function() {
+        doctorId = new URLSearchParams(window.location.search).get('id');
+        if (!doctorId) {
+            showError('معرف الطبيب غير موجود في عنوان URL');
+            return;
+        }
+        
+        fetchMedicalCenters();
+        fetchDoctorDetails(doctorId);
+    });
+</script>
 </body>
 </html>

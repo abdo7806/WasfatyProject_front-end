@@ -1,172 +1,207 @@
+$(document).ready(function() {
+    // إغلاق القائمة الجانبية تلقائياً على الهواتف
+    if ($(window).width() < 768) {
+        $('body').addClass('sidebar-collapse');
+    }
 
+    // إعادة حساب الأبعاد عند تغيير حجم النافذة
+    $(window).resize(function() {
+        if ($(window).width() < 768) {
+            $('body').addClass('sidebar-collapse');
+        } else {
+            $('body').removeClass('sidebar-collapse');
+        }
+    });
 
+    // زر إنشاء وصفة جديدة
+    $('.new-prescription-btn').click(function() {
+        window.location.href = './Doctor/Doctors.html';
+    });
+});
 
-        $(document).ready(function() {
-            // إغلاق القائمة الجانبية تلقائياً على الهواتف
-            if ($(window).width() < 768) {
-                $('body').addClass('sidebar-collapse');
-            }
+// تخزين الوصفات في المتغير لتصفية البحث لاحقاً
+let prescriptions = [];
+let currentPage = 1;
+const prescriptionsPerPage = 5;
 
-            // إعادة حساب الأبعاد عند تغيير حجم النافذة
-            $(window).resize(function() {
-                if ($(window).width() < 768) {
-                    $('body').addClass('sidebar-collapse');
-                } else {
-                    $('body').removeClass('sidebar-collapse');
-                }
-            });
+// ✅ 1. تحميل الوصفات (معدل)
+async function loadPrescriptions() {
+    let doctorData = JSON.parse(localStorage.getItem("doctorData"));
+    const doctorId = doctorData?.id;
 
-            // زر إنشاء وصفة جديدة
-            $('.new-prescription-btn').click(function() {
-                window.location.href = './Doctor/Doctors.html';
-            });
+    try {
+        const response = await fetchWithAuth('https://localhost:7219/api/Prescription/MyPrescriptions', {
+            method: 'GET'
         });
 
-
-        // تخزين الوصفات في المتغير لتصفية البحث لاحقاً
-        let prescriptions = [];
-        let currentPage = 1;
-        const prescriptionsPerPage = 5;
-
-        async function loadPrescriptions() {
-
-            let doctorData = JSON.parse(localStorage.getItem("doctorData"));
-            const doctorId = doctorData.id;
-
-
-            try {
-
-                // const response = await fetch(`https://localhost:7219/api/Prescription/GetByDoctorId/${doctorId}`, {
-                //     headers: {
-                //         'Authorization': 'Bearer ' + localStorage.getItem('token')
-                //     }
-                // });
-
-                const response = await fetch(`https://localhost:7219/api/Prescription/MyPrescriptions`, {
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    }
-                });
-
-                prescriptions = await response.json(); // تخزين البيانات في المتغير
-
-
-                displayPrescriptions(prescriptions); // عرض الوصفات
-                setupPagination(); // إعداد التقليب
-            } catch (error) {
-                console.error('حدث خطأ أثناء جلب البيانات:', error);
-            }
+        if (!response.ok) {
+            throw new Error('فشل في تحميل الوصفات');
         }
 
-        // عرض الوصفات في الجدول
-        function displayPrescriptions(data) {
-            const tableBody = document.getElementById('prescription-table-body');
-            tableBody.innerHTML = ''; // مسح الجدول قبل إضافة البيانات الجديدة
+        prescriptions = await response.json();
+        displayPrescriptions(prescriptions);
+        setupPagination();
+    } catch (error) {
+        console.error('حدث خطأ أثناء جلب البيانات:', error);
+        showMessage('حدث خطأ أثناء تحميل الوصفات', true);
+    }
+}
 
-                    const start = (currentPage - 1) * prescriptionsPerPage;
+// عرض الوصفات في الجدول
+function displayPrescriptions(data) {
+    const tableBody = document.getElementById('prescription-table-body');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = '';
+
+    const start = (currentPage - 1) * prescriptionsPerPage;
     const end = start + prescriptionsPerPage;
     const paginatedprescriptions = data.slice(start, end);
 
-
-            paginatedprescriptions.forEach(prescription => {
-                const row = document.createElement('tr');
-
-                // إضافة بيانات الوصفة
-                // إضافة بيانات الوصفة
-                row.innerHTML = `
-						 <td>${prescription.id}</td>
-						 <td>${prescription.patient.user.fullName}</td>
-						 <td>${prescription.doctor.user.fullName}</td>
-						 <td>${prescription.prescriptionItems.length}</td>
-						 <td>${new Date(prescription.issuedDate).toLocaleDateString()}</td>
-						 <td>${prescription.isDispensed ? 'نعم' : 'لا'}</td>
-						 <td>
+    paginatedprescriptions.forEach(prescription => {
+        const row = document.createElement('tr');
 
 
-                       <a href="./DetailsPrescription.html?id=${prescription.id}" class="btn btn-info btn-action" title="عرض"><i class="fas fa-eye"></i></a>
-                <button class="btn btn-danger btn-action" data-toggle="tooltip" onclick="deletePrescription(${prescription.id})" title="حذف"><i class="fas fa-trash"></i></button>
-								<a href="./EditPrescription.html?id=${prescription.id}"  class="btn btn-primary btn-action" title="تعديل"><i class="fas fa-edit"></i></a>
+        row.innerHTML = `
+            <td>${prescription.id}${'</td>'}
+            <td>${prescription.patient?.user?.fullName || '—'}</td>
+            <td>${prescription.doctor?.user?.fullName || '—'}</td>
+            <td>${prescription.prescriptionItems?.length || 0}</td>
+            <td>${prescription.issuedDate ? new Date(prescription.issuedDate).toLocaleDateString() : '—'}</td>
+            <td>${prescription.isDispensed ? 'نعم' : 'لا'}</td>
+            <td>
+                <a href="./DetailsPrescription.html?id=${prescription.id}" class="btn btn-info btn-action" title="عرض">
+                    <i class="fas fa-eye"></i>
+                </a>
+                <button class="btn btn-danger btn-action" onclick="deletePrescription(${prescription.id})" title="حذف">
+                    <i class="fas fa-trash"></i>
+                </button>
+                <a href="./EditPrescription.html?id=${prescription.id}" class="btn btn-primary btn-action" title="تعديل">
+                    <i class="fas fa-edit"></i>
+                </a>
+		         </td>
+        `;
+        tableBody.appendChild(row);
+    });
 
-
-
-						 </td>
-				 `;
-                tableBody.appendChild(row);
-            });
-        }
-
-
-
- 
-async function deletePrescription(prescriptionId) {
-    const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذا المستخدم؟");
-    if (confirmDelete) {
-        try {
-            // حذف المستخدم من API
-            const response = await fetch(`https://localhost:7219/api/Prescription/${prescriptionId}`, {
-                method: 'DELETE',
-
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                }
-
-            });
-
-
-
-            if (response.ok) {
-                // تحديث القائمة بعد الحذف
-                prescriptions = prescriptions.filter(prescription => prescription.id !== prescriptionId);
-                displayPrescriptions(prescriptions);
-                setupPagination();
-            }
-        } catch (error) {
-            console.error('خطأ في حذف المستخدم:', error);
-        }
+    const hintText = document.getElementById('hintText');
+    if (hintText) {
+        hintText.innerHTML = `عرض <b>${paginatedprescriptions.length}</b> من <b>${data.length}</b> إدخالات`;
     }
 }
-        // وظيفة لإعداد التقليب
+
+// ✅ 2. حذف وصفة (معدل)
+async function deletePrescription(prescriptionId) {
+    const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذه الوصفة؟");
+    if (!confirmDelete) return;
+    
+    try {
+        const response = await fetchWithAuth(`https://localhost:7219/api/Prescription/${prescriptionId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            prescriptions = prescriptions.filter(prescription => prescription.id !== prescriptionId);
+            displayPrescriptions(prescriptions);
+            setupPagination();
+            showMessage('تم حذف الوصفة بنجاح', false);
+        } else {
+            throw new Error('فشل في حذف الوصفة');
+        }
+    } catch (error) {
+        console.error('خطأ في حذف الوصفة:', error);
+        showMessage('حدث خطأ أثناء حذف الوصفة', true);
+    }
+}
+
+// وظيفة لإعداد التقليب
 function setupPagination() {
     const pagination = document.getElementById('pagination');
-    pagination.innerHTML = ''; // مسح المحتوى السابق
+    if (!pagination) return;
+    
+    pagination.innerHTML = '';
 
     const totalPages = Math.ceil(prescriptions.length / prescriptionsPerPage);
 
     for (let i = 1; i <= totalPages; i++) {
         const pageItem = document.createElement('li');
         pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
-        pageItem.innerHTML = `<button  class="page-link" onclick="changePage(${i})">${i}</button>`;
+        pageItem.innerHTML = `<button class="page-link" onclick="changePage(${i})">${i}</button>`;
         pagination.appendChild(pageItem);
     }
 }
 
-
 // وظيفة لتغيير الصفحة
 function changePage(page) {
-    //alert(page)
     currentPage = page;
     displayPrescriptions(prescriptions);
     setupPagination();
 }
 
+// ✅ 3. تصفية الوصفات بناءً على البحث (معدلة)
+function searchPrescriptions() {
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+    
+    const searchValue = searchInput.value.toLowerCase();
+    const filteredPrescriptions = prescriptions.filter(prescription => {
+        return (
+            prescription.id?.toString().includes(searchValue) ||
+            prescription.patient?.user?.fullName?.toLowerCase().includes(searchValue) ||
+            prescription.doctor?.user?.fullName?.toLowerCase().includes(searchValue) ||
+            (prescription.prescriptionItems?.length || 0).toString().includes(searchValue)
+        );
+    });
 
+    currentPage = 1;
+    displayPrescriptions(filteredPrescriptions);
+    
+    const hintText = document.getElementById('hintText');
+    if (hintText) {
+        hintText.innerHTML = `عرض <b>${Math.min(filteredPrescriptions.length, prescriptionsPerPage)}</b> من <b>${filteredPrescriptions.length}</b> إدخالات (نتائج البحث)`;
+    }
+    
+    setupPaginationForFiltered(filteredPrescriptions);
+}
 
- // تصفية الوصفات بناءً على البحث
- function searchPrescriptions() {
-     const searchInput = document.getElementById('searchInput').value.toLowerCase();
-     const filteredPrescriptions = prescriptions.filter(prescription => {
-         return (
-             prescription.id.toString().includes(searchInput) ||
-             prescription.patient.user.fullName.toLowerCase().includes(searchInput) ||
-             prescription.doctor.user.fullName.toLowerCase().includes(searchInput) ||
-             prescription.prescriptionItems.length.toString().includes(searchInput) 
-         );
-     });
+// ✅ 4. إعداد التقليب للنتائج المفلترة
+function setupPaginationForFiltered(filteredData) {
+    const pagination = document.getElementById('pagination');
+    if (!pagination) return;
+    
+    pagination.innerHTML = '';
 
-     displayPrescriptions(filteredPrescriptions); // عرض النتائج بعد التصفية
- }
+    const totalPages = Math.ceil(filteredData.length / prescriptionsPerPage);
 
+    for (let i = 1; i <= totalPages; i++) {
+        const pageItem = document.createElement('li');
+        pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        pageItem.innerHTML = `<button class="page-link" onclick="changePageToFiltered(${i}, filteredData)">${i}</button>`;
+        pagination.appendChild(pageItem);
+    }
+}
 
+// ✅ 5. تغيير الصفحة للنتائج المفلترة
+function changePageToFiltered(page, filteredData) {
+    currentPage = page;
+    displayPrescriptions(filteredData);
+    setupPaginationForFiltered(filteredData);
+}
 
-        // تحميل الوصفات عند تحميل الصفحة
-        window.onload = loadPrescriptions;
+// ✅ 6. دالة عرض الرسائل
+function showMessage(message, isError) {
+    const messageBox = document.getElementById('message');
+    if (messageBox) {
+        messageBox.textContent = message;
+        messageBox.style.display = 'block';
+        messageBox.className = isError ? 'alert alert-danger' : 'alert alert-success';
+        setTimeout(() => {
+            messageBox.style.display = 'none';
+        }, 5000);
+    } else {
+        alert(message);
+    }
+}
+
+// تحميل الوصفات عند تحميل الصفحة
+window.onload = loadPrescriptions;

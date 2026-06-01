@@ -8,7 +8,6 @@
     
     <!-- Bootstrap RTL CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.rtl.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             background-color: #f8f9fa;
@@ -121,76 +120,77 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Custom Scripts -->
+     <script src="../../js/auth.js"></script>
     <script src="../../js/checkAccess.js"></script>
     <script src="../../js/admin/user/user.js"></script>
     
-    <script>
-        checkAccess(['Admin'], '../../../shared/unauthorized.html');
 
-        // دالة لتحميل بيانات المستخدم
-        async function loadUserData(userId) {
-            try {
-                showLoading(true);
-                const response = await fetch(`https://localhost:7219/api/User/${userId}`, {
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('فشل في جلب بيانات المستخدم');
-                }
-                
-                const user = await response.json();
-                document.getElementById('userId').value = userId;
-                document.getElementById('fullName').value = user.fullName || '';
-                document.getElementById('email').value = user.email || '';
-                document.getElementById('role').value = user.role || '';
-                
-            } catch (error) {
-                console.error('خطأ في تحميل بيانات المستخدم:', error);
-                showError('حدث خطأ أثناء تحميل بيانات المستخدم');
-            } finally {
-                showLoading(false);
+<script>
+    checkAccess(['Admin'], '../../../shared/unauthorized.html');
+
+    // ✅ دالة لتحميل بيانات المستخدم (معدلة لاستخدام fetchWithAuth)
+    async function loadUserData(userId) {
+        try {
+            showLoading(true);
+            
+            // ✅ استخدام fetchWithAuth بدلاً من fetch
+            const response = await fetchWithAuth(`https://localhost:7219/api/User/${userId}`, {
+                method: 'GET'
+            });
+            
+            if (!response.ok) {
+                throw new Error('فشل في جلب بيانات المستخدم');
             }
+            
+            const user = await response.json();
+            document.getElementById('userId').value = userId;
+            document.getElementById('fullName').value = user.fullName || '';
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('role').value = user.role || '';
+            
+        } catch (error) {
+            console.error('خطأ في تحميل بيانات المستخدم:', error);
+            showError('حدث خطأ أثناء تحميل بيانات المستخدم');
+        } finally {
+            showLoading(false);
         }
+    }
 
-        function validateForm() {
-            // Reset error messages
-            document.querySelectorAll('.text-danger').forEach(el => el.textContent = '');
-            
-            const fullName = document.getElementById('fullName').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const role = document.getElementById('role').value;
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            
-            let isValid = true;
-            
-            // Validation checks
-            if (!fullName) {
-                document.getElementById('fullNameError').textContent = 'حقل الاسم الكامل مطلوب';
-                isValid = false;
-            }
-            
-            if (!email) {
-                document.getElementById('emailError').textContent = 'حقل البريد الإلكتروني مطلوب';
-                isValid = false;
-            } else if (!emailPattern.test(email)) {
-                document.getElementById('emailError').textContent = 'صيغة البريد الإلكتروني غير صالحة';
-                isValid = false;
-            }
-            
-            if (!role) {
-                document.getElementById('roleError').textContent = 'يجب اختيار دور للمستخدم';
-                isValid = false;
-            }
-            
-            return isValid;
+    function validateForm() {
+        // Reset error messages
+        document.querySelectorAll('.text-danger').forEach(el => el.textContent = '');
+        
+        const fullName = document.getElementById('fullName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const role = document.getElementById('role').value;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        let isValid = true;
+        
+        if (!fullName) {
+            document.getElementById('fullNameError').textContent = 'حقل الاسم الكامل مطلوب';
+            isValid = false;
         }
         
-        function showLoading(show) {
-            const btn = document.getElementById('updateBtn');
+        if (!email) {
+            document.getElementById('emailError').textContent = 'حقل البريد الإلكتروني مطلوب';
+            isValid = false;
+        } else if (!emailPattern.test(email)) {
+            document.getElementById('emailError').textContent = 'صيغة البريد الإلكتروني غير صالحة';
+            isValid = false;
+        }
+        
+        if (!role) {
+            document.getElementById('roleError').textContent = 'يجب اختيار دور للمستخدم';
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+    
+    function showLoading(show) {
+        const btn = document.getElementById('updateBtn');
+        if (btn) {
             if (show) {
                 btn.disabled = true;
                 btn.innerHTML = '<div class="loading-spinner"></div> جاري التحديث...';
@@ -199,9 +199,11 @@
                 btn.innerHTML = '<i class="fas fa-save me-2"></i>تحديث';
             }
         }
-        
-        function showError(message) {
-            const errorDiv = document.getElementById('error-message');
+    }
+    
+    function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        if (errorDiv) {
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
             
@@ -209,31 +211,33 @@
                 errorDiv.style.display = 'none';
             }, 5000);
         }
+    }
 
-        // عند تحميل الصفحة
-        $(document).ready(function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const userId = urlParams.get('id');
-            
-            if (!userId) {
-                showError('معرف المستخدم غير موجود في عنوان URL.');
-                return;
-            }
-            
-            loadUserData(userId);
-            
-            // Add Bootstrap validation classes
-            const forms = document.querySelectorAll('.needs-validation');
-            
-            Array.prototype.slice.call(forms).forEach(function(form) {
-                form.addEventListener('submit', function(event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    
-                    form.classList.add('was-validated');
-                }, false);
-            });
+    // عند تحميل الصفحة
+    $(document).ready(function() {
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('id');
+        
+        if (!userId) {
+            showError('معرف المستخدم غير موجود في عنوان URL.');
+            return;
+        }
+        
+        loadUserData(userId);
+        
+        // Add Bootstrap validation classes
+        const forms = document.querySelectorAll('.needs-validation');
+        
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                form.classList.add('was-validated');
+            }, false);
         });
-    </script>
+    });
+</script>
 </body>
 </html>

@@ -7,11 +7,10 @@ let searchColumn = 'name';
 
 async function fetchPharmacies() {
     try {
-        const response = await fetch('https://localhost:7219/api/Pharmacy/All', {
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            }
+        const response = await fetchWithAuth('https://localhost:7219/api/Pharmacy/All', {
+               method: 'GET'
         });
+
         pharmacies = await response.json();
         displayPharmacies();
         setupPagination();
@@ -117,12 +116,10 @@ async function deletePharmacy(id) {
     const confirmDelete = confirm("هل أنت متأكد أنك تريد حذف هذه الصيدلية؟");
     if (confirmDelete) {
         try {
-            const response = await fetch(`https://localhost:7219/api/Pharmacy/${id}`, {
+            const response = await fetchWithAuth(`https://localhost:7219/api/Pharmacy/${id}`, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                }
             });
+
             if (response.ok) {
                 pharmacies = pharmacies.filter(p => p.id !== id);
                 displayPharmacies();
@@ -189,12 +186,9 @@ async function addPharmacy() {
     const pharmacy = buildPharmacyModel();
 
     try {
-        const response = await fetch('https://localhost:7219/api/Pharmacy/CreatePharmacy', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
+        const response = await fetchWithAuth('https://localhost:7219/api/Pharmacy/CreatePharmacy', {
+                 method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(pharmacy)
         });
 
@@ -222,12 +216,9 @@ async function UpdatePharmacy() {
 
     const pharmacy = buildPharmacyModel();
     try {
-        const response = await fetch(`https://localhost:7219/api/Pharmacy/${PharmacyId}`, {
+        const response = await fetchWithAuth(`https://localhost:7219/api/Pharmacy/${PharmacyId}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(pharmacy)
         });
 
